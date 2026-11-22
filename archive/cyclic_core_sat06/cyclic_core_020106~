@@ -1,0 +1,33 @@
+<TeXmacs|WinTeXmacs-1.0.5>
+
+<style|article>
+
+<\body>
+  <\big-table>
+    Abstract Cell Complex Covering Table
+
+    \;
+  </big-table|>
+</body>
+
+<\initial>
+  <\collection>
+    <associate|font-family|tt>
+    <associate|language|verbatim>
+    <associate|par-first|0cm>
+  </collection>
+</initial>
+
+<\references>
+  <\collection>
+    <associate|auto-1|<tuple|1|?>>
+  </collection>
+</references>
+
+<\auxiliary>
+  <\collection>
+    <\associate|table>
+      <tuple|normal||<pageref|auto-1>>
+    </associate>
+  </collection>
+</auxiliary>

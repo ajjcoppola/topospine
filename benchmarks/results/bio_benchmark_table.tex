@@ -1,0 +1,16 @@
+\begin{table}[h]
+\centering\small
+\caption{Synthetic bio-circuit AIG gate counts (sum over nodes, no cross-node sharing). ``minterm'': unoptimized ON-set SOP; ``min-cube'': the same pipeline (exact min-cube SOP, then factoring) \emph{without} don't-cares; ``DC spine'': the same pipeline with exact satisfiability don't-cares; ``vs min-cube'': reduction from the don't-care spine alone. ABC columns: \texttt{strash} plus an expanded \texttt{resyn2} script run through \texttt{yosys-abc}; ``ABC (no DC)'' is applied to the minterm AIG with don't-cares forced to 0 (a standard flow), ``ABC on DC spine'' to our output.}
+\label{tab:bio}
+\resizebox{\linewidth}{!}{\begin{tabular}{lrrrrrr}
+\hline
+Circuit & minterm & min-cube & DC spine & vs min-cube & ABC (no DC) & ABC on DC spine \\
+\hline
+5-gene regulation toy (4 nodes) & 83 & 14 & 5 & 64\% & -- & -- \\
+pathway cascade, 24 nodes & 467 & 202 & 159 & 21\% & 180 & 140 \\
+pathway cascade, 40 nodes (seed 1) & 848 & 328 & 142 & 57\% & 298 & 137 \\
+pathway cascade, 40 nodes (seed 2) & 845 & 333 & 207 & 38\% & 299 & 195 \\
+pathway cascade, 40 nodes (seed 3) & 807 & 338 & 135 & 60\% & 303 & 127 \\
+\hline
+\end{tabular}}
+\end{table}

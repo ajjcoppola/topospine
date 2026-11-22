@@ -1,0 +1,13 @@
+# toy 4-input, 2-output PLA with don't-cares (fd)
+.i 4
+.o 2
+.ilb a b c d
+.ob f g
+.p 6
+1-00 10
+-111 11
+0011 1-
+1010 -1
+01-1 01
+1111 -0
+.e

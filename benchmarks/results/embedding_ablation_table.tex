@@ -1,0 +1,19 @@
+\begin{table}[h]
+\centering\small
+\caption{Embedding spines. $A$ is label 0. Recall is the fraction of $A$-points whose nearest other $A$-point lands in the same selected piece (1 is automatic when a single piece covers $A$). GUDHI Rips on $A$ matched our F$_2$ Rips.}
+\label{tab:embed}
+\resizebox{\linewidth}{!}{\begin{tabular}{llccc}
+\hline
+cloud & method & cover sizes & $r_A$ & NN recall \\
+\hline
+synthetic & relative & 36 / 62 / 64 & 0.000 / 0.000 / 0.000 & 0.00 / 0.00 / 0.00 \\
+synthetic & kcenter same budget & 36 / 62 / 64 & 0.400 / 0.000 / 0.000 & 0.83 / 0.00 / 0.00 \\
+synthetic & random same budget & 36 / 62 / 64 & 0.348 / 0.338 / 0.000 & 0.58 / 0.25 / 0.00 \\
+synthetic & coverage only & 25 / 62 / 64 & 0.423 / 0.000 / 0.000 & 0.92 / 0.00 / 0.00 \\
+MiniLM 24 sentences & relative & 11 / 24 / 24 & 0.000 / 0.000 / 0.000 & 0.00 / 0.00 / 0.00 \\
+MiniLM 24 sentences & kcenter same budget & 11 / 24 / 24 & 1.225 / 0.000 / 0.000 & 1.00 / 0.00 / 0.00 \\
+MiniLM 24 sentences & random same budget & 11 / 24 / 24 & 1.260 / 0.000 / 0.000 & 0.67 / 0.00 / 0.00 \\
+MiniLM 24 sentences & coverage only & 6 / 24 / 24 & 1.276 / 0.000 / 0.000 & 1.00 / 0.00 / 0.00 \\
+\hline
+\end{tabular}}
+\end{table}

@@ -1,0 +1,850 @@
+{
+  "gudhi": true,
+  "minilm": {
+    "file": "embeddings_minilm_tiny.npz",
+    "n": 24,
+    "dim": 384,
+    "A_label": 0,
+    "n_A": 6,
+    "base_scale": 1.2805,
+    "own_rips_matches_gudhi": [
+      true,
+      true,
+      true
+    ],
+    "methods": {
+      "relative": {
+        "cover_sizes": [
+          11,
+          24,
+          24
+        ],
+        "A_cover_radius": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.2805,
+          0.0,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0838,
+          0.1148,
+          0.1177
+        ]
+      },
+      "coverage_only": {
+        "cover_sizes": [
+          6,
+          24,
+          24
+        ],
+        "A_cover_radius": [
+          1.2758,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.2805,
+          0.0,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.063,
+          0.1004,
+          0.1166
+        ]
+      },
+      "kcenter_same_budget": {
+        "cover_sizes": [
+          11,
+          24,
+          24
+        ],
+        "A_cover_radius": [
+          1.2245,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.2245,
+          0.0,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0282,
+          0.0675,
+          0.0748
+        ]
+      },
+      "a_weighted_greedy": {
+        "cover_sizes": [
+          6,
+          24,
+          24
+        ],
+        "A_cover_radius": [
+          1.2758,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.2805,
+          0.0,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0259,
+          0.0653,
+          0.0765
+        ]
+      },
+      "random_same_budget": {
+        "cover_sizes": [
+          11,
+          24,
+          24
+        ],
+        "A_cover_radius": [
+          1.2597,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.3495,
+          0.0,
+          0.0
+        ],
+        "uncovered_points": [
+          1,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.6667,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0216,
+          0.053,
+          0.0605
+        ]
+      }
+    }
+  },
+  "synthetic_embeddings": {
+    "meta": {
+      "source": "synthetic",
+      "n_clusters": 4,
+      "n_per": 14,
+      "n_bridge_per_edge": 5,
+      "dim": 8,
+      "seed": 1,
+      "bridge_label": -1
+    },
+    "base_scale": 0.4345,
+    "n_A": 14,
+    "own_rips_matches_gudhi": [
+      true,
+      true,
+      true
+    ],
+    "methods": {
+      "relative": {
+        "cover_sizes": [
+          38,
+          74,
+          76
+        ],
+        "A_cover_radius": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          0.4257,
+          0.1657,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0522,
+          0.052,
+          0.0531
+        ]
+      },
+      "coverage_only": {
+        "cover_sizes": [
+          27,
+          74,
+          76
+        ],
+        "A_cover_radius": [
+          0.4227,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          0.432,
+          0.1657,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.9286,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0264,
+          0.0488,
+          0.0555
+        ]
+      },
+      "kcenter_same_budget": {
+        "cover_sizes": [
+          38,
+          74,
+          76
+        ],
+        "A_cover_radius": [
+          0.3567,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          0.4056,
+          0.1657,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.9286,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.012,
+          0.033,
+          0.0363
+        ]
+      },
+      "a_weighted_greedy": {
+        "cover_sizes": [
+          27,
+          74,
+          76
+        ],
+        "A_cover_radius": [
+          0.4149,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          0.4257,
+          0.1657,
+          0.0
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.7857,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0109,
+          0.0345,
+          0.039
+        ]
+      },
+      "random_same_budget": {
+        "cover_sizes": [
+          38,
+          74,
+          76
+        ],
+        "A_cover_radius": [
+          0.3478,
+          0.0,
+          0.0
+        ],
+        "r_all": [
+          1.0121,
+          0.3958,
+          0.0
+        ],
+        "uncovered_points": [
+          8,
+          2,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            14,
+            0
+          ],
+          [
+            14,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          true
+        ],
+        "nn_recall_A": [
+          0.6429,
+          0.0,
+          0.0
+        ],
+        "wall_time_s": [
+          0.0123,
+          0.0297,
+          0.0314
+        ]
+      }
+    }
+  },
+  "mol_rips_collapse": {
+    "vertices": 156,
+    "edges_before": 4017,
+    "edges_after": 166,
+    "iterations": 4,
+    "betti_before": [
+      1,
+      0,
+      51393
+    ],
+    "betti_after": [
+      1,
+      0,
+      1
+    ],
+    "betti_preserved": false,
+    "radius": 2.4
+  },
+  "md17": {
+    "meta": {
+      "source": "md17",
+      "file": "md17_ethanol.npz",
+      "n_frames": 12,
+      "A_atoms": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "A_definition": "proxy: most peripheral atoms of frame 0"
+    },
+    "n_points": 108,
+    "n_A": 48,
+    "own_rips_matches_gudhi": [
+      true,
+      true,
+      true
+    ],
+    "methods": {
+      "relative": {
+        "cover_sizes": [
+          41,
+          56,
+          82
+        ],
+        "A_cover_radius": [
+          0.3435,
+          0.1545,
+          0.0
+        ],
+        "r_all": [
+          1.4113,
+          0.7435,
+          0.3742
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            2
+          ],
+          [
+            19,
+            0
+          ],
+          [
+            40,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          false,
+          false,
+          false
+        ],
+        "nn_recall_A": [
+          0.2917,
+          0.0833,
+          0.0
+        ],
+        "wall_time_s": [
+          0.5643,
+          0.0497,
+          0.0611
+        ]
+      },
+      "coverage_only": {
+        "cover_sizes": [
+          8,
+          30,
+          75
+        ],
+        "A_cover_radius": [
+          1.4249,
+          0.7388,
+          0.3435
+        ],
+        "r_all": [
+          1.4249,
+          0.7435,
+          0.3742
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            2,
+            0
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            40,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          false,
+          false,
+          false
+        ],
+        "nn_recall_A": [
+          0.8542,
+          0.5833,
+          0.25
+        ],
+        "wall_time_s": [
+          0.0628,
+          0.0306,
+          0.0569
+        ]
+      },
+      "kcenter_same_budget": {
+        "cover_sizes": [
+          41,
+          56,
+          82
+        ],
+        "A_cover_radius": [
+          0.6832,
+          0.5274,
+          0.337
+        ],
+        "r_all": [
+          0.6862,
+          0.5274,
+          0.3429
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            3
+          ],
+          [
+            18,
+            0
+          ],
+          [
+            40,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          false,
+          false,
+          false
+        ],
+        "nn_recall_A": [
+          0.5625,
+          0.4583,
+          0.25
+        ],
+        "wall_time_s": [
+          0.7025,
+          0.0231,
+          0.0411
+        ]
+      },
+      "a_weighted_greedy": {
+        "cover_sizes": [
+          6,
+          31,
+          74
+        ],
+        "A_cover_radius": [
+          1.4785,
+          0.7449,
+          0.3435
+        ],
+        "r_all": [
+          1.4785,
+          0.7454,
+          0.3742
+        ],
+        "uncovered_points": [
+          0,
+          0,
+          0
+        ],
+        "betti_NA": [
+          [
+            1,
+            0
+          ],
+          [
+            19,
+            0
+          ],
+          [
+            39,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          true,
+          false,
+          false
+        ],
+        "nn_recall_A": [
+          0.75,
+          0.6042,
+          0.2917
+        ],
+        "wall_time_s": [
+          0.0079,
+          0.0145,
+          0.0356
+        ]
+      },
+      "random_same_budget": {
+        "cover_sizes": [
+          41,
+          56,
+          82
+        ],
+        "A_cover_radius": [
+          1.1878,
+          1.1878,
+          0.9596
+        ],
+        "r_all": [
+          1.1878,
+          1.1878,
+          0.9596
+        ],
+        "uncovered_points": [
+          0,
+          10,
+          14
+        ],
+        "betti_NA": [
+          [
+            1,
+            4
+          ],
+          [
+            11,
+            0
+          ],
+          [
+            29,
+            0
+          ]
+        ],
+        "betti_NA_matches_rips_A": [
+          false,
+          false,
+          false
+        ],
+        "nn_recall_A": [
+          0.5833,
+          0.375,
+          0.2292
+        ],
+        "wall_time_s": [
+          0.8237,
+          0.0316,
+          0.0377
+        ]
+      }
+    }
+  },
+  "figures": [
+    "benchmarks/results/figures/embeddings_pca.png",
+    "benchmarks/results/figures/synthetic_cloud_pca.png",
+    "benchmarks/results/figures/md17_ethanol_pca.png",
+    "benchmarks/results/figures/a_radius_bars.png"
+  ]
+}

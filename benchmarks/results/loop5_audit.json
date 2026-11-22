@@ -1,0 +1,56 @@
+{
+  "failure_rate": {
+    "n_vars": 5,
+    "sample": 40000,
+    "seed": 21,
+    "collapse_fired": 856,
+    "disagreements": 42,
+    "rate_all": 0.00105,
+    "wilson95_all": [
+      0.0007769437681501104,
+      0.001418885344421918
+    ],
+    "rate_when_fired": 0.04906542056074766,
+    "wilson95_when_fired": [
+      0.036502123347088744,
+      0.06565808848727704
+    ],
+    "comparison": "plain branch-and-bound, not a fresh exhaustive oracle"
+  },
+  "filters_on_4000": {
+    "same_row_support": {
+      "fired": 0,
+      "disagreements": 0,
+      "instances": 4000,
+      "status": "vacuous"
+    },
+    "face_is_vertex": {
+      "fired": 0,
+      "disagreements": 0,
+      "instances": 4000,
+      "status": "vacuous"
+    },
+    "parent_is_edge": {
+      "fired": 0,
+      "disagreements": 0,
+      "instances": 4000,
+      "status": "vacuous"
+    },
+    "face_covers_at_most_one_row": {
+      "fired": 84,
+      "disagreements": 4,
+      "instances": 4000,
+      "status": "refuted"
+    }
+  },
+  "c17": {
+    "reference_nand2_gates": 6,
+    "abc_on_original_netlist_ands": 6,
+    "pipeline_gates_summed": 8,
+    "n_outputs": 2,
+    "gates_separate": 8,
+    "gates_shared": 6,
+    "ands_in_shared_graph": 6,
+    "note": "shared count hashes the factored SOPs of each output into one AIG; it is not retimed against the NAND netlist"
+  }
+}

@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns:x="http://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>No title</title>
+    <meta name="generator" content="TeXmacs WinTeXmacs-1.0.5"></meta>
+    <style type="text/css">
+      body { text-align: justify } .title-block { width: 100%; text-align:
+      center } .title-block p { margin: 0px } 
+    </style>
+  </head>
+  <body>
+    <p>
+      <p>
+        <p>
+          <table class="title-block">
+            <tr>
+              <td><p>
+                <p>
+                  <p>
+                    <table class="title-block">
+                      <tr>
+                        <td><font size="+3"><b>Cyclic Core Covering and Finite
+                        Cubical Cell Complexes</b></font></td>
+                      </tr>
+                    </table><table class="title-block">
+                      <tr>
+                        <td><p>
+                          <font size="-1"><p>
+                            <p>
+                              <table style="display: inline">
+                                <col align="center"></col>
+                                <tbody><tr>
+                                  <td><p>
+                                    <center><p>
+                                      <p>
+                                        <p>
+                                        <p>
+                                        <table style="display: inline">
+                                        <col align="center"></col>
+                                        <tbody><tr>
+                                        <td><p>
+                                        <center><p>
+                                        <class style="font-variant: small-caps">Alan J. Coppola
+                                        (coppolaa@evergreen.edu) and Richard
+                                        Weiss (weissr@evergreen.edu)</class>
+                                      </p></center>
+                                    </p></td>
+                                  </tr></tbody>
+                                </table>
+                              </p>
+                            </p><p>
+                              <p>
+                                <p>
+                                  <table style="display: inline">
+                                    <col align="center"></col>
+                                    <tbody><tr>
+                                      <td><p>
+                                        <center><p>
+                                        <p>
+                                        The Evergreen State College
+                                      </p><p>
+                                        Olympia, WA 98505-0002
+                                      </p>
+                                    </p></center>
+                                  </p></td>
+                                </tr></tbody>
+                              </table>
+                            </p>
+                          </p>
+                        </p>
+                      </p>
+                    </p></center>
+                  </p></td>
+                </tr></tbody>
+              </table>
+            </p>  <p>
+              <table style="display: inline">
+                <col align="center"></col>
+                <tbody><tr>
+                  <td><p>
+                    <center><p>
+                      <p>
+                        <p>
+                          <p>
+                            <table style="display: inline">
+                              <col align="center"></col>
+                              <tbody><tr>
+                                <td><p>
+                                  <center><p>
+                                    <class style="font-variant: small-caps"></class>
+                                  </p></center>
+                                </p></td>
+                              </tr></tbody>
+                            </table>
+                          </p>
+                        </p>
+                      </p>
+                    </p></center>
+                  </p></td>
+                </tr></tbody>
+              </table>
+            </p> 
+          </p></font>
+        </p></td>
+      </tr>
+    </table>
+  </p>
+</p>
+</p></td>
+</tr>
+</table> 
+</p>
+</p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <div style="text-align: left"><p>
+          <font size="-1"><p>
+            <p>
+              <div style="text-align: left"></div><div style="text-align: center"><b>Abstract</b></div>
+            </p>
+          </p><p>
+            <p>
+              In this paper, we improve the standard branch-and-bound
+              algorithm for finding a minimum cover by addressing the
+              cyclic-core processing. We show how a covering problem such as
+              two-level logic minimization can be represented as a finite
+              cubical cell complex, which encodes topological information that
+              aids the minimization process. The paper shows that by extending
+              the covering table so that it also represents the implicitly
+              defined combinatorial finite cubical cell complex of a covering
+              problem, any resulting cyclic-core covering sub-problems, with
+              collapsible cells, can be exactly solved using only one
+              recursive call instead of two. The new covering table operation,
+              called collapse, arises from the concepts of cell collapse and
+              expansion from simple homotopy theory in topolgy. A collapsible
+              cell of the cyclic core allows the two recursive calls (cell-in
+              and cell-out) to be encoded into one call. This reduces the
+              number of recursive computations needed to solve the minimal
+              covering problem. Connections to Unate Covering Problems(UCP),
+              Binate Covering Problems (BCP), and MaxCostSAT are given.
+            </p>
+          </p></font>
+        </p></div><div style="text-align: right"></div>
+      </p>
+    </p>
+  </p>
+</p>
+<h2 id="auto-1">1 Introduction</h2>
+<p>
+  Covering problems are typically solved using branch and bound algorithms, by
+  realizing them in tabular form, followed by iterative reduction of the table
+  by removing columns and rows through a small set of fixed operations. This
+  process terminates when all of the rows have been eliminated indicating that
+  all of the cells have been covered. The columns correspond to prime
+  implicants and the ones that have been removed in this process form the
+  minimal cover. However, the operations that are usually applied can result
+  in a situation called a cyclic core, where the problem is split into two
+  subproblems of equal size and each one is solved independently. Our goal is
+  to create an operation which produces a single subproblem that is roughly
+  the same size as each of the other subproblems, and thus, we cut the amount
+  of computation for that step in half.
+</p>
+<p>
+  
+</p>
+<p>
+  The standard table operations that are used to produce the minimal cover are
+  essentiality, row dominance, column dominance and Gimpel's transform. [2]
+  They depend on finding essential prime implicants, followed by row and
+  column reductions. An essential prime implicant contains a min-term that is
+  not covered by any other prime implicant. A fixed-point occurs if the
+  operations do not change the table after each application even though the
+  algorithm has not terminated. This occurs when there are no essential prime
+  implicants, or dominated elements, and the configuration is called a cyclic
+  core. The step that is usually applied is to choose a column (prime
+  implicant) and generate two instances of the problem: one in which the prime
+  implicant is part of the minimal cover, and one in which it is not. Each of
+  these subproblems can then be solved recursively using the branch and bound
+  method with the standard table operations.
+</p>
+<p>
+  
+</p>
+<p>
+  Our approach is based on the intuition that the table representation is
+  omitting information that is present in the cube complex, which is a natural
+  representation of the original two-level logic minimization problem. The
+  cube complex is a set of cubes of various dimensions with the property that
+  if they intersect, then the intersect in a set of faces which are also
+  cubes. All of these cubes can be viewed as subsets of a cube whose dimension
+  is the number of variables in the logical expression to be minimized. [1],
+  [5]
+</p>
+<p>
+  
+</p>
+<p>
+  Most recent work on the covering problems have attacked finding and applying
+  the lower bounds found to prune the search space for the minimal solution.
+  [6-9] This paper introduces a different method for pruning the search space,
+  based on an encoding used for special cells in the cyclic core. The
+  identification and of these cells allows one recursive call instead of two
+  to solve a cyclic core subproblem. This is our contribution.
+</p>
+<p>
+  
+</p>
+<p>
+  We prove a theorem which shows that given the cyclic-core of a minimization
+  problem, there is a special type of cube, a collapsible cube, to branch on,
+  such that the minimum cover can be found with a single recursive call. We
+  present an example of a cubical cell complex representation, and
+  corresponding minimization.
+</p>
+<h2 id="auto-2">2 Definitions and Background</h2>
+<h3 id="auto-3">2.1 Cubical Cell Complexes, Combinatorial Topology, and Covering</h3>
+<p>
+  An cubical cell complex generalizes the representation of a structure in
+  which to represent minimal covering problems, higher-order connectivity,
+  cycles of any dimension, and geometric visualization of optimization
+  problems.
+</p>
+<p>
+  
+</p>
+<p>
+  For the purposes of this paper, we specialize to cubes and cubical
+  complexes, even though the techniques can be generalized to cells and
+  abstract cell complexes.
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <b>Definition 1. </b><i><class style="font-style: normal"> A <em>cubical  complex</em>
+            C = (Skel, &le;,  dim&#x2A7D;&#x2A7D;) consists of:</class></i>
+          </p><p>
+            <div style="text-align: left"><i><div style="text-align: left"><class style="font-style: normal"><ul>
+              <li>
+                A collection of cubes Skel of
+                <u><b>B</b></u>
+                <sup>k</sup>
+                , each of which is called a cube of C, and a partial order
+                &le;, which captures the face relations of C.
+              </li>
+              <li>
+                A
+                <em><em>closure under intersection
+                property</em><em></em></em>
+                for Skel (if a, b &epsilon; Skel, then a &and;b &#x03F5;
+                Skel)
+              </li>
+              <li>
+                A
+                <em>face closure property</em>
+                <strong></strong>
+                for Skel (if a &epsilon; Skel, and b &le;
+                <i>a</i>
+                then b &#x03F5; Skel )
+              </li>
+              <li>
+                A dimension function (There is a function dim:Skel &#x27F6;
+                <u><b>N</b></u>
+                such that dim(pt) = 0, and if 
+                <i>b</i>
+                &le;
+                <i>a</i>
+                , then  dim(b)&le;dim(
+                <i>a</i>
+                )
+              </li>
+            </ul></class></div><div style="text-align: right">&#x25A1;</div></i></div><div style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <div style="text-align: left"><b>Definition 2. </b><i><div style="text-align: left"><class style="font-style: normal"> L
+            is a sub-complex of K if L is a cubical complex, each of whose
+            faces are faces of K.  For example, if L<sup>i </sup>= { <i>c</i>
+            &epsilon; Skel | dim(<i>c</i>)&#x2A7D; <i>i</i> }, then L<sup>i
+            </sup> is the sub-complex called the i-skeleton of
+            C.</class></div><div style="text-align: right">&#x25A1;</div></i></div><div style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <div style="text-align: left"><b>Definition 3. </b><i><div style="text-align: left"><class style="font-style: normal"> Let
+            C be and cubical cell complex. Let c be a cell of C.  c is said to
+            be collapsible if c has a face f &le; <i>c</i>, such that dim(f) =
+            dim(<i>c</i>)  - 1,  and f is not a face of q, for all q &epsilon;
+            C.</class></div><div style="text-align: right">&#x25A1;</div></i></div><div style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  From the area of topology called simple homotopy theory comes the concept of
+  cellular collapses and expansions. [4], [5]
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <div style="text-align: left"><b>Definition 4. </b><i><div style="text-align: left"><class style="font-style: normal">If K
+            and L are cubical cell complexes, we say that there is an
+            elementary cell collapse from K to L (K&#x2198;<i>L</i>), if K = L
+            &cup; <i>e</i>, where <i>e</i> is <i>a</i> cell of <i>K</i>, with
+            free face f not a face of any other face of L.  Note: This is
+            equivalent to the existence of a homotpy from K to L.  Also, L is
+            said to expand to K (L&#x2197;<i>K</i>). </class></div><div style="text-align: right">&#x25A1;</div></i></div><div
+            style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <div style="text-align: left"><b>Definition 5. </b><i><div style="text-align: left"><class style="font-style: normal"> K
+            is simple homotopy equivalent to L if there is a sequence of
+            elementary collapses and expansions from K to L</class></div><div
+            style="text-align: right">&#x25A1;</div></i></div><div style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<h2 id="auto-4">3 Minimization Process</h2>
+<h3 id="auto-5">3.1 Restrictions</h3>
+<p>
+  For the purposes of this paper, we will restrict ourselves to considering
+  the Exact Two-Level Boolean Minimization problem.  The techniques presented
+  here can be extended to an abstract cell complex, with a universe complex in
+  a straightforward mannner. [2]
+</p>
+<h3 id="auto-6">3.2 Exact Two-Level Boolean Minimization</h3>
+<p>
+  The object of this classical problem is given a boolean function f, find an
+  exact  minimum size representation of f as a sum-of-products cube
+  representation of f.  The usual method is:
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <div style="text-align: left"><b>Theorem 6. </b><i>Given a sum-of-products boolean
+          function f, the minimum cost representation of f as a sum of
+          products is found by iteratively applying steps 1-4.</i></div><div
+          style="text-align: right"></div>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<ol>
+  <li>
+    [FindPrimes ] Find all the prime implicants of f
+  </li>
+  <li>
+    [CreateCov] Create the covering matrix of the primes of f, where the
+    columns are the primes and the rows are the minterms of f.
+  </li>
+  <li>
+    <p>
+      [Reduction] Perform reductions on the covering matrix, until a fixed
+      point table, called the cyclic-core  is reached. The table reductions
+      are: [2],[3]
+    </p>
+    <ol>
+      <li>
+        <p>
+          Partitioning (i.e. finding the conected components), iteratively
+          followed by:
+        </p>
+        <ul>
+          <li>
+            
+          </li>
+          <li>
+            Essentials reduction
+          </li>
+          <li>
+            Row dominance - a strongly equivalent operation 
+          </li>
+          <li>
+            <p>
+              Column dominance - a weakly equivalent operation
+            </p>
+            <p>
+              
+            </p>
+          </li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>
+      [SolveCyclicCore] Recursively solve the cyclic-core problem by choosing
+      a column(prime) to assume is first in the cover, find a recursive
+      solution, and then is not in the cover, find a recursive solution to
+      that problem, and then pick the cover that has the least number of
+      elements as the minimal cover.  Sophisticated branch and bound
+      techniques, involving choosing a maximal independent set of elements at
+      each cyclic-core recursion which  can be used to create a series of
+      lower bounds on which to prune the recursions. See [6],[7],[8],[9].
+    </p>
+    <p>
+      
+    </p>
+    <p>
+      The method we propose will enhance Step 4, by allowing a single
+      recursive call in the case that a free face is found.
+    </p>
+  </li>
+</ol>
+<h3 id="auto-7">3.3 Cyclic Core Reduction Overview </h3>
+<p>
+  We assume that the cell complex is represented either explicitly or
+  implicitly, and that no computation of faces or intersections are explicity
+  done unless needed. i.e. lazy evaluation is used.  For example, an explicit
+  initial representation would be a list of cubes of varying dimensions.  An
+  implicit representation would be as a BDD. 
+</p>
+<p>
+  
+</p>
+<p>
+  During the exact minimization algorithm outlined in Section  3.2, the list
+  of cubes can grow and shrink. We assume that the prime cube complex is
+  given, and that the covering table is replaced by a choice pairing function
+  function Pair<sub>f</sub>(cube, prime) = 1 &hArr;   cube&#x2A7D;prime . 
+  This allows us to view a covering table a view of the cubical complex.  No
+  face information is lost.  This is key in allowing us to compute the
+  collapsible cubes necessary to reduce the cyclic core resursively.
+</p>
+<h2 id="auto-8">4 Description of Algorithm</h2>
+<p>
+  Let P(C) represent the prime complex of a two-level minimization problem,
+  initially given as a cubical complex C, let T<sub>P(C)</sub> be the graded
+  (by dimension) covering table representing the choice pairing function
+  Pair<sub>f</sub>(cube, prime) by a  (&sum;n<sub>i</sub>) x |<i>P</i>| matrix
+  of 0's and 1's, where P is the cubical complex of all prime cubes of C, and
+  n<sub>i</sub> is the number of covering element cubes in the cover of
+  dimension i.  In the classical Quine-McCluskey case, n<sub>0</sub>=number of
+  vertices(minterms) of C(f).
+</p>
+<p>
+  
+</p>
+<p>
+  Each cube will correspond to a row of the covering table, and each column
+  corresponds to a prime cube of the cubical complex, which lives in a
+  universe which is the smallest dimensional cube containing all the cubes of
+  the cubical complex.
+</p>
+<p>
+  
+</p>
+<p>
+  The graded table is a view of the Abstract Cell Complex, but is not
+  equivalent to the information in the abstract cell complex.
+</p>
+<p>
+  
+</p>
+<p>
+  The covering problem is to find a minimum set of columns of T<sub>C</sub>
+  which cover C, and has minimal cost.
+</p>
+<p>
+  
+</p>
+<p>
+  The new contribution of this paper is two-fold: to introduce cell complexes
+  as a natural representation of combinatorial problems, and to show how this
+  representation allows the introduction of a new reduction method during the
+  cyclic-core recursive solution.
+</p>
+<h3 id="auto-9">4.1 Finding a collapsible cell.</h3>
+<p>
+  With the representation we have chosen, finding collapsible cubes is like
+  finding essential cubes. Consider a top dimensional cube c, of dimension k. 
+  Then a cube with a free face is one where the set of k-dimensional cubes
+  intersected with c does not cover c.  The faces of c not covered by
+  intersecting all the top-dimensional cells, with a chosen cell, and the free
+  faces are those not covered by the 1-less dimensional faces.  Note that this
+  is the first step in the classical Quine-McCluskey algorithm.  
+</p>
+<h3 id="auto-10">4.2 Collapsible Element Reduction</h3>
+<p>
+  Given an implicit or explicit representation of the initial cubical complex,
+  we allow the addition of cells to the complex, when necessary, to solve the
+  covering problem.  Most additions result from intersecting cells when
+  computing the set of primes or finding the collapsible cells.
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <b>Theorem 7. </b><i>The [CyclicCore] step of Theorem 6 can be
+          replaced by the [CyclicCoreCollapse] step, and maintain cover cost
+          minimality.</i>
+        </p><p>
+          <i><p>
+            
+          </p><p>
+            [CyclicCoreCollapse] If a collapsible element exists, removing the
+            element p, and replace it with the set of free faces of p, perform
+            a single recursive call of the modified minimization algorithm, if
+            any of the added faces are in the returned cover, remove them, and
+            add p back in.  If there are no collapsible faces, perform the
+            [CyclicCore] step of Theorem 6.
+          </p><p>
+            <p>
+              <p>
+                <p>
+                  <p>
+                    <div style="text-align: left"><b>Proof</b> </div><div style="text-align: right"></div>
+                  </p> &#x25A1;
+                </p>
+              </p>
+            </p>
+          </p><p>
+            This involves, at the covering matrix level, removing the  column
+            p, and replacing it with the set of one dimensional less columns
+            which are the free faces of FreeFaces(p).
+          </p><p>
+            
+          </p><p>
+            Recursively continue to apply the non cyclic-core reductions,
+            followed by the cyclic-core collapsible reduction, along with
+            chosing a face of the the most recently used collapsible cube
+            processed when a sub cyclic core has no collapsible cubes in it,
+            a<em><em></em></em>nd return with a cover CollapseCov.
+          </p><p>
+            
+          </p><p>
+            Claim: CollapseCov, or CollapseCovPlus = ReducedCov(CollapseCov +
+            p) is the absolute minimum cost cover of the row elements by the
+            column sets, where ReducedCov simply takes a cover and makes it
+            irredundant. 
+          </p><p>
+            
+          </p><p>
+            Let  FreeSize = |CollapseCov &and;FreeFaces(<i>p</i>)|.  To
+            complete the proof, consider the following cases:
+          </p><p>
+            
+          </p></i>
+        </p><p>
+          <div style="text-align: left"><i><ol>
+            <li>
+              <p>
+                FreeSize = 0 , 
+              </p>
+              <p>
+                If FreeSize = 0 ,  then CollapseCov is the minimum, as it
+                didn't use any of the added cells, hence only used the
+                original cells to cover the rows, and, so corresponds to the
+                case that the cube was not included initially.
+              </p>
+            </li>
+            <li>
+              <p>
+                FreeSize &#x2A7E; 1, 
+              </p>
+              <p>
+                Then CollapseCovPlus is the minimum, as the expansion of the
+                cube in the direction of one of the free faces returned keeps
+                the cost the same, or better, if the cost function is
+                dimension dependent. <em><em></em></em> Then CollapseCovPlus
+                is the minimum, and will have a cost less than or equal to the
+                cost of CollapseCov, as if all the returned faces are removed,
+                we have a minimum cover of the original Cyclic Core by primes,
+                which can be at most one less element in cost from the case
+                when the cube is originally included in the minimal cover, and
+                then minimized. This returned encoding corresponds to having
+                the original cube p in the minimal cover. 
+              </p>
+            </li>
+          </ol></i></div><div style="text-align: right"></div>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<h2 id="auto-11">5 Realization Considerations</h2>
+<p>
+  State of the art unate covering tools is embodied in the tools Eclipse,
+  Aura-II, Scherzo, and Espresso-Signature-Exact. [2, 6-9]  To implement the
+  concepts in this paper, the techniques should be added to one of the above
+  code bases, and compared to the others on suites of examples, as was done in
+  Eclipse and Aura-II.
+</p>
+<p>
+  
+</p>
+<p>
+  It is an open question as to whether the proof given in this paper can be
+  extended to the case of encoding all of the collapsible cubes
+  simultaneously, as a single step, and then continuing with the algorithm
+  recursively.  This type of operation would correspond to shelling the cyclic
+  core by collapsing it's boundary all at once, and then recursively
+  continuing with that process.
+</p>
+<h2 id="auto-12">6 Conclusions </h2>
+<p>
+  In this paper, it was shown first, how to identify special cubes, called
+  collapsible ones, in the cyclic core covering problem, and second how to use
+  them to modify the branch part of the branch and bound algorithm, which
+  allows a minimum cost solution to be found with a single recursion, at the
+  cost of encoding the collapsible cubes by their free faces, and by
+  maintaining the structure of the cubical cell complex, as the minimization
+  proceeds. 
+</p>
+<h2 id="auto-13">7 References</h2>
+<p>
+  [1] J.P. Roth, &ldquo;Algebraic topological methods for the synthesis of
+  switching systems I&ldquo;, Trans. Am. Math. Soc., Vol. 88, No. 2, pp301-32.
+</p>
+<p>
+  
+</p>
+<p>
+  [2] O. Courdert, &ldquo;Two-level logic minimization: and overview&rdquo;,
+  Integration, the VLSI Journal, 17-2, pp. 97-140, October 1994.
+</p>
+<p>
+  
+</p>
+<p>
+  [3] O. Coudert. On solving binate covering problems. In The Proceedings of
+  the Design Automation Conference, pages 197&ndash; 202, June 1996.
+</p>
+<p>
+  
+</p>
+<p>
+  [4] M.M. Cohen, A Course in Simple-Homotopy Theory, Springer-Verlag, New
+  York, 1973
+</p>
+<p>
+  
+</p>
+<p>
+  [5] A. J. Coppola, &ldquo;New methods in the analysis of logic minimization
+  data and algorithms&rdquo;, Proceedings of the 26th Design Automation
+  Conference, June, 1989.
+</p>
+<p>
+  
+</p>
+<p>
+  [6] X.Y. Li, M.F. Stallmann, and F. Brglez. A local search solver using an
+  e&#x0151;ective switching strategy and an e&#x015B;cient unit propagation.
+  Lecture Notes in Computer Science, 2919:53{68, 2004. For links to re-prints,
+  data sets and experimental testbed, see also
+  http://www.cbl.ncsu.edu/publications/.
+</p>
+<p>
+  
+</p>
+<p>
+  [7] E. I. Goldberg, L. P. Carloni, T. Villa, R. K. Brayton, and A. L.
+  Sangiovanni-Vincentelli. Negative Thinking in Branch-and-Bound: the Case of
+  Unate Covering. IEEE Transactions on Computer-Aided Design,
+  19(3):281&ndash;294, Mar. 2000.
+</p>
+<p>
+  
+</p>
+<p>
+  [8] C. Plessl and M. Platzner, &ldquo;Instance-Specific Accelerators for
+  Minimum Covering&rdquo;, Proceedings of the 1st International Conference on
+  Engineering of Reconfigurable Systems and Algorithms (ERSA)}, pp.
+  85&ndash;91, 2001, Las Vegas, Nevada, USA, June, CSREA Press}
+</p>
+<p>
+  
+</p>
+<p>
+  [9] Samir Sapra, Michael Theobald, Edmund M. Clarke, &ldquo;SAT-Based
+  Algorithms for Logic Minimization&rdquo;, ICCD, 2003,pp. 510-515
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <b>Example 8. </b>Cyclic Core Example
+        </p><p>
+          
+        </p><p>
+          If Figure 1 represents the geometric realization of a cyclic core,
+          then any of the primes 1-6 are collapsible. Table 1 represents the
+          face incidence relation, from which the graded table can be
+          generated.  Each 1 in the table refers to the fact that the row cell
+          intersects the column prime(which in this case also corresponds to a
+          row cell) in one lower dimensional face.
+        </p><p>
+          
+        </p><p>
+          <div style="text-align: left">If  cell c<sup>2</sup><sub>1</sub> is chosen as the
+          collapsible cell, then it is removed, and the 1 dimesional cell on
+          the outside, between cells 6 and 2 replaces it.  Note that there are
+          now three additional free faces, and the complex is still a cyclic
+          core.  Proceeding recursively, the whole one skeleton is outlined,
+          until finally the recursion is broken, and the process quickly pops
+          back up to the beginning, at each stage choosing a sequence of
+          primes wich minimally cover S.</div><div style="text-align: center">&#x25A1;</div><div
+          style="text-align: right"></div>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  
+</p>
+<p>
+  
+</p>
+<p>
+  <multicol cols="2"><p>
+    <table style="display: inline">
+      <col align="center"></col>
+      <tbody><tr>
+        <td><div style="text-align: right"><table border="1">
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <col align="left"></col>
+          <tbody><tr>
+            <td></td>
+            <td>p<sub>1</sub></td>
+            <td>p<sub>2</sub></td>
+            <td>p<sub>3</sub></td>
+            <td>p<sub>4</sub></td>
+            <td>p<sub>5</sub></td>
+            <td>p<sub>6</sub></td>
+            <td>p<sub>7</sub></td>
+            <td>p<sub>8</sub></td>
+            <td>p<sub>9</sub></td>
+          </tr><tr>
+            <td><table style="display: inline">
+              <col align="left"></col>
+              <tbody><tr>
+                <td>c<sup>2</sup><sub>1</sub></td>
+              </tr></tbody>
+            </table></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+          </tr><tr>
+            <td>c<sup>2</sup><em></em><sub>2</sub></td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+          </tr><tr>
+            <td>c<em><sup>2</sup></em><sub>3</sub></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+          </tr><tr>
+            <td>c<sup>2</sup><sub>4</sub></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+          </tr><tr>
+            <td>c<sup>2</sup><sub>5</sub></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+          </tr><tr>
+            <td>c<sup>2</sup><sub><sup></sup>6</sub></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+          </tr><tr>
+            <td>c<sup>2</sup><sub>7</sub></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+          </tr><tr>
+            <td><table style="display: inline">
+              <col align="left"></col>
+              <tbody><tr>
+                <td>c<sup>2</sup><sub>8</sub></td>
+              </tr></tbody>
+            </table></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+          </tr><tr>
+            <td><table style="display: inline">
+              <col align="left"></col>
+              <tbody><tr>
+                <td>c<sup>2</sup><sub>9</sub></td>
+              </tr></tbody>
+            </table></td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+          </tr></tbody>
+        </table></div></td>
+      </tr><tr>
+        <td></td>
+      </tr><tr>
+        <td><p>
+          <font size="-1"><p>
+            <b>Table 1. </b><a id="auto-14"></a>Initial  Prime Implicant Graded
+            Covering Table for S
+          </p></font>
+        </p></td>
+      </tr></tbody>
+    </table><em></em>
+  </p><p>
+    <center><p>
+      <p>
+        <div align="justify"><p>
+          <div style="text-align: left"><table style="display: inline">
+            <col align="center"></col>
+            <tbody><tr>
+              <td></td>
+            </tr><tr>
+              <td></td>
+            </tr><tr>
+              <td><p>
+                <font size="-1"><p>
+                  <b>Figure 1. </b><a id="auto-15"></a>Cyclic Core Two-Dimensional
+                  Collapsible Cube Complex S
+                </p></font>
+              </p></td>
+            </tr></tbody>
+          </table></div>
+        </p></div>
+      </p>
+    </p></center>
+  </p><p>
+    
+  </p></multicol>
+</p>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+<?xml version="1.0"?>
+
+<TeXmacs version="WinTeXmacs-1.0.5">
+  <style><tuple><tm-arg>article</tm-arg><tm-arg>allouche</tm-arg><tm-arg>bpr</tm-arg></tuple></style>
+  
+  <body>
+    <tm-par>
+      <doc-data>
+        <tm-arg><doc-title>Cyclic Core Covering and Finite Cubical Cell
+        Complexes</doc-title></tm-arg>
+        <tm-arg>
+          <doc-author-data>
+            <tm-arg><author-name>Alan J. Coppola (coppolaa@evergreen.edu) and
+            Richard Weiss (weissr@evergreen.edu)</author-name></tm-arg>
+            <tm-arg>
+              <tm-par>
+                
+              </tm-par>
+            </tm-arg>
+            <tm-arg>
+              <author-address>
+                <tm-par>
+                  The Evergreen State College
+                </tm-par>
+                
+                <tm-par>
+                  Olympia, WA 98505-0002
+                </tm-par>
+              </author-address>
+            </tm-arg>
+          </doc-author-data>
+        </tm-arg>
+        <tm-arg><doc-author-data><author-name><tm-arg></tm-arg></author-name></doc-author-data></tm-arg>
+      </doc-data>
+    </tm-par>
+    
+    <tm-par>
+      <abstract>
+        <tm-par>
+          In this paper, we improve the standard branch-and-bound algorithm
+          for finding a minimum cover by addressing the cyclic-core
+          processing. We show how a covering problem such as two-level logic
+          minimization can be represented as a finite cubical cell complex,
+          which encodes topological information that aids the minimization
+          process. The paper shows that by extending the covering table so
+          that it also represents the implicitly defined combinatorial finite
+          cubical cell complex of a covering problem, any resulting
+          cyclic-core covering sub-problems, with collapsible cells, can be
+          exactly solved using only one recursive call instead of two. The new
+          covering table operation, called collapse, arises from the concepts
+          of cell collapse and expansion from simple homotopy theory in
+          topolgy. A collapsible cell of the cyclic core allows the two
+          recursive calls (cell-in and cell-out) to be encoded into one call.
+          This reduces the number of recursive computations needed to solve
+          the minimal covering problem.
+        </tm-par>
+      </abstract>
+    </tm-par>
+    
+    <tm-par>
+      <section>Introduction</section>
+    </tm-par>
+    
+    <tm-par>
+      Covering problems are typically solved using branch and bound
+      algorithms, by realizing them in tabular form, followed by iterative
+      reduction of the table by removing columns and rows through a small set
+      of fixed operations. This process terminates when all of the rows have
+      been eliminated indicating that all of the cells have been covered. The
+      columns correspond to prime implicants and the ones that have been
+      removed in this process form the minimal cover. However, the operations
+      that are usually applied can result in a situation called a cyclic core,
+      where the problem is split into two subproblems of equal size and each
+      one is solved independently. Our goal is to create an operation which
+      produces a single subproblem that is roughly the same size as each of
+      the other subproblems, and thus, we cut the amount of computation for
+      that step in half.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      The standard table operations that are used to produce the minimal cover
+      are essentiality, row dominance, column dominance and Gimpel's
+      transform. [2] They depend on finding essential prime implicants,
+      followed by row and column reductions. An essential prime implicant
+      contains a min-term that is not covered by any other prime implicant. A
+      fixed-point occurs if the operations do not change the table after each
+      application even though the algorithm has not terminated. This occurs
+      when there are no essential prime implicants, or dominated elements, and
+      the configuration is called a cyclic core. The step that is usually
+      applied is to choose a column (prime implicant) and generate two
+      instances of the problem: one in which the prime implicant is part of
+      the minimal cover, and one in which it is not. Each of these subproblems
+      can then be solved recursively using the branch and bound method with
+      the standard table operations.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      Our approach is based on the intuition that the table representation is
+      omitting information that is present in the cube complex, which is a
+      natural representation of the original two-level logic minimization
+      problem. The cube complex is a set of cubes of various dimensions with
+      the property that if they intersect, then the intersect in a set of
+      faces which are also cubes. All of these cubes can be viewed as subsets
+      of a cube whose dimension is the number of variables in the logical
+      expression to be minimized. [1], [5]
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      Most recent work on the covering problems have attacked finding and
+      applying the lower bounds found to prune the search space for the
+      minimal solution. [6-9] This paper introduces a different method for
+      pruning the search space, based on an encoding used for special cells in
+      the cyclic core. The identification and of these cells allows one
+      recursive call instead of two to solve a cyclic core subproblem. This is
+      our contribution.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      We prove a theorem which shows that given the cyclic-core of a
+      minimization problem, there is a special type of cube, a collapsible
+      cube, to branch on, such that the minimum cover can be found with a
+      single recursive call. We present an example of a cubical cell complex
+      representation, and corresponding minimization.
+    </tm-par>
+    
+    <tm-par>
+      <section>Definitions and Background</section>
+    </tm-par>
+    
+    <tm-par>
+      <subsection>Cubical Cell Complexes, Combinatorial Topology, and
+      Covering</subsection>
+    </tm-par>
+    
+    <tm-par>
+      The cubical cell complex provides a general framework in which to
+      represent minimal covering problems, higher-order connectivity, cycles
+      of any dimension, and geometric visualization of optimization problems.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      For the purposes of this paper, we specialize to cubes and cubical
+      complexes, even though the techniques can be generalized to cells and
+      abstract cell complexes.
+    </tm-par>
+    
+    <tm-par>
+      <definition>
+        <tm-par xml:space="preserve"> A <em xml:space="preserve">cubical  complex</em> C = (Skel, <with xml:space="preserve" mode="math">&leq;,  dim</with>&leqslant;&leqslant;) consists of:</tm-par>
+        
+        <tm-par>
+          <itemize>
+            <tm-par>
+              <item/>A collection of cubes Skel of <with mode="math">&bbb-B;<with
+              mode="text"><rsup>k</rsup></with><with mode="text"><tm-arg></tm-arg></with></with>,
+              each of which is called a cube of C, and a partial order <with
+              mode="math">&leq;</with>, which captures the face relations of C.
+            </tm-par>
+            
+            <tm-par>
+              <item/>A <em><em>closure under intersection
+              property</em><em><tm-arg></tm-arg></em></em> for Skel (if a, b
+              <with mode="math">&epsilon;</with> Skel, then a <with mode="math">&wedge;</with>b
+              <with mode="math">&varepsilon;</with> Skel)
+            </tm-par>
+            
+            <tm-par>
+              <item/>A <em>face closure
+              property</em><strong><tm-arg></tm-arg></strong> for Skel (if a
+              <with mode="math">&epsilon;</with> Skel, and b <with mode="math">&leq;
+              a</with> then b <with mode="math">&varepsilon;</with> Skel )
+            </tm-par>
+            
+            <tm-par>
+              <item/>A dimension function (There is a function <with
+              xml:space="preserve" mode="math">dim:Skel &longrightarrow; &bbb-N; such that dim(pt) = 0, and if  b <with mode="math">&leq; a</with>, then  </with>dim(b)<with
+              mode="math">&leq;dim(a)</with>
+            </tm-par>
+          </itemize>
+        </tm-par>
+      </definition>
+    </tm-par>
+    
+    <tm-par>
+      <definition>
+        <tm-par xml:space="preserve"> L is a sub-complex of K if L is a cubical complex, each of whose faces are faces of K.  For example, if L<rsup xml:space="preserve">i </rsup>= <with mode="math"><mid>{</mid> c
+        &epsilon; Skel | dim(c)&leqslant; i }</with>, then L<rsup xml:space="preserve">i </rsup> is the sub-complex called the i-skeleton of C.</tm-par>
+      </definition>
+    </tm-par>
+    
+    <tm-par>
+      <definition>
+        <tm-par xml:space="preserve"> Let C be a cubical cell complex. Let c be a cell of C.  c is said to be collapsible if c has a face f <with mode="math"><tm-arg></tm-arg></with><with mode="math">&leq;
+        c</with>, such that dim(f) <with xml:space="preserve" mode="math">= dim(c) -1,  </with>and f is not a face of q, for all q <with mode="math">&epsilon;</with> C. f is also called a free face of c.</tm-par>
+      </definition>
+    </tm-par>
+    
+    <tm-par>
+      From the area of topology called simple homotopy theory comes the
+      concept of cellular collapses and expansions. [4], [5]
+    </tm-par>
+    
+    <tm-par>
+      The concept of cellular collapses and expansions comes from simple
+      homotopy theory of topology. In this context it also captures a
+      generalization of essential prime because for a cell to be collapsible,
+      it must have a free face, i.e. one that is not shared.
+    </tm-par>
+    
+    <tm-par>
+      <definition>
+        <tm-par xml:space="preserve">If K and L are cubical cell complexes, we say that there is an elementary cell collapse from K to L (K<with mode="math">&searrow;L</with>), if K = L <with mode="math">&cup; e,
+        where e is a cell of K</with>, with free face f not a face of any other face of L.  The cell e is said to be a collapsible cell. Note: This is equivalent to the existence of a homotopy from K to L.  Also, L is said to expand to K (L<with mode="math">&nearrow;K</with>). </tm-par>
+      </definition>
+    </tm-par>
+    
+    <tm-par>
+      <section>Minimization Process</section>
+    </tm-par>
+    
+    <tm-par>
+      <subsection>Exact Two-Level Boolean Minimization [2]</subsection>
+    </tm-par>
+    
+    <tm-par xml:space="preserve">The object of this classical problem is given a boolean function f, find an exact  minimum size representation of f as a sum-of-products cube representation of f.  The usual method is:</tm-par>
+    
+    <tm-par>
+      <theorem>
+        <tm-par>
+          Given a sum-of-products boolean function f, the minimum cost
+          representation of f as a sum of products is found by iteratively
+          applying steps 1-4.
+        </tm-par>
+      </theorem>
+    </tm-par>
+    
+    <tm-par>
+      <enumerate-numeric>
+        <tm-par>
+          <item/>[FindPrimes ] Find all the prime implicants of f
+        </tm-par>
+        
+        <tm-par>
+          <item/>[CreateCov] Create the covering matrix of the primes of f,
+          where the columns are the primes and the rows are the minterms of f.
+        </tm-par>
+        
+        <tm-par xml:space="preserve"><item/>[Reduction] Perform reductions on the covering matrix, until a fixed point table, called the cyclic-core  is reached. The table reductions are: [2],[3]</tm-par>
+        
+        <tm-par>
+          <enumerate-roman>
+            <tm-par>
+              Partitioning (i.e. finding the conected components), iteratively
+              followed by:
+            </tm-par>
+            
+            <tm-par>
+              <itemize-dot>
+                <tm-par>
+                  
+                </tm-par>
+                
+                <tm-par>
+                  <item/>Essentials reduction by choosing cubes which are
+                  essentials to be in the minimal cost cover.
+                </tm-par>
+                
+                <tm-par>
+                  <item/>Row dominance - a strongly equivalent operation (no
+                  solutions are eliminated [2])
+                </tm-par>
+                
+                <tm-par>
+                  <item/>Column dominance - a weakly equivalent operation
+                  (some solutions are eliminated, but a minimum is not [2])
+                </tm-par>
+                
+                <tm-par>
+                  
+                </tm-par>
+              </itemize-dot>
+            </tm-par>
+          </enumerate-roman>
+        </tm-par>
+        
+        <tm-par xml:space="preserve"><item/>[SolveCyclicCore] Recursively solve the cyclic-core problem by choosing a column(prime) to assume is first in the cover, find a recursive solution, and then is not in the cover, find a recursive solution to that problem, and then pick the cover that has the least number of elements as the minimal cover.  Sophisticated branch and bound techniques, involving choosing a maximal independent set of elements at each cyclic-core step which  can be used to create a series of lower bounds on which to prune the recursions. See [6],[7],[8],[9].</tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par>
+          The method we propose will enhance Step 4, by allowing a single
+          recursive call in the case that a free face is found.
+        </tm-par>
+      </enumerate-numeric>
+    </tm-par>
+    
+    <tm-par>
+      <subsection xml:space="preserve">Cyclic Core Reduction Overview </subsection>
+    </tm-par>
+    
+    <tm-par xml:space="preserve">We assume that the cell complex is represented either explicitly or implicitly, and that no computation of faces or intersections are explicity done unless needed. i.e. lazy evaluation is used.  For example, an explicit initial representation would be a list of cubes of varying dimensions.  An implicit representation would be as a BDD. </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par xml:space="preserve">During the exact minimization algorithm outlined in Section  3.2, the list of cubes can grow and shrink. We assume that the prime cube complex is given, and that the covering table is replaced by a choice pairing function Pair<rsub>f</rsub>(cube, prime) = 1 <with xml:space="preserve" mode="math">&Leftrightarrow;   cube&leqslant;prime</with> .  This allows us to view a covering table a view of the cubical complex.  No face information is lost.  This is key in allowing us to compute the collapsible cubes necessary to reduce the cyclic core resursively.</tm-par>
+    
+    <tm-par>
+      <section>Description of Algorithm</section>
+    </tm-par>
+    
+    <tm-par>
+      <inactive xml:space="preserve"><inactive>Let P(C) represent the prime complex of a
+      two-level minimization problem, initially given as a cubical complex C,
+      let T<rsub>P(C)</rsub> be the graded (by dimension) covering table
+      representing the choice pairing function Pair<rsub>f</rsub>(cube, prime)
+      by a <with xml:space="preserve" mode="math"> (<big>sum</big></with>n<rsub>i</rsub>)</inactive> x <with
+      mode="math"><mid>|</mid>P<mid>|</mid></with> matrix of 0's and 1's, where P is the cubical complex of all prime cubes of C, and n<rsub>i</rsub> is the number of covering element cubes in the cover of dimension i.  In the classical Quine-McCluskey case, n<rsub>0</rsub></inactive>=number
+      of vertices(minterms) of C(f).
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      Each cube will correspond to a row of the covering table, and each
+      column corresponds to a prime cube of the cubical complex, which lives
+      in a universe which is the smallest dimensional cube containing all the
+      cubes of the cubical complex.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par xml:space="preserve">The graded table is a view of the cubical cell complex and can be derived from it.  Restated, the minimal covering problem is to find a set of columns of TC which cover C, and has minimal cost. The contribution of this paper is two-fold: to use the cubical cell complex directly as the representation of the combinatorial minimization problem, and to show how this representation allows the introduction of a new reduction method during the cyclic core recursive solution.</tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      The covering problem is to find a minimum set of columns of
+      T<rsub>C</rsub> which cover C, and has minimal cost.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      The new contribution of this paper is two-fold: to introduce cell
+      complexes as a natural representation of combinatorial problems, and to
+      show how this representation allows the introduction of a new reduction
+      method during the cyclic-core recursive solution.
+    </tm-par>
+    
+    <tm-par>
+      <subsection>Finding a collapsible cell.</subsection>
+    </tm-par>
+    
+    <tm-par xml:space="preserve"> </tm-par>
+    
+    <tm-par>
+      With the representation we have chosen, finding collapsible cubes is
+      like finding essential cubes. Consider a top dimensional cell c, of
+      dimension k. Then a cube with a free face is one where the set of
+      k-dimensional cubes other than c intersected with c does not cover the
+      faces of c. The faces of c not covered by these k-dimensional cells are
+      the free faces. Note that the analogous step for essential primes is the
+      first step in the classical Quine-McCluskey algorithm.
+    </tm-par>
+    
+    <tm-par>
+      <subsection>Collapsible Element Reduction</subsection>
+    </tm-par>
+    
+    <tm-par xml:space="preserve">Given an implicit or explicit representation of the initial cubical complex, we allow the addition of cells to the complex, when necessary, to solve the covering problem.  Most additions result from intersecting cells when computing the set of primes or in finding the collapsible cells.</tm-par>
+    
+    <tm-par>
+      <theorem>
+        <tm-par>
+          The [CyclicCore] step of Theorem 5 can be replaced by the
+          [CyclicCoreCollapse] step, and maintain cover cost minimality.
+        </tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par xml:space="preserve">[CyclicCoreCollapse] If a collapsible element exists, removing the element p, and replace it with the set of free faces of p, perform a single recursive call of the modified minimization algorithm, if any of the added faces are in the returned cover, remove them, and add p back in.  If there are no collapsible faces, perform the [CyclicCore] step of Theorem 5.  So the Theorem 5 usual algorithm is not modified unless there are collapsible cells, in which case columns are temporarily removed and added during the course of the minimization.</tm-par>
+        
+        <tm-par>
+          <proof>
+            <tm-par xml:space="preserve"> </tm-par>
+          </proof>
+        </tm-par>
+        
+        <tm-par xml:space="preserve">This involves, at the graded covering matrix level, removing the  column p, and replacing it with a set of one dimensional less columns which are the free faces of p, FreeFaces(p).</tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par>
+          Recursively continue to apply the non cyclic-core reductions,
+          followed by the cyclic-core collapsible reduction, along with
+          chosing a face of the the most recently used collapsible cube
+          processed when a sub cyclic core has no collapsible cubes in it,
+          a<em><em><tm-arg></tm-arg></em></em>nd return with a cover
+          CollapseCov.
+        </tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par xml:space="preserve">Claim: CollapseCov, or CollapseCovPlus = ReducedCov(CollapseCov + p) is the absolute minimum cost cover of the row elements by the column sets, where ReducedCov simply takes a cover and makes it irredundant. </tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par xml:space="preserve">Let  FreeSize = <with mode="math"><mid>|</mid>CollapseCov
+        &wedge;FreeFaces(p)<mid>|</mid></with>.  To complete the proof, consider the following cases:</tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par>
+          <enumerate-roman>
+            <tm-par>
+              <item/>FreeSize <with xml:space="preserve" mode="math">= 0 , </with>
+            </tm-par>
+            
+            <tm-par>
+              If FreeSize <with xml:space="preserve" mode="math">= 0 , </with> then CollapseCov is
+              the minimum, as it didn't use any of the added free face cells,
+              hence only used the original cells to cover the rows, and, so
+              corresponds to the case that the collapsible cube was not
+              included initially, whereas, by including the free faces, the
+              opportunity was presented to the minimization algorithm to use
+              them to get a solution with lesser cost, so if a cover of lesser
+              cost existed with some of the free faces of p in it, then it
+              would have been found.
+            </tm-par>
+            
+            <tm-par>
+              <item/>FreeSize <with xml:space="preserve" mode="math">&geqslant; 1, </with>
+            </tm-par>
+            
+            <tm-par xml:space="preserve">Then CollapseCovPlus is the minimum, as the expansion of the cube in the direction of one of the free faces returned keeps the cost the same, or better, if the cost function is dimension dependent. <em><em><tm-arg></tm-arg></em></em> Then CollapseCovPlus is the minimum, and will have a cost less than or equal to the cost of CollapseCov, as if all the returned faces are removed, we have a minimum cover of the original Cyclic Core by primes, which can be at most one less element in cost from the case when the cube is originally included in the minimal cover, and then minimized. This returned encoding corresponds to having the original cube p in the minimal cover. </tm-par>
+          </enumerate-roman>
+        </tm-par>
+      </theorem>
+    </tm-par>
+    
+    <tm-par xml:space="preserve"><section>Realization Considerations</section> </tm-par>
+    
+    <tm-par xml:space="preserve">State of the art unate covering tools is embodied in the tools Eclipse, Aura-II, Scherzo, and Espresso-Signature-Exact. [2, 6-9]  To implement the concepts in this paper, the techniques should be added to one of the above code bases, and compared to the others on suites of examples, as was done in Eclipse and Aura-II.</tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par xml:space="preserve">It is an open question as to whether the proof given in this paper can be extended to the case of encoding all of the collapsible cubes simultaneously, as a single step, and then continuing with the algorithm recursively.  This type of operation would correspond to shelling the cyclic core by collapsing it's boundary all at once, and then recursively continuing with that process.</tm-par>
+    
+    <tm-par xml:space="preserve"><section>Conclusions and Future Work</section> </tm-par>
+    
+    <tm-par xml:space="preserve">In this paper, it was shown first, how to identify special cubes, called collapsible ones, in the cyclic core covering problem, and second how to use them to modify the branch part of the branch and bound algorithm, which allows a minimum cost solution to be found with a single recursion, at the cost of encoding the collapsible cubes by their free faces, and by maintaining the structur<hspace>20</hspace>e of the cubical cell complex, as the minimization proceeds. </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par xml:space="preserve">In future work, we plan to generalize the current approach for cubical cell complexes. We believe that binate covering problems, MaxCostSAT and other problem areas  can also be addressed using these methods.</tm-par>
+    
+    <tm-par>
+      <section>References</section>
+    </tm-par>
+    
+    <tm-par>
+      [1] J.P. Roth, ``Algebraic topological methods for the synthesis of
+      switching systems I``, Trans. Am. Math. Soc., Vol. 88, No. 2, pp301-32.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [2] O. Courdert, ``Two-level logic minimization: and overview'',
+      Integration, the VLSI Journal, 17-2, pp. 97-140, October 1994.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [3] O. Coudert. On solving binate covering problems. In The Proceedings
+      of the Design Automation Conference, pages 197-- 202, June 1996.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [4] M.M. Cohen, A Course in Simple-Homotopy Theory, Springer-Verlag, New
+      York, 1973
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [5] A. J. Coppola, ``New methods in the analysis of logic minimization
+      data and algorithms'', Proceedings of the 26th Design Automation
+      Conference, June, 1989.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [6] X.Y. Li, M.F. Stallmann, and F. Brglez. A local search solver using
+      an e®ective switching strategy and an e±cient unit propagation. Lecture
+      Notes in Computer Science, 2919:53{68, 2004. For links to re-prints,
+      data sets and experimental testbed, see also
+      http://www.cbl.ncsu.edu/publications/.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [7] E. I. Goldberg, L. P. Carloni, T. Villa, R. K. Brayton, and A. L.
+      Sangiovanni-Vincentelli. Negative Thinking in Branch-and-Bound: the Case
+      of Unate Covering. IEEE Transactions on Computer-Aided Design,
+      19(3):281--294, Mar. 2000.
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [8] C. Plessl and M. Platzner, ``Instance-Specific Accelerators for
+      Minimum Covering'', Proceedings of the 1st International Conference on
+      Engineering of Reconfigurable Systems and Algorithms (ERSA)}, pp.
+      85--91, 2001, Las Vegas, Nevada, USA, June, CSREA Press}
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      [9] Samir Sapra, Michael Theobald, Edmund M. Clarke, ``SAT-Based
+      Algorithms for Logic Minimization'', ICCD, 2003,pp. 510-515
+    </tm-par>
+    
+    <tm-par>
+      <example>
+        <tm-par>
+          Cyclic Core Example
+        </tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par xml:space="preserve">If Figure 1 represents the geometric realization of a cyclic core, then any of the primes 1-6 are collapsible. Table 1 represents the face incidence relation, from which the graded table can be generated.  Each 1 in the table refers to the fact that the row cell intersects the column prime(which in this case also corresponds to a row cell) in one lower dimensional face.</tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+        
+        <tm-par xml:space="preserve">If  cell c<rsup>2</rsup><rsub>1</rsub> is chosen as the collapsible cell, then it is removed, and the 1 dimesional cell on the outside, between cells 6 and 2 replaces it.  Note that there are now three additional free faces, and the complex is still a cyclic core.  Proceeding recursively, the whole one skeleton is outlined, until finally the recursion is broken, and the process quickly pops back up to the beginning, at each stage choosing a sequence of primes wich minimally cover S. </tm-par>
+      </example>
+    </tm-par>
+    
+    <tm-par>
+      
+    </tm-par>
+    
+    <tm-par>
+      <htab>5mm</htab>
+    </tm-par>
+    
+    <tm-par>
+      <with par-columns="2">
+        <tm-par>
+          <small-table>
+            <tm-arg>
+              <htab>5mm</htab><htab>5mm</htab><htab>5mm</htab><block>
+                <tformat>
+                  <tm-arg><twith><tm-arg>table-valign</tm-arg><tm-arg>b</tm-arg></twith></tm-arg>
+                  <tm-arg><twith><tm-arg>table-halign</tm-arg><tm-arg>r</tm-arg></twith></tm-arg>
+                  <tm-arg>
+                    <table>
+                      <tm-arg><row><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>p<rsub>1</rsub></cell></tm-arg><tm-arg><cell>p<rsub>2</rsub></cell></tm-arg><tm-arg><cell>p<rsub>3</rsub></cell></tm-arg><tm-arg><cell>p<rsub>4</rsub></cell></tm-arg><tm-arg><cell>p<rsub>5</rsub></cell></tm-arg><tm-arg><cell>p<rsub>6</rsub></cell></tm-arg><tm-arg><cell>p<rsub>7</rsub></cell></tm-arg><tm-arg><cell>p<rsub>8</rsub></cell></tm-arg><tm-arg><cell>p<rsub>9</rsub></cell></tm-arg></row></tm-arg>
+                      <tm-arg>
+                        <row>
+                          <tm-arg>
+                            <cell>
+                              <tformat>
+                                <table>
+                                  <row><cell>c<rsup>2</rsup><rsub>1</rsub></cell></row>
+                                </table>
+                              </tformat>
+                            </cell>
+                          </tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                        </row>
+                      </tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<rsup>2</rsup><em><tm-arg></tm-arg></em><rsub>2</rsub></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg></row></tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<em><rsup>2</rsup></em><rsub>3</rsub></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg></row></tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<rsup>2</rsup><rsub>4</rsub></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg></row></tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<rsup>2</rsup><rsub>5</rsub></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg></row></tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<rsup>2</rsup><rsub><rsup><tm-arg></tm-arg></rsup>6</rsub></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg></row></tm-arg>
+                      <tm-arg><row><tm-arg><cell>c<rsup>2</rsup><rsub>7</rsub></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell>1</cell></tm-arg><tm-arg><cell><tm-arg></tm-arg></cell></tm-arg></row></tm-arg>
+                      <tm-arg>
+                        <row>
+                          <tm-arg>
+                            <cell>
+                              <tformat>
+                                <table>
+                                  <row><cell>c<rsup>2</rsup><rsub>8</rsub></cell></row>
+                                </table>
+                              </tformat>
+                            </cell>
+                          </tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                        </row>
+                      </tm-arg>
+                      <tm-arg>
+                        <row>
+                          <tm-arg>
+                            <cell>
+                              <tformat>
+                                <table>
+                                  <row><cell>c<rsup>2</rsup><rsub>9</rsub></cell></row>
+                                </table>
+                              </tformat>
+                            </cell>
+                          </tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell>1</cell></tm-arg>
+                          <tm-arg><cell><tm-arg></tm-arg></cell></tm-arg>
+                        </row>
+                      </tm-arg>
+                    </table>
+                  </tm-arg>
+                </tformat>
+              </block>
+            </tm-arg>
+            <tm-arg xml:space="preserve">Initial  Prime Implicant Graded Covering Table for S</tm-arg>
+          </small-table><em><tm-arg></tm-arg></em>
+        </tm-par>
+        
+        <tm-par>
+          <with par-mode="center">
+            <tm-par>
+              <with par-mode="right">
+                <tm-par>
+                  <with par-mode="justify">
+                    <tm-par>
+                      
+                    </tm-par>
+                    
+                    <tm-par>
+                      <small-figure><tm-arg><postscript><tm-arg><tuple><tm-arg><raw-data>ÿØÿà JFIF  ` `  ÿÛ „ 
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ÿÀ  § À! ÿÄ¢          	
+       	
+   } !1AQa\"q2‘¡#B±ÁRÑğ$3br‚	
+%&amp;'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚáâãäåæçèéêñòóôõö÷øùú  w !1AQaq\"2B‘¡±Á	#3RğbrÑ
+$4á%ñ&amp;'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚâãäåæçèéêòóôõö÷øùúÿÚ   ? ıü¢€
+( ¯øÕâwBøY§øsÁWßÙŸ¾(ê±x7ÂWLSeßÜC4÷:——2˜&amp;şÍÓ­uWìó[¯°}™XI&_96__128_x_7__128_;	x^ßâŸ~ø÷Æ?çñ6ŸªêZß†/&amp;øáãëoøI¼'q4sÃ-¼qjâ?ø–Kzº4êçÿ E´»œD5;pş¿ÿ Óğëş†?ÿ ø}¾!ÿ òæ€øfŸ‡_ô1üÿ Ãíñÿ —4Ã4ü:ÿ ¡ãÿ şoˆü¹ ş§á×ıÿ ğû|Cÿ åÍğÍ?¿ècøÿ ÿ ‡Ûâÿ .h ÿ †iøuÿ CÇÿ ü&gt;ßÿ ùsGü3OÃ¯úş?ÿ áöø‡ÿ Ëš ?áš~ĞÇñÿ ÿ ·Ä?ş\\Ñÿ Óğëş†?ÿ ø}¾!ÿ òæ€øfŸ‡_ô1üÿ Ãíñÿ —5ä&gt;ø%áyş)ø+á¿€¼cñşj®›­øò&gt;¹ÿ „gÂvóI&_210__220_G._174_c_255__0__137__156__182_M_163__64__165__210__127__244__171__187__184__4__163_L_184__8__1__239__255__0__5__60_S_174__235__159__11__47__252_9_227_K_239__237__47__136__223__11__181_Y_124__27__226__219__207__38__40__127__181__47__237__161__134__123_mK_203__133_D_16__255__0_ii_215_Zv_171__246_xK_173__175__219__254__204__204_d_130__64__61__130__128__10__40__0__162__128__10__40__0__162__128__10__249__255__0__225_7_252__92__92__31__138__126__47__248__231_s_251__253__35_X_221__225__95__135__187__190_h_227__240__173__156__205__231_jPgz_143__237__125_Ae_186__91__139_iL7_186_m_167__135__164__42__178_Dh_3__160__248__179__225_mv_247__254__17__15__31_x_92__34__195__237__254__61__248_g_170__173__245__173__156_sEn_254__32__209_.6_193__172__233__6_Gh_213__252__251_C_246__139_he_158__11_s_169_Xi2_220_:_197_nH_244__15__9__248__167_A_241__199__194__207__12__248__215__194__215__223__218__158__24__241__134__149_e_173__233__23__158_L_176__125__174__194__238__20__158__222__95_.UY_19__124_R_35_muV_25__193__0__130__40__3__160__162__128__10__40__0__162__128__10__40__3__159__241_g_138_t_31__3__124__44__241__47__141__124_S_125__253__151__225__143__7__233_W_154__222__175_y_228__203__63__217__44_-_33_y_238__37__242__226_V_145__246_E_27__182__212_Vc_140__0_N_5_y_255__0__194_o_11_k_182__63__240__151__248__251__198__246__31__96__241__239__196__189_U_175__174__172__228__154__43__135__240__254__137_o_186__13__27_H_18__35_H_169__228_Z_1_qs_12_S_207_n5_43__253_Z_91_wh_174__1__32__28__255__0__197__159__248__183__223__20__252__33__241__206__215__253__31_H_209__182__248_W_226__22__223__146_9_60__43_y2_249__26__148__248__216__167__251__35_Ph_174__154__226__230_Q_13__150__155_w_226__25__2__153__37__21__244__5__0__20_P_1_E_0__20_P_1_E_0_x_127__197__221__91_U_213__124_U_224__63__131__254__25__212__181__13__31__91__248__147_w_61__254__177__168_X_92__92__61__173__214__147__224__237__41__237__228__214_f_134_U_40__235_-_195__220__233__218_:_189__188__209__93__91__182__178__47__96__36__217_;ß`Òt+@ğ®™¡hZfŸ¢èš-¤6~Ÿan–Ö– a… HâDUEEU@  (B¾ğÏüZ¿Úçáßú‡ÿ ?µ¼Uá7—Ÿ°ø©îçÔ&C_166__181__195__237__221__246__207__181__255__0_kY_219__230_y_143__147__175__157__209_ZZ_219_C_16__7__208__20_P_1_M_125__226__22_1_170__180__128__29__170__205__181_I_236__9__193__192__247__193__250_P_7__135__124__10__241__47__143__60_I_225__255__0__136__169__241__18__255__0_F_190__215__124__61__227__157_SH_137_4_171_s_21__157__141__164_q_91__201__21__180_L_192_I0_143__205_e3H_21__165__32__190__216__193__17__167__185__215__167__155_ai_225__235__198__157__39_u_236__233__59__218__215_r_165__9_7_203__205_._91__182__223__47_4_148_od_218_G_133__195__184__202__248__172__36__170__226__126__47_k_94_6M4_148__43__212__132_cu_24__223__150_1Q_230__229__139__149__174__213__219__10__43__204__61__211__231__255__0__18__255__0__197__212__253__169__237__190__29__255__0__175__248__127__240__175__251__39__197__94__44_x_190__95__183_x_170__59__184_5_15__15_i_171_p_155__182__253__143__236__127__218__215__150__249__130_a_231_x_124__238__150__210__234__230__25__126__128__160__12__253__91_I_210__181__239__10__234_Z_22__187__166_i_250__214__137__173_ZMa_168_i_247__246__233_si_127_i2_24__229__134_h_92__92__20__146__39_Fdd_96_U_148__144_A_6__188__127__225__14__173__170__233_;*ñßÁÿ êZ†¯­ü6»‚ÿ GÔ/îæëVğv¨÷hÓM+v–İíuâin®F7³oSp¸Q@ Q@gêÚ¶• xWR×uİKOÑtMÒkıCP¿¸KkKHPÉ,ÓJä$q\"+3;ª ’@ãÿ 4VóÂºçÅoéš†•ãŒ7qëo§êVï÷‡4O/DÑå†QæÚËofEÅİ¦ù\"T¾ÕŞ#²z÷
+ +Ïş%øşÿ …—zU†©ÿ Ç‹tÿ 3PğŸ‰ã¶ûEÏ„õÕ†H­ucŞo—æºK8êŞ[‹YƒÛÜK€üuÿ 	ÿ ÂËMRûJÿ „cÅº—§ø³Ã\\ı¢çÂzêÃ—Z|ÒlO7ËóQâPGuo-½Ô%íî\"‘ı€
+(…•¥éo|Úf›a§6§t÷×†Úİ!7wN^iv¾F »d£'WêçRs|Óm»%®º$’^‰$’è’HÊ•t£ËJ**íÙ$•äÜ¤ôêÛm¾­¶õ
+óÿ ‰~:ÿ „áeŞ©a¥ÂMâİCÌÓü'áˆî~ÏsâÍu¡’K]&gt;6?•æyNòÎÈcµ·Šâêb–öòÈjüÿ ÂËM*ûTÿ „›Åº‡—¨x³Äò[}çÅšëCWZ„Ñï+Ìò‘\"\\Çko½¬!-íâ=€
+ğÿ úN«eá]â·…4ÍCUñÁÛ¹5´ÓôÛwûÄz§—­èñCİKqfÅ¥¦øâ“T±ÒS²
+ ö'VÒµï
+éšî…©iúÖ‰­ZC§ê	sii2	!šP”’'FVWRU”‚	´( ¢€
+( ¯Ÿümÿ ?öğŸÃ}?ı3Áÿ 5[Oxöê/šõ[·¾ğöŠî6²\\µÜ–ºÛù23Å•kÌ_gÕ¡2 }E PÏş%ÿ ‹WûSÛ|Dÿ Qğÿ â§öO…|X‘sö=Ü‡µ%·M»¾Ùö¿ì›ËŒO1ò|&gt;6Åiks4_@PE P_?øgş.§íOsñıÃÿ …ÚŞğšKòı»ÅQİÏ§ø‡Rkwİ·ìcşÉ³¸Ä;_e´º¶šP ( Š ùÿ Áñl?hïü7¿ÿ BğÄ=VëÆº—å†MVù®/¼C¢£Ì÷+wÖ¶tŠòÅªİEmÙô™Œ@PE Pãÿ é_~x‡ÆºÅ¾¡}g Z£ÓôäIubéˆÖÂÆtß]\\&6_182__208__6__13_4_243_E_26__252__206__43__159__248_C_224__157_W_193__63__6__160__139__197_7_26__126__161__241__7__196__247_s_248__147__198__154__133__147__188__182__247__154__253__225__18__92__92__165__188__178__162__207__37__141__176__17__216_Y_9__247_K_21__141__157__148__12__199__201__20__1__234__20_P_1_E_0_x_127__237__21_yl_223__178__63__139__60__28_4_157__63__196__154__223__197__123_I_124__1__161_hW_175_p-_245__141_CW_137__237__2__220__11_Yc_187__251__12__16__188__247__183__175_j_222__124_66_151__179__167_0_241__228__31__15__60__33__241_k_94__241_W_196__31__8__248__175__246__169__248__223__167__248__199__192__94__32__184__133__224__180__209__60__1__20__23__250__5__219__189__214__137__127_n_178__248_p_203__36_Of_194__210_i_246__172_M_168__233__250__172_Qe-_243__64__30__159__255__0__10_o_226__47__253__29__143__199__255__0__252__20__124__60__255__0__230_f_143__248_S_127__17__127__232__236__126__63__255__0__224__163__225__231__255__0_34_0__127__194__155__248__139__255__0_Gc_241__255__0__255__0__5__31__15__63__249__153__163__254__20__223__196__95__250__59__31__143__255__0__248__40__248_y_255__0__204__205__0__31__240__166__254__92__34__255__0__209__216__252__127__255__0__193_G_195__207__254_fkC_246_t_188__182_O_217__31__194__126__14__254__201__211__252_5_173__252__39__180__139__192__26__238__133_d_247__6__223_G_212_4_136__146__208__173__184__186__150_K_191__176__207__10_A_123_d_247_M_231__205_cwe_59__243_5_0__123__133__20__0_Q_64__30__95__241__123__193_:_175__141__190__13_M_23__133_n4_253__59__226__15__133__238__237__252_I_224__189_B_245__222__27__123__61__126__200__153_-_146__226_X_145__167__142__198__228_y_150__23__162__13__178__203_cy_123__2__178__249__198__186__15__0_x_215_J_248__139__240_k_195__222_5_209__173__245__11__11__61_z_209_f_147_O_212_Q_92__34__212_4_123__165__38__59__171__11__232_Q_220_A_125_kp_146__218__220__192_X_180_3_195__44_m_243__33__160__14__194__138__0__40__160__15__159__225__255__0__139__165__251_d_233__186__197__191__250__95__195__191__129__127_m_251__5__244__124__219_k_30__59__184__91__157_2_239__201__144_lc_253__145__167__181__245__156__187_L_214__210__220_kw_17_7_151_w_164__186__199__244__5__0_x_231__199__95__136__215__255__0__12_;¶¿¤BÏ«j¾—¢YÊ&_61__169_x_133_l_229__189__185_H_60__246__211_4_236__93__222__8__213__153__252__136_Y_30_B_2__135_L_238__29__127__195__159__18__191__140__190__3__248_C_197_R_221__233_W_211_k_250_U_173__236__183__26_l_23_V_246__178__200__232__11__24__225__186_T_184__132_n_207__238__167_Q_44_g_40__227_r_154__209__208__148__96__171_9_197__169_6_148_o_203_4_225_f_218_N_254__214__47__158__42_N_60__190__193__198__42__124__255__0_X_167__201__205__10__242__158__92__34_tR_178__132__96__219__209__223__218_9_164__172__154_p_229__246_r_183_4Z_171__204__249__92__92__125__140__212__187_J_43_3_164__249__255__0__193__31__241_s_255__0_h_239__21__252_G_191__255__0_L_240__127__195__205_V_235__193__254__2__181__151__230__134__61_V_193__174__44__124_C_173__92__34__29__172__151_-w_37__214__136__158_tl_241_E_165__93_Im_47__217__245_i_132__135__198__175__248__183__255__0__217__255__0__31_t_191__244__47__248_W_254_W_252__39__222_O_201__253__183__224_D_243__190__221__246__143__189__230__127_e_125__166_Mj_13__145_Kr_126__201_wgm_229__255__0_i_220_y_128__31__64_Q_64__5__20__0_W_207__254_6_255__0__139_a_251_GxO_226_;Ÿş…àÿ ˆz­§ƒü{kËš­ó[Øø{Zt™îVî;]ü˜Õå‹Uµ’æ_³é0ˆÀ&gt;€¨åvŠÒY#…çxĞ²Ä…CH@áWq“ĞdêE yÂˆş\"ñİït¿x?Kğn¿à}^ßMº³Ó¼B5ÈPOeo}sN-àXï;”@‚TMÑ”šUpÕì4ZKIÂQ}T¢ãwüĞæJR¥/ŠŒÜ`êRp¨á.HÔâ•¬ôi&gt;—WIÚ\\®QRí$¥$¤šR’We|ÿ 7üZßÛ'QÖ.?Ñ&gt;üsûÛï¤âÛGñİ²Ûi–~t‡{í}=llâÜ`¶ŠãD·‰|Ë½Y@“è
+( ¯/ø±ã]WÂm4ÿ 	[é÷ßüyw7†üe¨£:ç_k+«ÈŞù‘Ğ¥½½•ÕåÉW´²¤5ËÃ €&_19__165__124_9_248_5_225__239__5_h_215__26__133__245__158__129_h_176__201__168_j._146__234__26__197__211__19__37__213__253__244__168__136__39__190__186__184_yn_174_g_42__26_i_230__150_F_249__156__215_a_64__28__239__138__188__43__162_x_207__192__247__126__29__241__4__23_si_183__134_6ci_127_s_167__221_A_36_n_36__142__91__123__171_i_35__158__222_duVIa_145__29__24__2__172__8__205_I_225__127__12__232__158__13__248_y_162__248_S_195__150_ma_161_x_126__210__43__27__40__30__226__91__135_Hc_93__171__190_iY_165__149__206_2_210_H_204__238__196__179_31_36__202__138__187_o_93__173__125_yw_191__37__254__14_m_61__167__37__189__167__37__47_i_205__236__169__242__36__146__187_I_38__237_v_146_M_242__223__149_7_187_Q_230__151__42_wQ_230__159_-_185__165__125__234__240__255__0__141__250__182__171_y_225__93__15__225_G_133_5-CJ_241__143__198__27__185_4D_212_4_219__135__130__251__195__154__2__39__153__173__235__17_K_17__243_me_183__179__38__222__210__239_d_145_G_170__95_i_9__40__217__61_P_207__96__210_t_157__43__64__240__174__153__161_hZf_159__162__232__154_-_164_6_26__126__159_an_150__214__150__22__144__160__142__24_a_133__0_H_226_DUEE_1_U_64__0__0__43_B_128_;øMÿ ûâŸ‹şÜÿ £é6ï|=İòG'…o&amp;o;Mƒ;ÿ dj-ªÛÛD!²Ónü=c$¦¾€ &_248__179__170_k_186__39__236__201__227__205__91__195__26__141__150__145__226__29__63_C_189__155_N_188__186__184__179__183__142__218__228_D_222__91__249__151__132_Z_163__134__198__211_pD_59__182__249__159__38__234__227__127_g_143__24_x_155__198__95__0_n_174__124__92__92__186__247__246__214__131__226_-k_64__146_Mu_180_f_213_f_91__43__167__133_M_233__210__25__180__239__180__141__187__36__251__41__17__134_B0_172__25_Dab_234_W_196_FR_92__92__176__167__25__37_u_205_wS_149__221_o_203_f_173__230__189_L_177_5_125__154__160__162__157__231_9E_190__150_PrV_243__186__215__201__163__221_k_63_V_210_t_173__123__194__186__150__133__174__233__154__126__181__162_kV_147_Xj_26__125__253__186__92__92__218__95__218_L_134_9a_154__23__5__36__137__209__153__25__24__21_e_36__16_A_171_5_60__127__224__134__173__170__217_xW_92__92__248_Q_226__189_KP_213__124_c_240_v_238__61__17__245__13_J_225__231__190__241__30__128__233__230_h_154__196__178__202_D_183_R_220_Y_129_oww_178_8_164__213__44_ut_136_l_130__189__178_h_218_KIbId_183_i_17__149_e_143_n_248__201__24__12__187__129__92__92__142__163__32__143_Ph_3__203__190__16__124_-_255__0__133_C_240__180__248_J_47__30__248__223__199__182__41_s-_212__23__94__40__93__36__222_B_242__177__146_b_210__216_YZ_153__222_Y_158_I_228__154__224_K4_146_H_236__210__18_k_213_j_41__211_P_138__132_vI_37__232__180_F_149_j:_149__37_VI_39__38__219__178_QWn_238__209__138_I_43__189__146_ItA_92__92__127__143__252__19__165__124_E_248_5_226__31__5_k_23__26__133__133__158__189_ha_143_P_211__157__92__34__212_4_123__165__92__34_K_91__251__25__93__28_A_125_kp_144__221__91_N_20__180_3_195__20__139__243__32__171_39_255__0__132__254_5_213__124__95__240__246__239_O_241_m_190__159_a_241__47__192_wp_248_o_199_VZr8_211__173__181__245__178__181__188__145__236_Y_221__203__216__220__91__222__218__222__91__22_s_42__193_u_18_N_176__220__164__208__197__234__20__0_W_207__255__0__13__255__0__226__230__252_l_188__248__238__255__0__47__134_-_244__171__239__7__252__61__133__185_it_163__126__95_S_214__150_T_196_s_91_j_242__233__250_T_150__152_7_9__246_-;Îê)Pê7Dô Q@ú¶­¥hÔµİwRÓô]E´šÿ PÔ/îÚÒÂÒ2K4Ò¹	HŠÌÎÄ*¨$xÿ Â'UÕ|Uã¿Œ%Ó5[ø“w†§ßÛ½­Ö“àí)î#Ñ¡šë-ÃÜê:Ã%Ä1][¶²l§Ù&amp;Ğp¢€&_127__227_W_133__181__221_s_225_f_159__226__63__5_X_127_i_124_F_248__93__170__197__227__47__9_Y_249__209_C_253__169__127_m_12__208__92__92__233__190_d_204__32__135__251_KN_186__212_4_175__180_L_29_m_126__223__246__149_C_36__17__145__232__30__22__241_N_131__227_O_2_Xx_147__195_W_223__218__26_F_161__230__170__59_C-_188__208_M_20__141__12__246__247__16_J_171_5_189__204__19_G_44__19__91__204__137__44_2_197__36_R_92__34_H_140__160__3_KR_211_4_221_g_195__183__250_;±§ØêºF«o-íä	=µå¼ŠRH¥‰ÁWÔ•e`A‚1U&_61__225__207__15_xK_193__154_w_134__252__41__161_h_222__25__240__238__145__23__145_c_165__233_6QYYYE_146_vC_4_J_177__198__185__36__225__64__25__38__146__138__189__237__168__27_4S_3__195__254_._233_:_174__147__226__175__1__252__96__240__206__153__168_j_250__223__195_k_185__236_5_141_;Âİînµojo³0¨wimŞ×NÖ-á–êá´ae õ÷{“«iZ÷…tÍwBÔ´ıkDÖ­!¿Óõ„¹´¿´™Í¨JI£++©*ÊAƒ@PE |ÿ ñ#ş-ÆË?ñóá‰ô«üB…xh´¡~KÖšWÌpÛißê²]äÛ§ØµË©es§[Á/Ğáÿ õmWVÓ´Ïƒ^ÔµÇ­.×ûNÊáì®&_59__225__123_i_236__237__245__237_V_222__237_H0_223_Ao_168__195__13__145_E_149__197__245__221__147__180_-m_21__212__176__251__6__147__164__233_Z_7__133_t_205__11_B_211_4_253__23_D_209_m_33__176__211__244__251__11_t_182__180__176__180__133__4_p_195__12__40__2_G_18__92__34__170__42__40__10__170__0__0__1__64__26__20_P_1_E_0__124__255__0__241_C_254_._95__197__61__39__224__93__135__239_t_136__191__178__188_U_241__47__204__253__220__127__240__138__180__215__127_b_211_F_236__173__207__246__174__161__166__61__173__205__187_E_44__47__166__193__171_E3A_36__246__126__127__208__20__0_Q_64__5__124__255__0__164__127__197__169__253__172_u_31__14__207__251__143__1__124_t_213__91_Q_240__178__197__243__166__153__227__33_guw_172__216__8_Sj_219__91__94_Zi_205__171_D_203__27__137__47__127__183_d_184__153__37__186__180__142__96__15__160__40__160__2__138__0__43__231__255__0__133__255__0__241_m;)êßï¿u¤Kı«â¯†_ï#ÿ „U&amp;´ûnšvám¿²µM-m­Ö(¡M6}&amp;(Zy
+                      ¼ò &gt;€¢€
+(?VÒt­{Âº–…®éš~µ¢kV“Xj}ıº\\Ú_ÚL†9aš$‰Ñ™e$A¯ø1«jºF©|ñ~¥¨jş8øSih¿Úw·{qâ/ÜÏyo ê·lIšú{}:hoK¬No­/]a[ime˜Ä&-_173__124__125__255__0__134__236__253__164_._244__191__134__159__7__245__157_Z_211_U_208_4m:Mw_226__94__171__162__222__127__194__27__6__158_.t_135__142__210__31__15__92__92__44__182__210_j_23__222__33__147__237_D_147__246__182__212__44__132__147__199__167_F_245__235__255__0__240__145__254__212__223__244_F_255__0_g_255__0__252__60__154__231__255__0_2t_0__127__194_G_251_S_127__209__27__253__159__255__0__240__242_k_159__252__201__209__255__0__9__31__237_M_255__0_Do_246__127__255__0__195__201__174__127__243__39__64__7__252__36__127__181_7_253__17__191__217__255__0__255__0__15__38__185__255__0__204__157__31__240__145__254__212__223__244_F_255__0_g_255__0__252__60__154__231__255__0_2t_0__126__207__31__233__30__4__248__131__171__235__31__186__248__141__173__252__64__215__230__241__205__171__124__173_a_170__193__92__34_X_217__91__170__124__164__219_G_162_Zh_169_ip_208__219__61__245__144__179__191__146__8__164__189_q_95__64_P_7__206_;&amp;øMáÁE|ã«Ï‡7¾Ñ.õcâÆĞÑuKJBl¬mWQá†ŞMBF·g`[wÚ
+©¯£¨§ƒ£†£Ğ›q›•GEF”š’ŠŠNÓåU$åy9ÎR½šJ=·¶©)JŸ,¢£k·Î’æ‹Õ.Uw•şß^X•áÿ ´„ZS~Ä¾&gt;¸Ô¯5:ïI´·Õ¼?s§Y¥ş¡Š,®a»ĞŒ’Ãı÷ö¼:Ù¬^EK¹ü«f³!fü$µ7ı¿Ùÿ ÿ &amp;¹ÿ Ìğ‘şÔßôFÿ gÿ ü&_154__231__255__0_2t_0__127__194_G_251_S_127__209__27__253__159__255__0__240__242_k_159__252__201__209__255__0__9__31__237_M_255__0_Do_246__127__255__0__195__201__174__127__243__39__64__7__252__36__127__181_7_253__17__191__217__255__0__255__0__15__38__185__255__0__204__157_x_135__199__13__127__246__146__93__59__225__94__165__47__194__127__129__246__94__43__210__126__37_xe_252__44_t_239__138__250__197__253__236__215_W_19__181__142__165__28_V_143__225__136__214_h_155_A_187__214__197__204__159__188_kKO_181__223__36_l_246_h_64__7__183__255__0__194_G_251_S_127__209__27__253__159__255__0__240__242_k_159__252__201__209__255__0__9__31__237_M_255__0_Do_246__127__255__0__195__201__174__127__243__39__64__7__252__36__127__181_7_253__17__191__217__255__0__255__0__15__38__185__255__0__204__157__31__240__145__254__212__223__244_F_255__0_g_255__0__252__60__154__231__255__0_2t_0__127__194_G_251_S_127__209__27__253__159__255__0__240__242_k_159__252__201__215__144_x_167_Z_248__251__255__0__13__217__251_7_93__234__127__13_;èÚµÖ«¯èÚŒšÄ½WZ¼ÿ „6}&_220__234__207__37__164__222__30__183_X_173__163__212__44__124__61__39__218__129__7__237_k_167__217__25__32__143_Q_145__232__3__215__254_1_127__197__184__214__33__253__161__180__255__0__150__15__3_iM_167_x_238__211__253__92__92_:_151__131_M_212_7_23_w_242__148__253__228__151_:_44_Ky_168__91_._219__130__209_K_170__218__195__8__155_QY_161__250__2__128__10__40__0__162__128_;ñ·ü[Ú;Âôÿ ô/üCÕm&_31__227__219_X_190_Xd_213_o_154__222__199__195__218__211__160__220__207_r_183_q_218__232__143__228__198__175__44_Z_173__172__151_2_253__159_I_132_G_244__5__0__20_P_1__95__63__205__255__0__23_K_246__201__212_t_123__143__244__191__135__127__2__254__197__246__251__25_9_182__214__60_wp_182__218__157__159__157__17__216__199__251__35_Ok_27__200__183__9__173__165__184__214__237__229__95_._239_IF_140__3__232__10__40__0__162__128__10__249__255__0__193__31__241_s_255__0_h_239__21__252_G_191__255__0_L_240__127__195__205_V_235__193__254__2__181__151__230__134__61_V_193__174__44__124_C_173__92__34__29__172__151_-w_37__214__136__158_tl_241_E_165__93_Im_47__217__245_i_132__128__31__64_Q_64__5__20__0_W_207__255__0__7__63__226__227_k_19__126__208__218__135_0x_227_J_93__59__192__150__159__235__33__211__124__26_._166__184__180__191__136__191__239__35__185__214__162_k_61_B_229_v_219__149__138_-_42__214_h_124__237_9_166__152__3__232__10__249__255__0__225__23__252__91__175__29__234__255__0__179__236__255__0__184__208__188__23__165_Xj_63__13_Z_95__189_q_224__209__26_Y_253__128__204__219_Z_234__231_J_187__137__173__229_eG1_217__94_hMq4_247_WR_200__224__31__64_Q_64__5__20__1__159__171_i:V_189__225__93_KB_215_t_205__63_Z_209_5_171_I_172_5_13_;şİ.m/í&amp;C°Í‚’DèÌŒŒ
+²’
+                      ×üÕµ]#NÔ¾x¿RÔ5|)´´_í;Û‡½¸ñ…îg¼·Ğu[‹¶$Í}=¾47¥Ö'7Ö—®°­´¶²ÌîP—üXñ®«á‡¶š„­ôûï‰~&_187__155__195__126__5__178__212_Q_206__157_s_175__181__149__213__228_o_124__200__232_R_198__222__222__202__234__242__228__171__137_Z_11_YR_5__154__229__225__134__94__131__192__30__9__210__190__28__252__26__240__247__130__180_k_141_B_250__207__64__180_Xd_212_5_23_Iu_13_b_233__137__146__234__254__250_TD_19__223__93__92__92__60__183_W3_149__13_4_243_K_35__124__206_h_3__176__175__35__213_;0èºOíE§|-—Ã¾*êú7—]Š;/ì›‹µ¼{[iwÜ-ÓK*é×$4VòD»@yœTs¯kJŠøªIF&gt;­6½6&amp;¤”)N´¾+¿K¥ù´zåeñŸVÕum;Lø5àıKPÑüqñZÒí´ì®ÊãÃ¾¶Îß^ÕmîÔƒôúŒ0ÙY\\_]Ù;BÖÑ]K°i:N• xWLĞ´-3OÑtMÒ?O°·KkKHPG0Â€$q\"*¢¢€ª   ¡E PÏÿ ?ââøïGıŸmÿ }¡xÓJ¿Ô~%4_zßÁ¦7³û ™w5­Î«w*ÛÄÌˆd²³×ZŞh.­b‘&gt;€ ¼ã…µİGÀøÓÀiø­ğïv©á¤Šh­f×!Y!šÿ @yåe†;mVafï8’+yZÖ÷ËiìmÙ =Â~)Ğ|qğ³Ã&gt;5ğµ÷ö§†&a_165_YkzE_231__147__44__31_k_176__187__133__39__183__151__203__149_VD_223__20__136__219__93_U_134_p_64__32__138__232__40__0__162__128__10__240__255__0__140_:N_171__163__234_;øÕá}3P×&E_240__146__211_XmCC_211__173__222__231_P_241__95__133__238__224_I5-_42__198_0_24__125__185__174__44_t_187__235__96__16__60__211__233__177_Y_249__182__208__222_O2_128__123__6__147__171_iZ_247__133_t_205_wB_212__180__253_kD_214__173__33__191__211__245__11__11__132__185__180__191__180__153__4__144__205__12__168_JI_19__163__43__43__169__42__202_A_4__131_Z_20__1__243__255__0__195__127__248__185__191__27__47_;;¿Ëá‹}*ûÁÿ anZ](ß—Ôõ¥•1ÖÚ¼º~•%¦Â}‹O³ºŠT:Ä}@|ÿ â‚ÚÆµûmøoâÅ¿Œ´Û=3E‚fÓ¥Ğm]R4¸meª­Ò-¥Ì’ÛËunÖÓyÍkŞ˜O/)S“­B²“JœÔœtåšQ’äšë´ì­¬WK¢j'*5i-ââŸXíïG³Vû›&gt;€¬ı[VÒ´
+êZî»©iú.‰¢ÚM¨j÷	miai
+%ši\\„$EfgbTHµ(ñÿ ƒÚN«¬j&gt;$øÕâ}3PĞüEñnÓFm?CÔmŞÛPğ§…í
+                      y4Í*ú2}¹n/µKëS|3êRÙù·0ÙÁ3{… P\\ÿ ‹&S_160__248__27__225_g_137__124_k_226__155__239__236__191__12_x_63_J_188__214__245__123__207__38_Y_254__201_ai_11__207_q_47__151__18__180__143__178__40__221__182__162__179__28__96__2_p_40__3__207__254__14_x_91__93__211__188__9_7_141__60__127_a_246_o_138__223__17_6_234__158__37_If_138__230_m_14__22__146_i_172_4_4__158__38_hd_182__210__161__185_6h_240__8__226__184__149_n_175__124__181__158__250__225__159__216__40__0__162__128_;Ğ?âÙ~Ù:×ƒßıÁ&gt;Óâ¯gä¶Ó|U¯öæ›Ü†/¶Â!Ö
+                      ·‰dš{ˆüOw+Q_@P{·1iW2+¼f8ƒ$M+.äF¼¹ÿ drz
+ùö;Õšÿ ág‹-bø¥Ç+]BÎâ/[]kOm«O=¤m=¹·Ôµ;ÿ ²\\Àë™­íŞÚuAm¬‹Q'ËÊÕQ·ËÌ§%ìâÓ“œ©¥(ÎÆ4ù¤£É9ÂÕcÍì«tS”}Œã;$ÜZ“‹ÖJö¦¥¢R”\\§É¬¥R’-9¸ı…EYÎ|ÿ ğ÷ş-·í¯|ÿ QàıWJÿ „Ãáµªÿ ©Òt«v·±Ö4[tš;k¹ì.¡ób×c³µ‰-ôÌ&amp;‡Åİ[UÕ|Uà?ƒşÔµ[ø“w=ş±¨X\\=­Ö“àí)íäÖf†U(ë-ÃÜéÚ:½¼Ñ][¶²/`$Ù&gt;Ğ`Òt+@ğ®™¡hZfŸ¢èš-¤6~Ÿan–Ö– a… HâDUEEU@  +B€
+( ¯Ÿş!ÅÈı£´‚£÷şÒt¡ã‰6­ş§VÒ®âÇGÑnìi-¯îà¿º›ËwF‹B’Îê'·Ôğà@Q@&amp;~ÑÚş‡¡üQøJÏñ/Å&gt;ñ›ë¯¡h~¯ui‰ ˆ¾,Q¢ƒWº0•·ÓÊÂ(n®.R&amp;x…}g[N¼]8PTZå¼E¬gÍeËÍwiÁBò§h¨ÂtçkÕr•ÉG–.JÓé{¦éı–¡Ë¸sûT«^rœ”èÊ|¸xB|ÿ ¯ÿ ÅÌı²tOÇş‘à‚ßfñW‰qóÛj^*[ûM“ïÃ/Ø¡3kÛÊ±ÍÄ»‰Š±¬H&gt;€¢€
+(Ïş(øş?ÀsÂpêŸØµÇÙuYû7Ú¿°uÛˆ¯ô­CìåÑn~Ë¨[ZÜù7—7“åÈ7e'Ã?Âğ²ÓT¾Ò¿áñnŸåéş,ğÄ—?h¹ğº°Ç%ÖŸ4›ÍòüÔx§Tİ[Ëou	{{ˆ¤p@¢€
+(Ãÿ h«+dı‘üYã«işÖşÚKãı]½Kƒo£êDOvàÚÅ%ßØg…'²½KUóæ±»½9š¼ƒáç‹ş-h*øƒâïşÊßïücãÏ\\LóÚk~ –ÍŞ×D°·i|F%$³Qw4š%ÔuVX°— Oÿ …Éñş;ãÿ şşóKGü.Oˆ¿ôißÿ ğoğóÿ šZ ?ár|Eÿ £Nøÿ ÿ ƒ‡ŸüÒÑÿ “â/ıwÇÿ üü&_255__0__230__150__128__15__248__92__92__159__17__127__232__211__190__63__255__0__224__223__225__231__255__0_4_181__161__251_:Y_91_7_236__143__225__63__24__127_ki_254__36__214__254__43__218_E_227__253_w_93__178_K_129_o_172_j_26__188_IvZ_220__221_E_29__223__216__96__133__224__178__178_K_165__243__225__177__180__178__129__249__135__128__15_p_162__128__10__40__3__207__254__36_x_235__254__16__63__2_Y_221_Yi_95__240__145_x_155__196_Z_173__143__135__188_7_162_-_207__217__219_V_213_n_228__9__26__179__132__146_D_182__130__33_5_237__220__177_C_59__219__217_Z_94__92__92__8__165__16__20__39__194__223__2__255__0__194__183__248__19__161_xNmS_251__127_V_182__251_N_161__174_k_63_f_251__39__246__246__187__125_q-_254__171__168__125__156__59__173__183__218__181__11__155__171__159__92__34_6_242__225__243__188__184__194__198__138__160__3__208__40__160__2__138__0__43__231__255__0__22__255__0__197__169__253__163__180__207__136__246__156_x_63__226__182__171__161_x_63__198__150__191_r_29_3U_149__165__177__209_u_168__146__63__154__91__155__155__187__141_7D_185__204_r_60__145_;•!–ÚßK”Lô Q@?ø—ş.§íOmğïıÃÿ …Ù&gt;*ñcÅòı»ÅQİÁ¨x{M[„İ·ìcşÖ¼·Ì;Ãçt¶—W0Ëô PE óÿ †âÕşÔ÷?ÿ Ô|?ø©ı­â¯	¼¼ı‡ÅOw&gt;¡â5®nï¶}¯ûZÎß3Ì||îŠÒÖÚ€&gt;€¢€
+(çÿ ÿ ÅÖı£µ/ˆ÷_ò'ü(Õußø.×ïÃ©ê±4V:Öµ*IóEsmwo©h–Ø7$ÕdÜÛê‘~€ Š ( ¹ÿ x[AñÇÂÏø'Å6Úñ†•y¢jö~t°}®Âî‚â/2&amp;Y|R:îFVÈ
+                      €hÏşx§]½ÿ „¿À&gt;7¾û~ê­cuy$1[¿ˆ4KÓèÚ°5&gt;Ğ‹{™¢‚s©XjÑ[¢Ån ö
+ +Ïş%øëş…—z¥†•ÿ 	7‹u3OğŸ†#¹û=Ï‹5Ö†I-tødØşW™å;Ë;!ÖŞ+‹©Š[ÛË\" üÿ ÂËM*ûTÿ „›Åº‡—¨x³Äò[}çÅšëCWZ„Ñï+Ìò‘\"\\Çko½¬!-íâ=€
+Yb·´–yä
+                      C$’;HÑFI$ğ $Ğğ·âg†ş/|ƒÇMEt­OWÒàkèVf}:şãN–@ŠÍˆŞ[WxòCd,¨ÙUô:Ê…_kJRk™'f¬ÕÒviêšÙ§³Ğ”¥Óån7Z§ÊÚºktí£ê‚¼ÿ â_á?øYw¥XjŸğŒx·Oó5	ø;o´\\øO]XdŠ×P†=éæù~k¤°3ˆî­å¸µ˜=½Ä±¾ üuÿ 	ÿ ÂËMRûJÿ „cÅº—§ø³Ã\\ı¢çÂzêÃ—Z|ÒlO7ËóQâPGuo-½Ô%íî\"‘ı€
+ñÿ ‹&gt;)×láğ‚/¾Áãß‰zªØÚŞGWáıßlúÎ¬cu‘SÈ´g¶šX'·•ş“Â4W@ğŸ…´|,ğÏ‚|-aı—áéVZ&amp;‘gçK?Ù,-!H-âó%f‘öE.çfcŒ’NMt Q@ Q@?üjÿ ‹ıŸñ÷Kÿ Bÿ …åÂ}äüŸÛ~O;íßhûŞgöWÚdÖ Ù·'ì—vvŞ_öÇ™ô óÿ †âê~Ô÷??×ü?øWı­á_	¤¿/Û¼UÜúˆu&amp;·}Û~Çö?ì›;ŒA0óµñ¶[K«i¥ úŠ +‘ñï„-üğoÄ~
+»Õu]ÏÄÖ2i÷šjÚ=ÌPÈ6¸Eº†x2åeŠDefH5ÏŠÃªô*Prqç‹Õ®®­utÕ×K¦¯ĞÒOgR3²viÙìíÑù&gt;§ğ3áMçÁ¯óø6÷ÇÇÄ	fñ¿¯jjVV3í=FãPh¼«Hã*÷,Y‚€ÎÎQaŒ¤1{m¨ÂŒRQŒc¥íîÅFşó“Ö×İï¦‡=:|œÚŞò”µ¶œÒrKD—»{-ˆ(ª4&gt;ñ/üZ¿ÚÛâ'ú‡ÿ ?²|+âÄ‹Ÿ°ø©îàÓü=©-ºmİöÏµÿ dŞ\\by“áñ¶+K[™¢ú€
+ùÿ à§ü\\·ü}Õ?Óá`y¿ğ€ùß?ö'ÉûÙşï—ı«öhµ©÷ÅÈû]¥Ï™ı™oå€}E PE P_?ü&amp;ÿ ‹}ñOÅÿ îÑôwŠ¾îù#“Â·“7¦ÁŠ²5–Õmí¢Ùi·~ˆ±’S@ÅŸë¶?ğˆxÁß`ñïÄ½Ulmo#†+‡ğş‰o¶}gV1ºÈ©äZ³ÛM,ÛJÿ IŠá+‚ xOÂÚ¾xgÁ&gt;°şËğÇƒô«-H³ó¥Ÿì–¤ñy’³Hû\"s³1ÆI'&amp;€:
+( ¢€
+( ¢€9ÿ x[AñÇÂÏø'Å6Úñ†•y¢jö~t°}®Âî‚â/2&amp;Y|R:îFVÈ
+                      €kÏşx§]½ÿ „¿À&gt;7¾û~ê­cuy$1[¿ˆ4KÓèÚ°5&gt;Ğ‹{™¢‚s©XjÑ[¢Ån  çş,ÿ ÅÁø§áv¿¿Ò5¾*ø…·æ?
+ÙÌ¾F›&gt;7¨ş×Ô+V·¹ˆÃ{¦Úx†
+                      Ë$B¾€ Š ( Š ( ¼ãW…µİsáfŸâ?Xi|Fø]ªÅã/	YùÑCı©mĞ\\é¾dÌ
+                      ‡ûKNºÔ4¯´Lm~ßö•C$ğ€?à£ß±Œÿ ükñÇ¿&_143__19_j_26__174__165__162_xb_206_o_9_x_138__231__254__17__159__9__219__205__28__16__197_o_36_V_38__63__248__153__203_d_186__204__236__17__39__255__0_J_180__180__156__202_4_203_r_158__193__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_208__1__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_209__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_208__1__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_209__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_208__1__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_209__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_208__1__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_209__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_208__1__255__0__15_G_253__132__255__0__232__185__255__0__229__153__226__127__254_W_215__143__248__251__254__10__61__251__24__219__252_S_240_W_196__127__1__124_d_243__252_M_167__234__186_n_137__226__123_8_124__37__226__43_o_248_I_188__39_q4_144_M_21__196__146__216__136__255__0__226_Y-_235_k01G_159__253__22__238__210__3__16__212__238__11__128__125__255__0__240_S_194__218__238__133__240__178__255__0__196__126_4_176__254__204__248__141__241_GU_151__198__94_-_179__243__162__155__251_._254__226__24__96__182__211__124__200_X_193_7_246_n_157_k_167_i_95_h_132__92__34__221__125__131__237__44__130_I_228__39__216__40__0__162__128__10__40__3__255__217_;</raw-data></tm-arg><tm-arg>jpg</tm-arg></tuple></tm-arg><tm-arg>*5/8</tm-arg><tm-arg>*5/8</tm-arg><tm-arg></tm-arg><tm-arg></tm-arg><tm-arg></tm-arg><tm-arg></tm-arg></postscript></tm-arg><tm-arg>Cyclic
+                      Core Two-Dimensional Collapsible Cube Complex
+                      S</tm-arg></small-figure><htab>5mm</htab>
+                    </tm-par>
+                  </with>
+                </tm-par>
+              </with>
+            </tm-par>
+          </with>
+        </tm-par>
+        
+        <tm-par>
+          
+        </tm-par>
+      </with>
+    </tm-par>
+  </body>
+  
+  <initial>
+    <collection>
+      <tm-arg>
+        <associate>
+          <tm-arg>font-family</tm-arg>
+          <tm-arg>tt</tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>language</tm-arg>
+          <tm-arg>verbatim</tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>par-columns</tm-arg>
+          <tm-arg>1</tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>par-first</tm-arg>
+          <tm-arg>0cm</tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>sfactor</tm-arg>
+          <tm-arg>10</tm-arg>
+        </associate>
+      </tm-arg>
+    </collection>
+  </initial>
+  
+  <references>
+    <collection>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-1</tm-arg>
+          <tm-arg><tuple><tm-arg>1</tm-arg><tm-arg>1</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-10</tm-arg>
+          <tm-arg><tuple><tm-arg>5</tm-arg><tm-arg>5</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-11</tm-arg>
+          <tm-arg><tuple><tm-arg>6</tm-arg><tm-arg>5</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-12</tm-arg>
+          <tm-arg><tuple><tm-arg>7</tm-arg><tm-arg>5</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-13</tm-arg>
+          <tm-arg><tuple><tm-arg>1</tm-arg><tm-arg>6</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-14</tm-arg>
+          <tm-arg><tuple><tm-arg>1</tm-arg><tm-arg>6</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-15</tm-arg>
+          <tm-arg><tuple><tm-arg>1</tm-arg><tm-arg>6</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-16</tm-arg>
+          <tm-arg><tuple><tm-arg>2</tm-arg><tm-arg>?</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-17</tm-arg>
+          <tm-arg><tuple><tm-arg>8</tm-arg><tm-arg>?</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-2</tm-arg>
+          <tm-arg><tuple><tm-arg>2</tm-arg><tm-arg>2</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-3</tm-arg>
+          <tm-arg><tuple><tm-arg>2.1</tm-arg><tm-arg>2</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-4</tm-arg>
+          <tm-arg><tuple><tm-arg>3</tm-arg><tm-arg>2</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-5</tm-arg>
+          <tm-arg><tuple><tm-arg>3.1</tm-arg><tm-arg>2</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-6</tm-arg>
+          <tm-arg><tuple><tm-arg>3.2</tm-arg><tm-arg>3</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-7</tm-arg>
+          <tm-arg><tuple><tm-arg>4</tm-arg><tm-arg>3</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-8</tm-arg>
+          <tm-arg><tuple><tm-arg>4.1</tm-arg><tm-arg>4</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>auto-9</tm-arg>
+          <tm-arg><tuple><tm-arg>4.2</tm-arg><tm-arg>4</tm-arg></tuple></tm-arg>
+        </associate>
+      </tm-arg>
+    </collection>
+  </references>
+  
+  <auxiliary>
+    <collection>
+      <tm-arg>
+        <associate>
+          <tm-arg>figure</tm-arg>
+          <tm-arg>
+            <tm-par>
+              <tuple><tm-arg>normal</tm-arg><tm-arg>Cyclic Core
+              Two-Dimensional Collapsible Cube Complex
+              S</tm-arg><tm-arg><pageref>auto-14</pageref></tm-arg></tuple>
+            </tm-par>
+          </tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>table</tm-arg>
+          <tm-arg>
+            <tm-par>
+              <tuple><tm-arg>normal</tm-arg><tm-arg xml:space="preserve">Initial  Prime Implicant Graded Covering Table for S</tm-arg><tm-arg><pageref>auto-13</pageref></tm-arg></tuple>
+            </tm-par>
+          </tm-arg>
+        </associate>
+      </tm-arg>
+      <tm-arg>
+        <associate>
+          <tm-arg>toc</tm-arg>
+          <tm-arg>
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">1<space>2spc</space>Introduction</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-1</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">2<space>2spc</space>Definitions
+              and Background</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-2</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <with par-left="1.5fn">2.1<space>2spc</space>Cubical Cell Complexes,
+              Combinatorial Topology, and Covering
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-3</pageref></with>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">3<space>2spc</space>Minimization
+              Process</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-4</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <with par-left="1.5fn">3.1<space>2spc</space>Exact Two-Level Boolean
+              Minimization [2]
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-5</pageref></with>
+            </tm-par>
+            
+            <tm-par>
+              <with xml:space="preserve" par-left="1.5fn">3.2<space>2spc</space>Cyclic Core Reduction Overview  <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms> <no-break/><pageref>auto-6</pageref></with>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">4<space>2spc</space>Description
+              of Algorithm</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-7</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <with par-left="1.5fn">4.1<space>2spc</space>Finding a collapsible
+              cell.
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-8</pageref></with>
+            </tm-par>
+            
+            <tm-par>
+              <with par-left="1.5fn">4.2<space>2spc</space>Collapsible Element
+              Reduction
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-9</pageref></with>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">5<space>2spc</space>Realization
+              Considerations</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-10</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">6<space>2spc</space>Conclusions
+              and Future Work</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-11</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+            
+            <tm-par>
+              <vspace_42_>1fn</vspace_42_><with font-series="bold" math-font-series="bold">7<space>2spc</space>References</with>
+              <datoms><tm-arg><macro><tm-arg>x</tm-arg><tm-arg><repeat><tm-arg><arg>x</arg></tm-arg><tm-arg><with
+              font-series="medium"><with font-size="1"><space>0.2fn</space>.<space>0.2fn</space></with></with></tm-arg></repeat></tm-arg></macro></tm-arg><tm-arg><htab>5mm</htab></tm-arg></datoms>
+              <no-break/><pageref>auto-12</pageref><vspace>0.5fn</vspace>
+            </tm-par>
+          </tm-arg>
+        </associate>
+      </tm-arg>
+    </collection>
+  </auxiliary>
+</TeXmacs>

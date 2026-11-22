@@ -1,0 +1,344 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TopoSpine certificates v1",
+  "oneOf": [
+    {
+      "title": "ElementaryCollapseTrace",
+      "type": "object",
+      "required": [
+        "type",
+        "cell",
+        "free_face",
+        "other_top_cells"
+      ],
+      "properties": {
+        "type": {
+          "const": "ElementaryCollapseTrace"
+        },
+        "cell": {
+          "type": "string"
+        },
+        "free_face": {
+          "type": "string"
+        },
+        "other_top_cells": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "chi_before": {
+          "type": "integer"
+        },
+        "chi_after": {
+          "type": "integer"
+        }
+      }
+    },
+    {
+      "title": "CoverOptimalityWitness",
+      "type": "object",
+      "required": [
+        "type",
+        "decode_cover",
+        "cost"
+      ],
+      "properties": {
+        "type": {
+          "const": "CoverOptimalityWitness"
+        },
+        "decode_cover": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "cost": {
+          "type": "number"
+        },
+        "hypothesis": {
+          "type": "string"
+        },
+        "claimed_optimum": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "title": "PassTrace",
+      "type": "object",
+      "required": [
+        "type",
+        "pass"
+      ],
+      "properties": {
+        "type": {
+          "const": "PassTrace"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "cell": {
+          "type": "string"
+        },
+        "free_face": {
+          "type": "string"
+        },
+        "size_before": {
+          "type": "integer"
+        },
+        "size_after": {
+          "type": "integer"
+        },
+        "chi_before": {
+          "type": "integer"
+        },
+        "chi_after": {
+          "type": "integer"
+        },
+        "inserted_face": {
+          "type": "string",
+          "description": "CoveringAwareCollapse: free face inserted in place of `cell`"
+        },
+        "decode": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "face -> parent column"
+        },
+        "weight_preserved": {
+          "type": "boolean"
+        },
+        "dim_before": {
+          "type": "integer"
+        },
+        "dim_after": {
+          "type": "integer"
+        },
+        "optimality_claim": {
+          "type": "boolean",
+          "description": "ShotgunCoveringCollapse: must be false (claim C9 disproved)"
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "cell",
+              "inserted_face"
+            ],
+            "properties": {
+              "cell": {
+                "type": "string"
+              },
+              "inserted_face": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "ShotgunCoveringCollapse batch (>= 2 closure-disjoint pairs)"
+        },
+        "collapse_used": {
+          "type": "integer",
+          "description": "BoundedExactCore audit: collapse-branch invocations (comparator only)"
+        },
+        "collapse_branch_agrees": {
+          "type": "boolean",
+          "description": "BoundedExactCore audit: collapse-branch cost equals certified cost"
+        }
+      }
+    },
+    {
+      "title": "FiltrationMapWitness",
+      "type": "object",
+      "required": [
+        "type",
+        "pass",
+        "grade_cell",
+        "grade_face"
+      ],
+      "properties": {
+        "type": {
+          "const": "FiltrationMapWitness"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "grade_cell": {
+          "type": "number"
+        },
+        "grade_face": {
+          "type": "number"
+        },
+        "cell": {
+          "type": "string"
+        },
+        "free_face": {
+          "type": "string"
+        },
+        "size_before": {
+          "type": "integer"
+        },
+        "size_after": {
+          "type": "integer"
+        }
+      }
+    },
+    {
+      "title": "LogicPassTrace",
+      "type": "object",
+      "required": [
+        "type",
+        "pass",
+        "n",
+        "on",
+        "dc",
+        "gates_after"
+      ],
+      "properties": {
+        "type": {
+          "const": "LogicPassTrace"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "n": {
+          "type": "integer"
+        },
+        "on": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "dc": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "cubes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gates_before": {
+          "type": "integer"
+        },
+        "gates_after": {
+          "type": "integer"
+        },
+        "optimality": {
+          "enum": [
+            "ProvenMinimum",
+            "Irredundant",
+            "LocallyMinimal",
+            "ObjectiveApproximation",
+            "TopologicalApproximation"
+          ]
+        },
+        "abc_available": {
+          "type": "boolean"
+        },
+        "abc_ands": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "objective": {
+          "enum": [
+            "cubes",
+            "literals",
+            "cubes_then_literals"
+          ]
+        },
+        "collapse_used": {
+          "type": "integer"
+        },
+        "collapse_branch_agrees": {
+          "type": "boolean"
+        },
+        "abc_binary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "abc_ands_initial": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "title": "RelativeTowerCertificate",
+      "type": "object",
+      "required": [
+        "contracts",
+        "mode",
+        "cover_sizes",
+        "betti_N",
+        "betti_NA",
+        "betti_relative"
+      ],
+      "properties": {
+        "contracts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mode": {
+          "enum": [
+            "relative",
+            "coverage_only"
+          ]
+        },
+        "relative_equivalence_checked": {
+          "type": "boolean"
+        },
+        "cover_sizes": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "A_cover_radius": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "betti_N": {
+          "type": "array"
+        },
+        "betti_NA": {
+          "type": "array"
+        },
+        "betti_relative": {
+          "type": "array"
+        },
+        "uncovered_points": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ]
+}

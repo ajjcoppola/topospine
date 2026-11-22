@@ -1,0 +1,163 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,graphicx,hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+
+\title{Covering-Aware Collapse, Don't-Care Spines, and Relative Towers:\\
+Certified Reductions for Logic Circuits, Bio Networks, and Molecular Conformations}
+\author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
+\date{Draft 2026-11-18 (Loop~4, camera-ready audit)}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We extend the certificate-carrying \textsf{TopoSpine} pass manager from
+complexes to circuits and point clouds.  (i)~\emph{Covering-aware collapse}
+replaces a column of a covering IR by an admissible free face \emph{in place},
+preserving column count and weights and recording a decode map, so that the IR
+can never be silently emptied (the failure mode of deletion-style collapse).
+(ii)~A small And--Inverter-Graph / factor-diagram IR, with a
+\emph{don't-care spine} pass that solves the covering problem whose rows are only
+the care ON-set and whose columns are primes of $\mathrm{ON}\cup\mathrm{DC}$, then
+factors the result; every pass is re-checked by an independent evaluator and
+exact optimality witnesses are produced for min-cube covers.
+(iii)~A \emph{relative SpineTower} for molecular conformation clouds, forcing an
+$\varepsilon$-net of a designated subset $A$ (functional group) at every scale
+and reporting exact $\mathbb F_2$ Betti numbers of $N$, $N_A$ and $(N,N_A)$.
+All benchmarks here are on \emph{synthetic} bio circuits and a \emph{synthetic}
+conformation cloud; no claim is made about real pathways or real molecules.
+Against a real Berkeley~ABC baseline (run through \texttt{yosys-abc}), the don't-care
+spine beats ABC applied without don't-cares on every synthetic cascade, and ABC applied
+to our output is better still; ABC cannot use our don't-cares in this flow.  A same-budget
+ablation of the relative tower shows a smaller covering radius on the designated subset
+than a $k$-center baseline of equal size, but \emph{no demonstrated topological advantage}.
+\end{abstract}
+
+\section{Covering-aware collapse}
+Let $T_C$ be the graded covering table of a cubical complex: columns are top
+cells, rows are all faces, incidence is the face relation.  For a top cell $c$
+with free face $f$ (no other top cell contains $f$), the 2007 collapse-branch
+replaces the column of $c$ by that of $f$ and recurses; an optimal cover of the
+reduced table decodes to one of the original table under the hypothesis
+\textsf{CoverAdmissibleFreeFace} (every row incident to $f$ is covered only by
+columns containing $f$).
+
+\begin{proposition}[IR-level invariants]\label{prop:ir}
+Let $\mathrm{replace}_{c\to f}$ substitute $f$ for $c$ in a list of column ids.
+Then $|\mathrm{replace}_{c\to f}(X)|=|X|$; if $X\neq\emptyset$ then
+$\mathrm{replace}_{c\to f}(X)\neq\emptyset$; and if $f\notin X$,
+$\mathrm{decode}_{f\to c}\circ \mathrm{replace}_{c\to f}=\mathrm{id}$.
+\end{proposition}
+These are proved in Lean~4 (\texttt{CoveringCollapse.lean}; the proofs use only
+\texttt{propext}).  Optimality transport itself is the abstract
+\texttt{transport\_optimum} (L5); its four cost/feasibility hypotheses are
+\emph{not} proved for covers and remain the admissibility hypothesis, checked
+only by the Python auditor.
+
+The implementation (\textsf{CoveringAwareCollapsePass}) is fail-closed: it
+refuses cells in the designated relative subcomplex, refuses inadmissible
+faces, and its certificate is rejected by the independent checker if the column
+count changes, the inserted face is absent, the dimension does not drop, or the
+decode map is missing.  \emph{Negative result.}  On the 2007 cyclic-core complex
+$\{{--00},{-0-0},\dots\}$ \emph{every} free face is inadmissible
+(6 of its 9 columns have free faces, 12 in all), so the pass inserts nothing; on disjoint squares it
+reduces each square to a vertex in two steps while keeping both columns.
+
+\section{AIG, factor diagrams, and the don't-care spine}
+A single-output incompletely specified function is a triple
+$(n,\mathrm{ON},\mathrm{DC})$.  \textsf{DontCareSpinePass} builds the table with
+rows $=\mathrm{ON}$ (don't-cares are never rows), columns $=$ prime implicants of
+$\mathrm{ON}\cup\mathrm{DC}$, and solves it with \emph{plain} branch-and-bound (the
+collapse-branch is only run as an audited comparator, because it is suboptimal on some
+$n=5$ instances; see Paper~A).  Whenever $\le 16$ columns remain an exhaustive oracle
+audit is attached and the result is labelled \textsf{ProvenMinimum} for the chosen
+objective: \texttt{cubes} (default), \texttt{literals}, or \texttt{cubes\_then\_literals}
+(minimum over covers of ON by primes of $\mathrm{ON}\cup\mathrm{DC}$).  Single-output
+\texttt{.pla} and combinational \texttt{.blif} inputs ($\le 10$ inputs) are read by
+\texttt{topospine.formats}.  \textsf{FactorDiagramRewritePass} applies algebraic quick-factoring
+into a structurally hashed AIG and is rejected if it would increase the AND
+count.  The checker \texttt{verify\_logic\_trace} evaluates the realized AIG on
+every minterm and rejects any ON minterm mapped to $0$ or OFF minterm mapped to
+$1$.  A \textsf{CoverOptimalityWitness} (decoded cover, cost) is verified by the
+Loop~1 checker.  An adapter \textsf{AbcBaselineAdapterPass} writes BLIF and runs
+\texttt{strash} plus an explicit expansion of \texttt{resyn2} through Berkeley~ABC
+(\texttt{yosys-abc}, installed for this study); it never mutates the state, and
+ABC's AND counts are baseline numbers only (we do not re-verify ABC's output).
+
+\section{Synthetic bio circuits}
+\emph{Gene-regulation toy.}  Four next-state functions of a 5-gene toy network
+(not a published model) with satisfiability don't-cares from two stated
+invariants ($\mathrm{CycE}\Rightarrow\mathrm{E2F}$,
+$\mathrm{CycA}\Rightarrow\mathrm{CycE}$).
+\emph{Pathway cascade.}  A seeded feed-forward cascade of 24 or 40 four-input nodes over 6
+primary inputs.  The local don't-cares are the \emph{exact} unreachable fan-in
+patterns over all $2^6$ primary-input assignments; hence replacing each node by
+any function agreeing with it on the reachable patterns preserves every node
+value on every primary input, which we verify exhaustively (0 mismatches).
+Table~\ref{tab:bio} compares an unoptimized minterm SOP, the same pipeline
+without don't-cares, and the don't-care spine; gate counts are summed over nodes
+without cross-node sharing.
+
+\input{../../benchmarks/results/bio_benchmark_table.tex}
+
+On every node of every benchmark circuit the don't-care spine used no more gates
+than the no-DC pipeline (an empirical observation, not a theorem: the factoring
+step is heuristic), and every node carries a verified witness.  ABC with
+don't-cares forced to $0$ is better than our own no-don't-care pipeline but worse than the
+don't-care spine in every cascade row (e.g.\ 298 vs.\ 142 ANDs on the 40-node, seed~1
+cascade); running ABC on the spine's output gives a further small gain (137).  On the ISCAS
+\texttt{c17} netlist, per-output synthesis uses 8 gates versus 6 in the shared original:
+we do no cross-output sharing.  Changing the cover objective from cubes to literals reduces the total
+literals of 120 random 5-variable incompletely specified functions only from 2830 to 2824
+(cubes unchanged at 776; $\approx5\%$ of functions differ).  We stress that the cascade structure and its
+don't-care density are produced by our generator; the percentages should not be
+read as typical of biological or industrial circuits.
+
+\section{Relative SpineTower on molecular conformations}
+Let $P$ be a point cloud (atoms pooled over conformations) and $A\subseteq P$ a
+designated subset (functional group).  At scale $s$ we take pieces
+$B(c,s)$; the \emph{relative tower} forces centres at an $s/2$-net of $A$, then
+covers the remaining points by a greedy irredundant spine over columns passing
+the collapsibility oracle.  Let $N$ be the nerve of the selected pieces
+(2-skeleton), $N_A$ the subcomplex of faces with a common point in $A$, and
+$(N,N_A)$ the relative pair; Betti numbers are exact over $\mathbb F_2$ (checked
+against Euler additivity on every level).  Certificates: \textsf{RelativeEquivalence}
+(each $A$-point lies in a piece centred in $A$) and \textsf{ApproximatePersistence}
+(selected refinement maps; \emph{no} interleaving proof).
+
+\input{../../benchmarks/results/molecular_benchmark_table.tex}
+
+On the synthetic 156-point cloud (13 atoms $\times$ 12 torsion/jitter conformations,
+$|A|=48$) the relative tower resolves $A$ at radius $\approx 0.6,0.27,0.14$ versus
+$2.33,1.17,0.60$ for a coverage-only spine, at the price of $15,31,43$ rather
+than $4,13,19$ pieces.  This is a trade-off, and the same-budget ablation of
+Table~\ref{tab:ablation} tempers it.  A $k$-center baseline with the same number of
+pieces reaches $r_A=1.11,0.38,0.27$ (relative tower: $0.60,0.27,0.14$), so forcing an
+$A$-net is roughly a $1.4$--$2\times$ improvement in $A$-resolution; but the relative tower
+is \emph{worse} on the global radius ($1.61$ vs.\ $1.11$ at the coarsest scale) and the
+exact $\mathbb F_2$ Betti numbers of the $A$-nerve agree with an own-code Vietoris--Rips
+reference on $A$ at twice the scale at the same levels as for the $k$-center baseline (two of three; the coverage-only spine matches at one of three).  We therefore
+claim \emph{no topological benefit}, only improved $A$-resolution at equal budget.
+MD17/MD22 is supported through a local \texttt{.npz} (\texttt{TOPOSPINE\_MD17\_NPZ}) but was
+not run; GUDHI was not installed.
+
+\input{../../benchmarks/results/molecular_ablation_table.tex}
+
+\section{Lean and claim status}
+Lean: Proposition~\ref{prop:ir} (list-level covering-collapse invariants); a concrete
+\texttt{decide}-checked triangle contraction (L3) and an $\mathbb F_2$ cup-product Leibniz
+rule (L6) are described in Paper~B.  Schema-level only: the cover specialization of
+transport, which is the admissibility hypothesis checked only by the Python auditor.
+\textbf{Mode caveat.}  In the covering mode of the pass manager the pass is vacuous on the 2007
+core and on a solid $8^3$ voxel blob (no admissible free face), so Section~1 is a
+correctness and negative-result statement, not a performance result.
+
+\section*{Acknowledgments}
+Cyclic-core geometry follows Coppola--Weiss (2006/07).  Berkeley~ABC is due to
+A.~Mishchenko et al.; we cite it only as an intended baseline.
+
+\end{document}

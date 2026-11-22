@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx,hyperref}
+
+\title{Embedding Spines and Real Laplacians\\
+for Certificate-Carrying Complexes}
+\author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
+\date{Draft 2026-11-21 (TopoSpine Loop~5)}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Two extensions of the TopoSpine pipelines, both with a same-budget baseline and
+both willing to report a loss.  On labelled point clouds --- synthetic blobs,
+24 MiniLM sentence embeddings, and 12 frames of the MD17 ethanol trajectory ---
+a relative cover that is forced to resolve a designated label cuts the
+covering radius of that label and, on these examples, \emph{lowers} the chance
+that a point and its nearest labelled neighbour fall in the same piece.
+On chain complexes, the nullity of the combinatorial Hodge Laplacian reproduces
+the $\mathbb F_2$ Betti numbers of the 7-vertex torus and the tetrahedron
+boundary, and drops the torsion summand of $\mathbb{R}P^2$.  An elementary
+collapse that deletes a free face together with its coface preserves that
+nullity while shrinking the chain space; the spectral gap moves; deleting an
+arbitrary edge does not preserve the nullity.  No quantum device is used.
+GUDHI~3.13 supplies an independent Rips check and an edge-collapse baseline
+that does not rewrite the complex.
+\end{abstract}
+
+\section{Embedding spines}
+The relative tower of Paper~C is applied with $A$ a label class.  Pieces are
+balls.  At equal cardinality the comparators are farthest-point $k$-center,
+uniform random landmarks, and the coverage-only spine.  Nearest-neighbour
+recall is the fraction of points of $A$ whose nearest other point of $A$ is
+assigned to the same centre.  A cover that selects every point of $A$ has
+radius 0 and recall 0.
+
+\input{../../benchmarks/results/embedding_ablation_table.tex}
+
+On the synthetic blobs and on the 24 MiniLM sentences the relative radius at
+the coarsest scale is 0, against about $0.40$ (blobs) and $1.22$ (MiniLM) for
+$k$-center at the same number of centres, and the relative recall is 0 against
+$0.83$ and $1$.  The forced net is buying resolution by splitting $A$.
+Twelve frames of MD17 ethanol (9 atoms, $A$ the four atoms farthest from the
+centroid of frame 0; file \texttt{data/md17\_ethanol.npz}, 555\,092 frames of
+which 12 are used) gives relative radii $0.34/0.15/0$ against $k$-center
+$0.68/0.53/0.34$, and recalls $0.29/0.08/0$ against $0.56/0.46/0.25$.
+Same trade.  GUDHI's Rips Betti numbers over $\mathbb F_2$ matched the
+in-house routine on every level of these three clouds.  The full ethanol
+trajectory was not built into a tower.
+
+\section{Hodge kernels and encoding size}
+Let $B_k$ be the real boundary matrix.  The Hodge Laplacian
+$L_k=B_k^\top B_k+B_{k+1}B_{k+1}^\top$ has nullity equal to the real Betti
+number.  An elementary collapse removes one free simplex and the unique
+coface that contains it, and leaves every other face in place.
+
+\input{../../benchmarks/results/quantum_bench_table.tex}
+
+One Boolean square has 9 cells.  The pair collapse leaves 7.  Both have real
+Betti numbers $(1,0)$, padded with a zero in degree 2 after the collapse.
+The smallest positive eigenvalue of $L_0$ moves from 2 to about $0.586$.
+A one-qubit-per-cell encoding of the chain space therefore uses 9 qubits
+before and 7 after; the Dirac operator, as an operator on that space, has
+those orders.  A $\lceil\log_2\rceil$ encoding of the cell index uses 4 bits
+before and 3 after.
+Deleting one edge of the 6-cycle that is the $k=3$ suspension changes real
+Betti numbers from $(1,1)$ to $(1,0)$.  The stock deletion pass that drops a
+whole top cell is a different operation and is not claimed to preserve Betti
+numbers.
+
+\section{Collapse-branch filters and one shared netlist}
+Paper~A records that cover-admissibility does not imply the transport
+hypothesis $(H)$.  On 4\,000 further $n=5$ ON-sets, requiring the free face to
+cover the same rows as its parent never fired, nor did restricting to vertex
+faces or to parents that are edges.  Requiring the face to cover at most one
+row still fired and still disagreed with branch-and-bound.  None of these
+filters is a usable sufficient condition on minterm tables.
+
+On ISCAS c17 the per-output pipeline sums to 8 AND gates.  Placing the two
+factored covers into one structurally hashed AIG uses 6, which equals both
+the NAND2 reference and ABC run on the original netlist.  This is one
+circuit.  The hash shares whatever the algebraic factorisation happened to
+repeat; it is not a multi-level synthesis proof.
+
+\section*{Acknowledgments}
+MD17 ethanol is the trajectory of Chmiela et al.\ (Sci.\ Adv.\ 2017),
+distributed by the sGDML project.  GUDHI is the INRIA library, version 3.13,
+installed with \texttt{pip} into the working conda environment for this
+draft.  Sentence embeddings are \texttt{all-MiniLM-L6-v2} via
+sentence-transformers, from a local cache, on a 24-sentence list written for
+this repository.
+\end{document}

@@ -1,0 +1,23 @@
+# ISCAS-85 c17 (public benchmark): 5 inputs, 2 outputs, 6 NAND2 gates
+.model c17
+.inputs N1 N2 N3 N6 N7
+.outputs N22 N23
+.names N1 N3 N10
+0- 1
+-0 1
+.names N3 N6 N11
+0- 1
+-0 1
+.names N2 N11 N16
+0- 1
+-0 1
+.names N11 N7 N19
+0- 1
+-0 1
+.names N10 N16 N22
+0- 1
+-0 1
+.names N16 N19 N23
+0- 1
+-0 1
+.end

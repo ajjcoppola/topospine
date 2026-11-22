@@ -1,0 +1,88 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,graphicx,hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+
+\title{TopoSpine: Certificate-Carrying Synthesis of Filtered Cubical and Dual Complexes}
+\author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
+\date{Draft 2026-11-18 (Loop~4, camera-ready audit)}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present \textsf{TopoSpine}, a certificate-carrying rewrite engine for finite
+cubical and dual (nerve / Stanley--Reisner) complexes.  An ABC-style pass
+manager proposes aggressive reductions---elementary, filtration-compatible,
+and relative collapses, plus bounded exact covering on residual cores---and
+commits only transforms whose JSON witnesses are accepted by an independent
+checker.  The pass manager is \emph{mode-aware}: in \emph{homotopy} mode cells are
+deleted by elementary collapse; in \emph{covering} mode the free face is inserted in
+place of the cell and the checker rejects deletion-style passes and any silent emptying
+of the IR.  The Lean~4 library builds from a bare \texttt{lake build}; it contains
+finite, machine-checked instances of the collapse chain contraction and of the
+cup-product Leibniz rule, plus abstract lemmas for transport and filtration/relative
+compatibility (the general collapse theorem is \emph{not} formalized).  Benchmarks are
+synthetic: medical-style voxel blobs and spine/tower pipelines with explicit
+\textsf{ApproximatePersistence} contracts.
+\end{abstract}
+
+\section{Architecture}
+\textsf{PassManager} implements
+\texttt{read$\to$validate$\to$simplify$\to$inspect$\to$rewrite$\to$check$\to$export}.
+Each pass declares a preservation contract
+(\textsf{ElementaryCollapse}, \textsf{PersistentEquivalence},
+\textsf{RelativeEquivalence}, \textsf{CoverOptimality}).
+
+\paragraph{Modes.}
+\textsf{PassManager.default}(\texttt{mode="homotopy"}) uses the deletion passes
+(elementary, filtration-compatible and relative collapse) and scores progress by the
+decrease of the cell count.  \textsf{PassManager.covering}() runs
+\textsf{CoveringAwareCollapsePass}, \textsf{BoundedExactCorePass} and the flag-edge
+adapter, scores progress by the decrease of the total dimension (column count and
+weights are preserved), and the verifier \texttt{verify\_pass\_trace} refuses a
+deletion-style pass in this mode.  \textsf{ElementaryCubicalCollapsePass} itself
+declines to run in covering mode.  An experimental \textsf{ShotgunCoveringCollapsePass}
+applies several closure-disjoint covering collapses at once; it is contractually
+\textsf{Coverage} only and its certificate is rejected if it claims optimality,
+because simultaneous collapse is \emph{not} optimality-preserving (counterexample in
+Paper~A).  \textsf{BoundedExactCorePass} certifies a plain branch-and-bound cover (not the
+collapse branch, which is suboptimal on some $n=5$ instances) and, when an exhaustive
+oracle result is attached, the checker requires the certified cost to equal it.
+
+\section{Spines and towers}
+\textsf{SpineMin} optimizes cover cardinality under a coverage contract.
+\textsf{SpineTower} builds multiscale collapsible covers with
+\emph{selected-spine} refinement maps and fail-closed collapsibility oracles.
+
+\section{Medical volumes}
+Cubical voxel complexes from boolean masks are reduced by the pass manager.
+Table~\ref{tab:medical} reports a synthetic $8^3$ blob in both modes.  Homotopy mode
+reduces 81 cells to 49 (verified).  Covering mode leaves the instance unchanged
+(81 cells, dimension sum 243$\to$243): on a solid voxel blob no free face passes the
+admissibility test, so the covering pass is vacuous there, as it is on the 2007
+cyclic core.  We report this as a negative result.  No real volumetric data was used;
+CubicalRipser/GUDHI baselines were not run.
+
+\input{../../benchmarks/results/medical_benchmark_table.tex}
+
+\section{Lean status}
+Earlier drafts stated that the library built; that was false (the default target was
+empty), and it is now fixed and guarded by a test that runs \texttt{lake build} and
+rejects any unfinished proof.  Content: abstract transport (L5); a trace-checker schema (L1);
+$d\circ d=0$ as a schema (L2); a concrete \texttt{decide}-checked contraction on the filled
+triangle with the free pair $(t,e_{02})$ (L3: $d^2=0$, $p\circ i=\mathrm{id}$, $\mathrm{id}+ip=dh+hd$,
+$p,i$ chain maps, over all 128 chains over $\mathbb F_2$); filtration/relative lemmas (L4);
+list-level invariants of covering collapse; and the Leibniz rule
+$\delta(\alpha\cup\beta)=\delta\alpha\cup\beta+\alpha\cup\delta\beta$ for $\mathbb F_2$
+1-cochains on a 3-simplex (L6).  Not formalized: the general collapse theorem, the
+Lusternik--Schnirelmann cup-length bound (tested in Python on the 7-vertex torus and the
+2-sphere), and any optimality statement for covers.
+
+\section*{Acknowledgments}
+Historical cyclic-core geometry follows Coppola--Weiss (2006/07).  Proposed
+TU collaboration with Bala Krishnamoorthy remains on Paper~A.
+
+\end{document}

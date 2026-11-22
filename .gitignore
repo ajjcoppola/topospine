@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+.lake/
+build/
+*.aux
+*.log
+*.out
+.DS_Store
+**/.DS_Store
+# MD17 and other fetched trajectories (hundreds of MB).  Tiny embedding npz is kept.
+data/*.npz
+!data/embeddings_minilm_tiny.npz
+lake-packages/
+.lake/

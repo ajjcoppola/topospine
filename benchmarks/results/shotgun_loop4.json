@@ -1,0 +1,128 @@
+{
+  "sets": [
+    {
+      "label": "n=3 (all)",
+      "n_vars": 3,
+      "sequential": {
+        "instances": 255,
+        "collapse_used": 0,
+        "disagreements": 0
+      },
+      "shotgun": {
+        "none": {
+          "independence": "none",
+          "instances": 255,
+          "nontrivial_instances": 0,
+          "cost_mismatches": 0,
+          "infeasible_decodes": 0,
+          "reduced_table_infeasible": 0,
+          "exhaustive_checked": 255,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "rows": {
+          "independence": "rows",
+          "instances": 255,
+          "nontrivial_instances": 0,
+          "cost_mismatches": 0,
+          "infeasible_decodes": 0,
+          "reduced_table_infeasible": 0,
+          "exhaustive_checked": 255,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "safe": {
+          "independence": "safe",
+          "instances": 255,
+          "nontrivial_instances": 0,
+          "cost_mismatches": 0,
+          "infeasible_decodes": 0,
+          "reduced_table_infeasible": 0,
+          "exhaustive_checked": 255,
+          "std_vs_exhaustive_disagreements": 0
+        }
+      }
+    },
+    {
+      "label": "n=4 (all)",
+      "n_vars": 4,
+      "sequential": {
+        "instances": 65535,
+        "collapse_used": 330,
+        "disagreements": 0
+      },
+      "shotgun": {
+        "none": {
+          "independence": "none",
+          "instances": 65535,
+          "nontrivial_instances": 864,
+          "cost_mismatches": 672,
+          "infeasible_decodes": 672,
+          "reduced_table_infeasible": 672,
+          "exhaustive_checked": 65519,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "rows": {
+          "independence": "rows",
+          "instances": 65535,
+          "nontrivial_instances": 864,
+          "cost_mismatches": 672,
+          "infeasible_decodes": 672,
+          "reduced_table_infeasible": 672,
+          "exhaustive_checked": 65519,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "safe": {
+          "independence": "safe",
+          "instances": 65535,
+          "nontrivial_instances": 864,
+          "cost_mismatches": 33,
+          "infeasible_decodes": 0,
+          "reduced_table_infeasible": 0,
+          "exhaustive_checked": 65519,
+          "std_vs_exhaustive_disagreements": 0
+        }
+      }
+    },
+    {
+      "label": "n=5 (sample 1500)",
+      "n_vars": 5,
+      "sequential": {
+        "instances": 1500,
+        "collapse_used": 36,
+        "disagreements": 2
+      },
+      "shotgun": {
+        "none": {
+          "independence": "none",
+          "instances": 1500,
+          "nontrivial_instances": 72,
+          "cost_mismatches": 40,
+          "infeasible_decodes": 37,
+          "reduced_table_infeasible": 37,
+          "exhaustive_checked": 1089,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "rows": {
+          "independence": "rows",
+          "instances": 1500,
+          "nontrivial_instances": 72,
+          "cost_mismatches": 40,
+          "infeasible_decodes": 37,
+          "reduced_table_infeasible": 37,
+          "exhaustive_checked": 1089,
+          "std_vs_exhaustive_disagreements": 0
+        },
+        "safe": {
+          "independence": "safe",
+          "instances": 1500,
+          "nontrivial_instances": 72,
+          "cost_mismatches": 16,
+          "infeasible_decodes": 0,
+          "reduced_table_infeasible": 0,
+          "exhaustive_checked": 1089,
+          "std_vs_exhaustive_disagreements": 0
+        }
+      }
+    }
+  ],
+  "wall_time_s": 39.042455333983526
+}

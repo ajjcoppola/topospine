@@ -1,0 +1,15 @@
+\begin{table}[h]
+\centering\small
+\caption{Ablation on the synthetic cloud, levels listed coarse to fine. $r_A$: max distance from an A-point to a selected centre; $r_{\mathrm{all}}$: same over all points. ``$\beta(N_A)$ = Rips'': whether $\beta_0,\beta_1$ of the A-nerve equal those of the Vietoris--Rips complex of A at twice the scale (own exact F$_2$ code; GUDHI not installed).}
+\label{tab:ablation}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllll}
+\hline
+method & cover sizes & $r_A$ & $r_{\mathrm{all}}$ & $\beta(N_A)$ = Rips \\
+\hline
+relative (forced A-net) & 15 / 31 / 43 & 0.60 / 0.27 / 0.14 & 1.61 / 0.70 / 0.57 & yes / yes / no \\
+coverage-only spine & 4 / 13 / 19 & 2.33 / 1.17 / 0.60 & 2.33 / 1.17 / 0.60 & yes / no / no \\
+k-center, same budget & 15 / 31 / 43 & 1.11 / 0.38 / 0.27 & 1.11 / 0.39 / 0.27 & yes / yes / no \\
+A-weighted greedy (x10) & 4 / 13 / 20 & 2.10 / 1.19 / 0.60 & 2.37 / 1.19 / 0.60 & yes / yes / no \\
+\hline
+\end{tabular}}
+\end{table}

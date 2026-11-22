@@ -1,0 +1,15 @@
+\begin{table}[h]
+\centering\small
+\caption{Collapse-branch on 40000 random $n=5$ ON-sets (seed 21). Disagreements with plain B\&B: 42 (rate 0.0010, Wilson 95\% interval [0.0008, 0.0014]). The branch fired on 856 instances. Filters are decidable restrictions of that branch. c17: summed pipeline 8 gates, shared factored AIG 6, ABC on the NAND netlist 6.}
+\label{tab:audit5}
+\begin{tabular}{lrrr}
+\hline
+filter & status & times fired & disagreements \\
+\hline
+same row support & vacuous & 0 & 0 \\
+face is vertex & vacuous & 0 & 0 \\
+parent is edge & vacuous & 0 & 0 \\
+face covers at most one row & refuted & 84 & 4 \\
+\hline
+\end{tabular}
+\end{table}

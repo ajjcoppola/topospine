@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns:x="http://www.texmacs.org/2002/extensions" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>No title</title>
+    <meta name="generator" content="TeXmacs WinTeXmacs-1.0.5"></meta>
+    <style type="text/css">
+      body { text-align: justify } .title-block { width: 100%; text-align:
+      center } .title-block p { margin: 0px } 
+    </style>
+  </head>
+  <body>
+    <p>
+      <p>
+        <p>
+          <table class="title-block">
+            <tr>
+              <td><p>
+                <p>
+                  <p>
+                    <table class="title-block">
+                      <tr>
+                        <td><font size="+3"><b>The Abstract Cell Complex Covering
+                        Table</b></font></td>
+                      </tr>
+                    </table><table class="title-block">
+                      <tr>
+                        <td><p>
+                          <font size="-1"><p>
+                            <p>
+                              <table style="display: inline">
+                                <col align="center"></col>
+                                <tbody><tr>
+                                  <td><p>
+                                    <center><p>
+                                      <p>
+                                        <p>
+                                        <p>
+                                        <table style="display: inline">
+                                        <col align="center"></col>
+                                        <tbody><tr>
+                                        <td><p>
+                                        <center><p>
+                                        <class style="font-variant: small-caps">Alan J. Coppola and
+                                        Richard Weiss</class>
+                                      </p></center>
+                                    </p></td>
+                                  </tr></tbody>
+                                </table>
+                              </p>
+                            </p><p>
+                              <p>
+                                <p>
+                                  <table style="display: inline">
+                                    <col align="center"></col>
+                                    <tbody><tr>
+                                      <td><p>
+                                        <center><p>
+                                        <p>
+                                        
+                                      </p>
+                                    </p></center>
+                                  </p></td>
+                                </tr></tbody>
+                              </table>
+                            </p>
+                          </p>
+                        </p><p>
+                          <p>
+                            <p>
+                              <table style="display: inline">
+                                <col align="center"></col>
+                                <tbody><tr>
+                                  <td><p>
+                                    <center><p>
+                                      <p>
+                                        The Evergreen State College
+                                      </p><p>
+                                        Olympia, WA 98005
+                                      </p>
+                                    </p></center>
+                                  </p></td>
+                                </tr></tbody>
+                              </table>
+                            </p>
+                          </p>
+                        </p>
+                      </p>
+                    </p></center>
+                  </p></td>
+                </tr></tbody>
+              </table>
+            </p>  <p>
+              <table style="display: inline">
+                <col align="center"></col>
+                <tbody><tr>
+                  <td><p>
+                    <center><p>
+                      <p>
+                        <p>
+                          <p>
+                            <table style="display: inline">
+                              <col align="center"></col>
+                              <tbody><tr>
+                                <td><p>
+                                  <center><p>
+                                    <class style="font-variant: small-caps"></class>
+                                  </p></center>
+                                </p></td>
+                              </tr></tbody>
+                            </table>
+                          </p>
+                        </p>
+                      </p>
+                    </p></center>
+                  </p></td>
+                </tr></tbody>
+              </table>
+            </p> 
+          </p></font>
+        </p></td>
+      </tr>
+    </table>
+  </p>
+</p>
+</p></td>
+</tr>
+</table> 
+</p>
+</p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <div style="text-align: left"><p>
+          <font size="-1"><p>
+            <p>
+              <div style="text-align: left"></div><div style="text-align: center"><b>Abstract</b></div>
+            </p>
+          </p><p>
+            <p>
+              The minimal cover problem is generalized to abstract cell
+              complexes, and a new covering table operation is defined, which
+              applies to solving the cyclic-core subproblem at the recursive
+              branch and bound stage of the classical minimum covering
+              algorithm.  It is shown how the introduction of the concepts of
+              cell collapse and expansion from simple homotopy theory are used
+              to reduce the number of recursive computations needed to solve
+              the minimal covering problem.  Connections to classical
+              two-level logic minimization covering tables are given. 
+            </p>
+          </p></font>
+        </p></div><div style="text-align: right"></div>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  
+</p>
+<h2 id="auto-1">1 Introduction</h2>
+<h2 id="auto-2">2 Definitions and Background</h2>
+<h2 id="auto-3">3 Abstract Cell Complex</h2>
+<p>
+  An abstract cell complex generalizes the representation of a structure in
+  which to represent minimal covering problems, higher-order connectivity,
+  cycles of any dimension, and geometric visualization of optimization
+  problems. 
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <b>Definition 1. </b><i><class style="font-style: normal">An abstract cell complex C
+            consists of:</class></i>
+          </p><p>
+            <div style="text-align: left"><i><div style="text-align: left"><class style="font-style: normal"><ul>
+              <li>
+                A set S
+              </li>
+              <li>
+                A collection Skel of finite subsets of S, each called a cell
+                of C
+              </li>
+              <li>
+                A closure under intersection property for Skel (if a, b
+                &epsilon; Skel, then a &and;b &#x03F5; Skel)
+              </li>
+              <li>
+                A face and boundary operator
+              </li>
+            </ul></class></div><div style="text-align: right">&#x25A1;</div></i></div><div style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <p>
+            <div style="text-align: left"><b>Definition 2. </b><i><div style="text-align: left"><class style="font-style: normal">Let
+            C be and abstract cell complex. Let c be a cell of C.  c is said
+            to be collapsible if c has a free face f &epsilon; 
+            &part;<i>c</i>, such that f &#x2AB0; <i>c</i>,  and f
+            &#x2AAF;&#x0338; q for all q &epsilon; C.</class></div><div style="text-align: right">&#x25A1;</div></i></div><div
+            style="text-align: right"></div>
+          </p>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<h2 id="auto-4">4 Minimization Process</h2>
+<p>
+  An abstract cell complex can be used to represent a variety of problems. For
+  example:
+</p>
+<ol>
+  <li>
+    Two-Level Boolean Logic Minimization, where each cell is an n-cube, and a
+    collection of n-cubes represents the ON-set of a boolean function f.
+  </li>
+  <li>
+    Multi-Valued Logic Minimization, where each cell is an m
+    <sub>1</sub>
+    x m
+    <sub>2 </sub>
+    x ... x m
+    <sub>k</sub>
+    - hedron.
+  </li>
+  <li>
+    Deadlock complexes
+  </li>
+  <li>
+    Programs as fixed-points
+  </li>
+</ol>
+<h3 id="auto-5">4.1 Exact Two-Level Boolean Minimization</h3>
+<p>
+  The object of this classical problem is given a boolean function f, find an
+  exact  minimum size representation of f as a sum-of-products cube
+  representation of f.  The usual algorithm is to
+</p>
+<ol>
+  <li>
+    Find all the prime implicants of f
+  </li>
+  <li>
+    Create the covering matrix of the primes of f, where the columns are the
+    primes and the rows are the minterms of f.
+  </li>
+  <li>
+    <p>
+      Perform reductions on the covering matrix, until a fixed point table,
+      called the cyclic-core  is reached. The table reductions are:
+    </p>
+    <ol>
+      <li>
+        Essentials reduction
+      </li>
+      <li>
+        Row dominance - a strongly equivalent operation
+      </li>
+      <li>
+        Column dominance - a weakly equivalent operation
+      </li>
+    </ol>
+  </li>
+  <li>
+    Recursively solve the cyclic-core problem by choosing a column(prime) to
+    assume is first in the cover, find a recursive solution, and then is not
+    in the cover, find a recursive solution to that problem, and then pick the
+    cover that has the least number of elements as the minimal cover. 
+    Sophisticated branch and bound techniques, involving choosing a maximal
+    independent set of elements at each cyclic-core recursion can be used to
+    create a series of lower bounds on which to prune the recursions.
+  </li>
+</ol>
+<h2 id="auto-6">5 Description of Algorithm</h2>
+<p>
+  Given the representation of a problem as an abstract cell complex C, let
+  T<sub>C</sub> be the graded(by dimension)) covering table represented by a
+  (&sum;n<sub>i</sub> x P) matrix of 0's and 1's, where P is the number of
+  elements in the cover, and n<sub>i</sub> is the number of elements of
+  dimension i.
+</p>
+<p>
+  
+</p>
+<p>
+  The covering problem is to find a minimum set of columns of T<sub>C</sub>
+  which cover C, and has minimal cost.
+</p>
+<p>
+  
+</p>
+<p>
+  The new contribution of this paper is two-fold: to introduce abstract cell
+  complexes as a natural representation of combinatorial problems, and to show
+  how this representation allows the introduction of a new reduction method
+  during the cyclic-core recursive solution.
+</p>
+<p>
+  
+</p>
+<h3 id="auto-7">5.1 Collapsible Element Reduction</h3>
+<p>
+  <p>
+    <p>
+      <p>
+        <p>
+          <b>Theorem 3. </b><i>Given a  collapsible element p in a graded
+          covering matrix, which is a cyclic-core, remove the element p, and
+          replace it with the set of free faces of p.  Then one recursive call
+          is all that is necessary to find the minimum cost cover of
+          T<sub>C</sub>.</i>
+        </p><p>
+          <i><p>
+            
+          </p><p>
+            <p>
+              <p>
+                <p>
+                  <p>
+                    <div style="text-align: left"><b>Proof</b> </div><div style="text-align: right"></div>
+                  </p> &#x25A1;
+                </p>
+              </p>
+            </p>
+          </p><p>
+            This involves, at the covering matrix level, removing the  column
+            p, and replacing it with the set of one dimensional less columns
+            which are the free faces of FreeFaces(p).
+          </p><p>
+            
+          </p></i>
+        </p><p>
+          <div style="text-align: left"><i>Recursively continue to apply the non cyclic-core
+          reductions, followed by the cyclic-core collapsible reduction, and
+          return with a cover MinCov.  Let  FreeSize = |MinCov
+          &and;FreeFaces(<i>p</i>)|.  If FreeSize &#x2A7E; 1 , then put back
+          in p to get the minimum cover.  If FreeSize = 0 ,  then MinCov is
+          the minimum, as it's size will at most be one less than the minimum
+          with the element p not included</i></div><div style="text-align: right"></div>
+        </p>
+      </p>
+    </p>
+  </p>
+</p>
+<p>
+  
+</p>
+<h2 id="auto-8">6 Acyclic Models</h2>
+<h2 id="auto-9">7 Conclusions</h2>
+<h2 id="auto-10">8 References</h2>
+<p>
+  
+</p>
+</body>
+</html>

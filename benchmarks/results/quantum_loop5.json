@@ -1,0 +1,90 @@
+{
+  "surfaces": [
+    {
+      "complex": "torus7",
+      "betti_f2": [
+        1,
+        2,
+        1
+      ],
+      "betti_real": [
+        1,
+        2,
+        1
+      ]
+    },
+    {
+      "complex": "sphere2",
+      "betti_f2": [
+        1,
+        0,
+        1
+      ],
+      "betti_real": [
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "complex": "RP2",
+      "betti_f2": [
+        1,
+        1,
+        1
+      ],
+      "betti_real": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "square_pair_collapse": {
+    "cells_before": 9,
+    "cells_after": 7,
+    "betti_before": [
+      1,
+      0,
+      0
+    ],
+    "betti_after": [
+      1,
+      0
+    ],
+    "betti_preserved": true,
+    "gap_before": [
+      1.9999999999999987,
+      2.0,
+      4.0
+    ],
+    "gap_after": [
+      0.585786437626905,
+      0.585786437626905
+    ],
+    "resources_before": {
+      "cells": 9,
+      "qubits_one_per_cell": 9,
+      "qubits_log_encoding": 4,
+      "dirac_dimension": 9
+    },
+    "resources_after": {
+      "cells": 7,
+      "qubits_one_per_cell": 7,
+      "qubits_log_encoding": 3,
+      "dirac_dimension": 7
+    }
+  },
+  "cycle_delete_one_edge": {
+    "betti_before": [
+      1,
+      1
+    ],
+    "betti_after": [
+      1,
+      0
+    ],
+    "cells_before": 12,
+    "cells_after": 11
+  }
+}

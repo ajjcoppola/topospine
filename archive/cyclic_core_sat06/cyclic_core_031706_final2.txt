@@ -1,0 +1,80 @@
+
+
+
+Covering problems are typically solved using branch and bound algorithms, by realizing them in tabular form, followed by iterative reduction of the table by removing columns and rows through a small set of fixed operations. This process terminates when all of the rows have been eliminated indicating that all of the cells have been covered. The columns correspond to prime implicants and the ones that have been removed in this process form the minimal cover. However, the operations that are usually applied can result in a situation called a cyclic core, where the problem is split into two subproblems of equal size and each one is solved independently. Our goal is to create an operation which produces a single subproblem that is roughly the same size as each of the other subproblems, and thus, we cut the amount of computation for that step in half.
+
+The standard table operations that are used to produce the minimal cover are essentiality, row dominance, column dominance and Gimpel's transform. [2] They depend on finding essential prime implicants, followed by row and column reductions. An essential prime implicant contains a min-term that is not covered by any other prime implicant. A fixed-point occurs if the operations do not change the table after each application even though the algorithm has not terminated. This occurs when there are no essential prime implicants, or dominated elements, and the configuration is called a cyclic core. The step that is usually applied is to choose a column (prime implicant) and generate two instances of the problem: one in which the prime implicant is part of the minimal cover, and one in which it is not. Each of these subproblems can then be solved recursively using the branch and bound method with the standard table operations.
+
+Our approach is based on the intuition that the table representation is omitting information that is present in the cube complex, which is a natural representation of the original two-level logic minimization problem. The cube complex is a set of cubes of various dimensions with the property that if they intersect, then the intersect in a set of faces which are also cubes. All of these cubes can be viewed as subsets of a cube whose dimension is the number of variables in the logical expression to be minimized. [1], [5]
+
+Most recent work on the covering problems have attacked finding and applying the lower bounds found to prune the search space for the minimal solution. [6-9] This paper introduces a different method for pruning the search space, based on an encoding used for special cells in the cyclic core. The identification and of these cells allows one recursive call instead of two to solve a cyclic core subproblem. This is our contribution.
+
+We prove a theorem which shows that given the cyclic-core of a minimization problem, there is a special type of cube, a collapsible cube, to branch on, such that the minimum cover can be found with a single recursive call. We present an example of a cubical cell complex representation, and corresponding minimization.
+
+
+The cubical cell complex provides a general framework in which to represent minimal covering problems, higher-order connectivity, cycles of any dimension, and geometric visualization of optimization problems.
+
+For the purposes of this paper, we specialize to cubes and cubical complexes, even though the techniques can be generalized to cells and abstract cell complexes.
+
+
+
+From the area of topology called simple homotopy theory comes the concept of cellular collapses and expansions. [4], [5]
+The concept of cellular collapses and expansions comes from simple homotopy theory of topology. In this context it also captures a generalization of essential prime because for a cell to be collapsible, it must have a free face, i.e. one that is not shared.
+
+
+
+The object of this classical problem is given a boolean function f, find an exact  minimum size representation of f as a sum-of-products cube representation of f.  The usual method is:
+
+
+
+We assume that the cell complex is represented either explicitly or implicitly, and that no computation of faces or intersections are explicity done unless needed. i.e. lazy evaluation is used.  For example, an explicit initial representation would be a list of cubes of varying dimensions.  An implicit representation would be as a BDD. 
+
+During the exact minimization algorithm outlined in Section  3.2, the list of cubes can grow and shrink. We assume that the prime cube complex is given, and that the covering table is replaced by a choice pairing function Pairf(cube, prime) = 1    cubeprime .  This allows us to view a covering table a view of the cubical complex.  No face information is lost.  This is key in allowing us to compute the collapsible cubes necessary to reduce the cyclic core resursively.
+
+Let P(C) represent the prime complex of a two-level minimization problem, initially given as a cubical complex C, let TP(C) be the graded (by dimension) covering table representing the choice pairing function Pairf(cube, prime) by a  (ni) x P matrix of 0's and 1's, where P is the cubical complex of all prime cubes of C, and ni is the number of covering element cubes in the cover of dimension i.  In the classical Quine-McCluskey case, n0=number of vertices(minterms) of C(f).
+
+Each cube will correspond to a row of the covering table, and each column corresponds to a prime cube of the cubical complex, which lives in a universe which is the smallest dimensional cube containing all the cubes of the cubical complex.
+
+The graded table is a view of the cubical cell complex and can be derived from it.  Restated, the minimal covering problem is to find a set of columns of TC which cover C, and has minimal cost. The contribution of this paper is two-fold: to use the cubical cell complex directly as the representation of the combinatorial minimization problem, and to show how this representation allows the introduction of a new reduction method during the cyclic core recursive solution.
+
+The covering problem is to find a minimum set of columns of TC which cover C, and has minimal cost.
+
+The new contribution of this paper is two-fold: to introduce cell complexes as a natural representation of combinatorial problems, and to show how this representation allows the introduction of a new reduction method during the cyclic-core recursive solution.
+
+ 
+With the representation we have chosen, finding collapsible cubes is like finding essential cubes. Consider a top dimensional cell c, of dimension k. Then a cube with a free face is one where the set of k-dimensional cubes other than c intersected with c does not cover the faces of c. The faces of c not covered by these k-dimensional cells are the free faces. Note that the analogous step for essential primes is the first step in the classical Quine-McCluskey algorithm.
+
+Given an implicit or explicit representation of the initial cubical complex, we allow the addition of cells to the complex, when necessary, to solve the covering problem.  Most additions result from intersecting cells when computing the set of primes or in finding the collapsible cells.
+
+ 
+State of the art unate covering tools is embodied in the tools Eclipse, Aura-II, Scherzo, and Espresso-Signature-Exact. [2, 6-9]  To implement the concepts in this paper, the techniques should be added to one of the above code bases, and compared to the others on suites of examples, as was done in Eclipse and Aura-II.
+
+It is an open question as to whether the proof given in this paper can be extended to the case of encoding all of the collapsible cubes simultaneously, as a single step, and then continuing with the algorithm recursively.  This type of operation would correspond to shelling the cyclic core by collapsing it's boundary all at once, and then recursively continuing with that process.
+ 
+In this paper, it was shown first, how to identify special cubes, called collapsible ones, in the cyclic core covering problem, and second how to use them to modify the branch part of the branch and bound algorithm, which allows a minimum cost solution to be found with a single recursion, at the cost of encoding the collapsible cubes by their free faces, and by maintaining the structure of the cubical cell complex, as the minimization proceeds. 
+
+In future work, we plan to generalize the current approach for cubical cell complexes. We believe that binate covering problems, MaxCostSAT and other problem areas  can also be addressed using these methods.
+
+[1] J.P. Roth, ``Algebraic topological methods for the synthesis of switching systems I``, Trans. Am. Math. Soc., Vol. 88, No. 2, pp301-32.
+
+[2] O. Courdert, ``Two-level logic minimization: and overview'', Integration, the VLSI Journal, 17-2, pp. 97-140, October 1994.
+
+[3] O. Coudert. On solving binate covering problems. In The Proceedings of the Design Automation Conference, pages 197-- 202, June 1996.
+
+[4] M.M. Cohen, A Course in Simple-Homotopy Theory, Springer-Verlag, New York, 1973
+
+[5] A. J. Coppola, ``New methods in the analysis of logic minimization data and algorithms'', Proceedings of the 26th Design Automation Conference, June, 1989.
+
+[6] X.Y. Li, M.F. Stallmann, and F. Brglez. A local search solver using an e®ective switching strategy and an e±cient unit propagation. Lecture Notes in Computer Science, 2919:53{68, 2004. For links to re-prints, data sets and experimental testbed, see also http://www.cbl.ncsu.edu/publications/.
+
+[7] E. I. Goldberg, L. P. Carloni, T. Villa, R. K. Brayton, and A. L. Sangiovanni-Vincentelli. Negative Thinking in Branch-and-Bound: the Case of Unate Covering. IEEE Transactions on Computer-Aided Design, 19(3):281--294, Mar. 2000.
+
+[8] C. Plessl and M. Platzner, ``Instance-Specific Accelerators for Minimum Covering'', Proceedings of the 1st International Conference on Engineering of Reconfigurable Systems and Algorithms (ERSA)}, pp. 85--91, 2001, Las Vegas, Nevada, USA, June, CSREA Press}
+
+[9] Samir Sapra, Michael Theobald, Edmund M. Clarke, ``SAT-Based Algorithms for Logic Minimization'', ICCD, 2003,pp. 510-515
+
+
+
+
+
+
