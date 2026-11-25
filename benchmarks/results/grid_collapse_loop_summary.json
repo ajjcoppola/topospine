@@ -1,0 +1,46 @@
+{
+  "rounds": [
+    {
+      "name": "far_empty",
+      "total": 32288,
+      "fires": 5700,
+      "failures": 0,
+      "fire_rate": 0.17653617443012884,
+      "pass": true,
+      "trivial_ok": true,
+      "round": 1,
+      "note": "trivial: F_p empty",
+      "grid": "3x3",
+      "wall_time_s": 3.5031529581174254,
+      "reported_separately": true
+    },
+    {
+      "name": "far1_face1",
+      "total": 32288,
+      "fires": 10760,
+      "failures": 0,
+      "fire_rate": 0.33325074331020815,
+      "pass": true,
+      "trivial_ok": true,
+      "round": 2,
+      "note": "|F_p|=1 and |V(f)\u2229R|=1",
+      "grid": "3x3",
+      "wall_time_s": 4.242399417096749
+    }
+  ],
+  "winner": {
+    "name": "far1_face1",
+    "total": 32288,
+    "fires": 10760,
+    "failures": 0,
+    "fire_rate": 0.33325074331020815,
+    "pass": true,
+    "trivial_ok": true,
+    "round": 2,
+    "note": "|F_p|=1 and |V(f)\u2229R|=1",
+    "grid": "3x3",
+    "wall_time_s": 4.242399417096749
+  },
+  "stopped_early": true,
+  "n_rounds": 2
+}

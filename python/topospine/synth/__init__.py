@@ -5,8 +5,12 @@ from topospine.synth.passes import (
     CoveringAwareCollapsePass,
     ElementaryCubicalCollapsePass,
     FiltrationCompatibleCollapsePass,
+    FiltrationCompatibleHornPass,
     FlagEdgeCollapseAdapterPass,
+    HornRetractionCollapsePass,
     RelativeCollapsePass,
+    covering_collapse_closure,
+    horn_retraction_closure,
 )
 
 __all__ = [
@@ -15,8 +19,12 @@ __all__ = [
     "PassManager",
     "ElementaryCubicalCollapsePass",
     "FiltrationCompatibleCollapsePass",
+    "FiltrationCompatibleHornPass",
     "RelativeCollapsePass",
     "FlagEdgeCollapseAdapterPass",
     "BoundedExactCorePass",
     "CoveringAwareCollapsePass",
+    "HornRetractionCollapsePass",
+    "horn_retraction_closure",
+    "covering_collapse_closure",
 ]

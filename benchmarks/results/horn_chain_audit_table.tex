@@ -1,0 +1,11 @@
+\begin{table}[h]\centering\small
+\caption{Constructive Layer-0 free-face variants and controlled collapsible horn chains on 195 $n=5$ Blake-prime cyclic cores (2519 collapsible pairs). Complement duality: 0/14682 mismatches; cohomology \& persistent cohomology along chains: 0/195 mismatches (filtered cells compressed to 52.1\%).}
+\label{tab:horn-chains}
+\begin{tabular}{lrrr}\hline
+variant / mode & evaluated & exact optimum & violations / mismatches \\\hline
+Single-face swap $(P\setminus\{p\})\cup\{f\}$ & 2519 & 2332 (92.6\%) & — \\
+Horn retraction $(P\setminus\{p\})\cup(\partial p\setminus\{f\})$ & 2519 & 2376 (94.3\%) & 0 (IFF) \\
+Chain approx ($K=1$ greedy spine) & 195 & 161 (82.6\%) & 0 (window) \\
+Chain probabilistic ($K=8$ trials) & 195 & 181 (92.8\%) & 0 (118 cert.\ 0-B\&B) \\
+Chain exact mode (warm-start + MIS B\&B) & 195 & 195 (100.0\%) & 0 \\
+\hline\end{tabular}\end{table}

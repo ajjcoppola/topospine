@@ -1,0 +1,9 @@
+\begin{table}[h]\centering\small
+\caption{Layer-0 cube-array audit ($n=5$ Blake-prime cyclic cores and multi-blob benchmarks). Zero-loss push-down ($F_p(f)=\emptyset$) fires on 193/220 (87.7\%) collapsible cores with 0 errors; Layer-0 Far-Side IFF has 0/2821 mismatches; exact Layer-0 blob solver matches plain B\&B on all instances while cutting search nodes from 817 to 385.}
+\label{tab:layer0-blobs}
+\begin{tabular}{lrrr}\hline
+benchmark & plain B\&B calls & Layer-0 blob nodes & cost mismatches \\\hline
+$n=5$ random (231 cores) & 817 & 385 & 0 \\
+Bridged double-$6$-cycle ($12\times 13$) & 9 & 0 & 0 \\
+Three-blob core ($27\times 27$) & 53 & 9 & 0 \\
+\hline\end{tabular}\end{table}

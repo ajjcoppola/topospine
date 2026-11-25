@@ -1,0 +1,47 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{Madrid}
+\usepackage{amsmath,amssymb}
+
+\title{Paper E: Horn for TDA Programs Now}
+\subtitle{Closing covering vacuity + Espresso/ABC extensions}
+\author{Alan J.\ Coppola}
+\date{2026-11-24}
+
+\begin{document}
+\begin{frame}\titlepage\end{frame}
+
+\begin{frame}{The gap}
+Paper~B: covering mode vacuous on $8^3$ blob and 2007 core.\\[0.5em]
+Paper~A: Horn $\Lambda_f=\partial f_{\mathrm{top}}\setminus\{f\}$ (H1--H4, E1).\\[0.5em]
+\textbf{Paper~E:} wire theorems into programs; measure TDA deltas.
+\end{frame}
+
+\begin{frame}{Medical / 2007}
+\begin{itemize}
+\item $8^3$ Horn covering: $132$ steps; dim-$3$ tops $81\to 27$.
+\item 2007: $9$ steps, max-dim $2\to 1$, $H^*$ preserved.
+\item Paper~B had $0$ covering steps on both.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Spines and persistence}
+\begin{itemize}
+\item \texttt{FiltrationCompatibleHornPass} (birth-equal pairs).
+\item SpineTower \texttt{method="horn"} $\Rightarrow$ $(L,U)$ per level;\\
+$U=L$ certifies without B\&B.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Large Espresso / ABC}
+\begin{itemize}
+\item Classic Berkeley Espresso CLI (third\_party build).
+\item \texttt{AbcHornSopRefinePass}: ABC ISOP seed $\to$ Horn SOP.
+\item Conjecture E1: AIG Forman pairing (not claimed yet).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Takeaway}
+Horn is not only a Paper~A theorem --- it unsticks TopoSpine covering
+mode and certifies spine windows \emph{today}.
+\end{frame}
+\end{document}

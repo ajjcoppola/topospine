@@ -68,10 +68,14 @@ def test_all_n3_collapsible_boolean_functions_succeed_with_reduced_cov():
 
 
 def test_path6_collar_lockin_fails_even_with_reduced_cov():
+    """P6 is a Boolean Out_complex witness, not a cyclic-core collapse witness."""
     cm, col_j = path6_collar_lockin_instance()
     exh, exh_idx = exhaustive_min_cost(cm)
     assert exh == 3.0
     assert [cm.cols[k] for k in exh_idx] == ["-000", "001-", "01-1"]
+    # Still has essentials before reduction — not a cyclic core.
+    sub, _, ess = reduce_to_cyclic_core(cm.copy())
+    assert ess or sub.n_rows() < cm.n_rows()
 
     out = build_out_complex(cm, col_j, variant="keep_intersection")
     assert out.rows == ["0000", "0010", "0011", "0111", "0101"]  # shared vertex 0000 stays!

@@ -15,3 +15,7 @@ data/*.npz
 !data/embeddings_minilm_tiny.npz
 lake-packages/
 .lake/
+
+# Classic Espresso build
+third_party/espresso/build/
+

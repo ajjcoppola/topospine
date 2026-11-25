@@ -6,11 +6,36 @@ build-backend = "setuptools.build_meta"
 name = "topospine"
 version = "0.1.0"
 description = "Certificate-carrying cubical/simplicial synthesis and cover solvers"
+readme = "../README.md"
 requires-python = ">=3.10"
-dependencies = []
+license = { text = "MIT" }
+authors = [{ name = "Alan J. Coppola", email = "ajjc@optngn.com" }]
+keywords = [
+  "topology",
+  "cubical-complexes",
+  "logic-minimization",
+  "horn-retraction",
+  "certificates",
+]
+dependencies = [
+  "numpy>=1.24",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+scipy = ["scipy>=1.10"]  # HiGHS LP via scipy.optimize.linprog
+gudhi = ["gudhi>=3.8"]   # Rips / edge-collapse baselines
+abc = []                 # system yosys-abc / berkeley-abc on PATH
+all = ["pytest>=7.0", "scipy>=1.10", "gudhi>=3.8"]
+
+[project.urls]
+Homepage = "https://github.com/ajjcoppola/topospine"
+Repository = "https://github.com/ajjcoppola/topospine"
+Issues = "https://github.com/ajjcoppola/topospine/issues"
+Documentation = "https://github.com/ajjcoppola/topospine#readme"
+# Fill after Wave 1 accept:
+# Paper-A = "https://arxiv.org/abs/XXXX.XXXXX"
+# Paper-E = "https://arxiv.org/abs/YYYY.YYYYY"
 
 [tool.setuptools.packages.find]
 where = ["."]

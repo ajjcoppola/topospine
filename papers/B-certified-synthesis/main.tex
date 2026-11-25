@@ -7,7 +7,7 @@
 
 \title{TopoSpine: Certificate-Carrying Synthesis of Filtered Cubical and Dual Complexes}
 \author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
-\date{Draft 2026-11-18 (Loop~4, camera-ready audit)}
+\date{Draft 2026-11-24 (Horn covering supersedes single-face vacuity; cf.\ Paper~E)}
 
 \begin{document}
 \maketitle
@@ -38,19 +38,17 @@ Each pass declares a preservation contract
 
 \paragraph{Modes.}
 \textsf{PassManager.default}(\texttt{mode="homotopy"}) uses the deletion passes
-(elementary, filtration-compatible and relative collapse) and scores progress by the
-decrease of the cell count.  \textsf{PassManager.covering}() runs
-\textsf{CoveringAwareCollapsePass}, \textsf{BoundedExactCorePass} and the flag-edge
-adapter, scores progress by the decrease of the total dimension (column count and
-weights are preserved), and the verifier \texttt{verify\_pass\_trace} refuses a
-deletion-style pass in this mode.  \textsf{ElementaryCubicalCollapsePass} itself
-declines to run in covering mode.  An experimental \textsf{ShotgunCoveringCollapsePass}
-applies several closure-disjoint covering collapses at once; it is contractually
-\textsf{Coverage} only and its certificate is rejected if it claims optimality,
-because simultaneous collapse is \emph{not} optimality-preserving (counterexample in
-Paper~A).  \textsf{BoundedExactCorePass} certifies a plain branch-and-bound cover (not the
-collapse branch, which is suboptimal on some $n=5$ instances) and, when an exhaustive
-oracle result is attached, the checker requires the certified cost to equal it.
+(elementary, filtration-compatible / filtration-compatible Horn, and relative collapse)
+and scores progress by the decrease of the cell count.
+\textsf{PassManager.covering}() runs the historical single-face
+\textsf{CoveringAwareCollapsePass} plus bounded exact core and the flag-edge adapter
+(claim C21 vacuity on solid voxels / 2007).  \textsf{PassManager.covering\_horn}()
+runs \textsf{HornRetractionCollapsePass} (Paper~E / C56).  Progress is scored by
+dimension drop (Horn scores the collapsed cell's dimension).  The verifier
+\texttt{verify\_pass\_trace} refuses a deletion-style pass in covering mode.
+An experimental \textsf{ShotgunCoveringCollapsePass} is contractually
+\textsf{Coverage} only (Paper~A counterexample: shotgun is not optimality-preserving).
+\textsf{BoundedExactCorePass} certifies plain branch-and-bound (not collapse-branch).
 
 \section{Spines and towers}
 \textsf{SpineMin} optimizes cover cardinality under a coverage contract.
@@ -59,12 +57,19 @@ oracle result is attached, the checker requires the certified cost to equal it.
 
 \section{Medical volumes}
 Cubical voxel complexes from boolean masks are reduced by the pass manager.
-Table~\ref{tab:medical} reports a synthetic $8^3$ blob in both modes.  Homotopy mode
-reduces 81 cells to 49 (verified).  Covering mode leaves the instance unchanged
-(81 cells, dimension sum 243$\to$243): on a solid voxel blob no free face passes the
-admissibility test, so the covering pass is vacuous there, as it is on the 2007
-cyclic core.  We report this as a negative result.  No real volumetric data was used;
-CubicalRipser/GUDHI baselines were not run.
+Table~\ref{tab:medical} reports a synthetic $8^3$ blob and the Coppola--Weiss 2007
+core.  Homotopy mode reduces the blob $81\to 49$ cells (verified).
+
+\paragraph{Historical negative (single-face covering).}
+Under \emph{single-face} \textsf{CoveringAwareCollapsePass}, every free face of the
+2007 core (and of a solid voxel blob) fails the admissibility guard, so that pass
+is vacuous (claim C21).  We retain that as a regression for the single-face path.
+
+\paragraph{Superseded by Horn covering (Paper~E / C56).}
+\textsf{HornRetractionCollapsePass} / \textsf{covering\_horn} is \emph{non-vacuous}
+on the same instances: $132$ Horn steps on the $8^3$ blob (dim-$3$ tops $81\to 27$)
+and $9$ steps on the 2007 core with max-dim $2\to 1$ and $H^*(K;\mathbb{F}_2)$
+preserved.  See Paper~E for the program-level story.
 
 \input{../../benchmarks/results/medical_benchmark_table.tex}
 

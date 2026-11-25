@@ -9,17 +9,19 @@
 \title{Covering-Aware Collapse, Don't-Care Spines, and Relative Towers:\\
 Certified Reductions for Logic Circuits, Bio Networks, and Molecular Conformations}
 \author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
-\date{Draft 2026-11-18 (Loop~4, camera-ready audit)}
+\date{Wave~2 draft 2026-11-24 (EMPIRICAL-SYNTHETIC; cites A/E after IDs)}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
+\textit{Label:} EMPIRICAL-SYNTHETIC.
 We extend the certificate-carrying \textsf{TopoSpine} pass manager from
 complexes to circuits and point clouds.  (i)~\emph{Covering-aware collapse}
 replaces a column of a covering IR by an admissible free face \emph{in place},
 preserving column count and weights and recording a decode map, so that the IR
 can never be silently emptied (the failure mode of deletion-style collapse).
+Horn covering (Paper~E) supersedes single-face vacuity on solid voxels.
 (ii)~A small And--Inverter-Graph / factor-diagram IR, with a
 \emph{don't-care spine} pass that solves the covering problem whose rows are only
 the care ON-set and whose columns are primes of $\mathrm{ON}\cup\mathrm{DC}$, then

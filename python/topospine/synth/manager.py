@@ -13,6 +13,8 @@ from topospine.synth.passes import (
     ElementaryCubicalCollapsePass,
     FiltrationCompatibleCollapsePass,
     FlagEdgeCollapseAdapterPass,
+    FiltrationCompatibleHornPass,
+    HornRetractionCollapsePass,
     Pass,
     RelativeCollapsePass,
 )
@@ -37,6 +39,7 @@ class PassManager:
             raise ValueError(f"unknown mode {mode!r}")
         return cls(
             passes=[
+                FiltrationCompatibleHornPass(),
                 FiltrationCompatibleCollapsePass(),
                 RelativeCollapsePass(),
                 ElementaryCubicalCollapsePass(),
@@ -47,9 +50,23 @@ class PassManager:
 
     @classmethod
     def covering(cls) -> PassManager:
+        """Single-face covering (historical C21 path). Prefer ``covering_horn`` for TDA."""
         return cls(
             passes=[
                 CoveringAwareCollapsePass(),
+                BoundedExactCorePass(),
+                FlagEdgeCollapseAdapterPass(),
+            ],
+            max_iterations=256,
+            mode="covering",
+        )
+
+    @classmethod
+    def covering_horn(cls) -> PassManager:
+        """Horn covering (Paper E / C56): non-vacuous on medical voxels and 2007 core."""
+        return cls(
+            passes=[
+                HornRetractionCollapsePass(),
                 BoundedExactCorePass(),
                 FlagEdgeCollapseAdapterPass(),
             ],
@@ -59,6 +76,14 @@ class PassManager:
 
     def _progress(self, cert: dict[str, Any], before: SynthesisState, after: SynthesisState) -> float:
         if self.mode == "covering":
+            # Horn inserts multiple faces: total dim-sum may temporarily rise while the
+            # collapsed cell's dimension strictly drops — score that local dim drop.
+            if cert.get("pass") in ("HornRetractionCollapse", "FiltrationCompatibleHorn"):
+                db = cert.get("dim_before")
+                da = cert.get("dim_after")
+                if db is not None and da is not None and da < db:
+                    return float(db - da)
+                return float(before.total_dimension() - after.total_dimension())
             if cert.get("pass") == "CoveringAwareCollapse":
                 return float(before.total_dimension() - after.total_dimension())
             return 0.0

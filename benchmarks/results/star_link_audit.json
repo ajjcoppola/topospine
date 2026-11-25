@@ -1,0 +1,79 @@
+{
+  "theorem_a": {
+    "2x2": {
+      "checked": 360,
+      "mismatches": 0,
+      "essential_pairs": 360
+    },
+    "2x3": {
+      "checked": 4698,
+      "mismatches": 0,
+      "essential_pairs": 4698
+    },
+    "3x3": {
+      "checked": 183708,
+      "mismatches": 0,
+      "essential_pairs": 183708
+    }
+  },
+  "link_bounds": {
+    "2x3": {
+      "checked": 298,
+      "violations": 0,
+      "exact_stitch": 298,
+      "exact_rate": 1.0,
+      "gap_histogram": {
+        "0": 298
+      }
+    },
+    "3x3": {
+      "checked": 32288,
+      "violations": 0,
+      "exact_stitch": 31016,
+      "exact_rate": 0.9606045589692765,
+      "gap_histogram": {
+        "0": 31016,
+        "1": 1272
+      }
+    }
+  },
+  "ring_2x3": [
+    {
+      "p": "S01",
+      "f": "('ed', 'h', 0, 1)",
+      "opp": "('ed', 'h', 0, 2)",
+      "L": 3.0,
+      "opt": 5.0,
+      "U": 5.0,
+      "exact": true
+    },
+    {
+      "p": "S01",
+      "f": "('ed', 'v', 1, 1)",
+      "opp": "('ed', 'v', 0, 1)",
+      "L": 2.0,
+      "opt": 5.0,
+      "U": 5.0,
+      "exact": true
+    },
+    {
+      "p": "S01",
+      "f": "('ed', 'h', 0, 2)",
+      "opp": "('ed', 'h', 0, 1)",
+      "L": 3.0,
+      "opt": 5.0,
+      "U": 5.0,
+      "exact": true
+    },
+    {
+      "p": "S01",
+      "f": "('ed', 'v', 0, 1)",
+      "opp": "('ed', 'v', 1, 1)",
+      "L": 3.0,
+      "opt": 5.0,
+      "U": 5.0,
+      "exact": true
+    }
+  ],
+  "wall_s": 227.48073883308098
+}

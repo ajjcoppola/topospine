@@ -1,0 +1,77 @@
+{
+  "espresso_binary": "/Users/ajjc/proj/TopoSpine/third_party/espresso/build/espresso",
+  "rows": [
+    {
+      "name": "hex_ring",
+      "n_on": 6,
+      "classic": {
+        "cost": 6,
+        "time_s": 0.005028834100812674,
+        "meta": {
+          "available": true,
+          "binary": "espresso",
+          "returncode": 0
+        }
+      },
+      "abc_isop": {
+        "cost": 6,
+        "time_s": 0.050479708006605506,
+        "meta": {
+          "available": true,
+          "binary": "yosys-abc",
+          "returncode": 0
+        }
+      },
+      "horn": {
+        "cost": 6,
+        "time_s": 0.0030419589020311832,
+        "meta": {
+          "n_push": 0,
+          "essentials": 6,
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      }
+    },
+    {
+      "name": "antipodal",
+      "n_on": 2,
+      "classic": {
+        "cost": 2,
+        "time_s": 0.004267750075086951,
+        "meta": {
+          "available": true,
+          "binary": "espresso",
+          "returncode": 0
+        }
+      },
+      "abc_isop": {
+        "cost": 2,
+        "time_s": 0.05010874988511205,
+        "meta": {
+          "available": true,
+          "binary": "yosys-abc",
+          "returncode": 0
+        }
+      },
+      "horn": {
+        "cost": 2,
+        "time_s": 0.000687750056385994,
+        "meta": {
+          "n_push": 0,
+          "essentials": 2,
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      }
+    }
+  ],
+  "abc_horn_witness": {
+    "accepted": true,
+    "cubes_before": 8,
+    "cubes_after": 2,
+    "abc_isop_cubes": 2,
+    "horn_cubes": 2,
+    "action": "sop_refined"
+  }
+}

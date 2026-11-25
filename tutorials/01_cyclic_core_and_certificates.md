@@ -4,13 +4,20 @@
 **Time:** ~20 minutes  
 **Runner:** `python tutorials/run_tutorial_01.py`
 
+**Vocabulary:** read [`docs/definitions-cube-array.md`](../docs/definitions-cube-array.md)
+first. **Layer 0** = array of cubes covering (implicit) minterms → absolute min →
+cyclic core after legal reductions. **Layer 1** = F/H/. grids (`cover.grid2d`) are a
+geometric sandbox; their residuals are *grid-surrogate cores*, not Layer-0 cores.
+
 ## 1. The story in one breath
 
-Two-level Boolean minimization reduces to a **covering table**. After essentials and
-dominance, you hit a **cyclic core**. If a prime has a **free face** (simple-homotopy),
+Two-level Boolean minimization starts from an **array of cubes** and an ON-set of
+**minterms**, builds a **covering table**, and after essentials and dominance hits a
+**cyclic core** (Layer 0). If a prime has a **free face** (simple-homotopy),
 **collapse-branch** replaces the classical in/out pair of recursive calls by **one**
 expanded call — *provided* a checkable admissibility hypothesis holds so that
-`encode`/`decode` transport optimality (Lean `transport_optimum`).
+`encode`/`decode` transport optimality (Lean `transport_optimum`). Grid pictures in
+later tutorials are Layer 1 unless re-stated for minterm×cube tables.
 
 ## 2. Build a cubical complex and derive $T_C$
 

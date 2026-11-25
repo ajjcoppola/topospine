@@ -285,6 +285,100 @@ def abc_optimize_blif_text(blif_text: str, script: str = RESYN2, timeout_s: int 
     }
 
 
+class AbcHornSopRefinePass(LogicPass):
+    """ABC ISOP (optional) then Espresso-Horn refine of the SOP cover (Paper E).
+
+    Mutates the state when Horn returns a strictly smaller cube cover that still
+    contains the ON-set.  Records cube/AND deltas vs plain ABC ISOP.  Full AIG
+    simple-homotopy rewriting remains Conjecture E1 (not claimed here).
+    """
+
+    name = "AbcHornSopRefine"
+    contract = "CoverOptimality"
+
+    def __init__(self, use_abc_seed: bool = True, timeout_s: int = 30) -> None:
+        self.use_abc_seed = use_abc_seed
+        self.timeout_s = timeout_s
+
+    def try_apply(self, state: LogicState) -> LogicPassResult:
+        from topospine.cover.espresso_variants import (
+            abc_isop_minimize,
+            cover_contains_on,
+            espresso_horn_minimize,
+        )
+
+        on_cubes = list(state.cubes) if state.cubes else minterm_sop(state.n, state.on)
+        abc_cost = None
+        abc_cover = None
+        if self.use_abc_seed:
+            abc_res = abc_isop_minimize(on_cubes, timeout_s=self.timeout_s)
+            if abc_res.cost >= 0 and abc_res.cover:
+                abc_cost = abc_res.cost
+                abc_cover = abc_res.cover
+                seed = abc_res.cover
+            else:
+                seed = on_cubes
+        else:
+            seed = on_cubes
+
+        horn = espresso_horn_minimize(seed, mode="exact")
+        cert: dict[str, Any] = {
+            "type": "LogicPassTrace",
+            "pass": self.name,
+            "contract": self.contract,
+            "n": state.n,
+            "on": sorted(state.on),
+            "dc": sorted(state.dc),
+            "cubes_before": len(state.cubes),
+            "gates_before": state.gates(),
+            "abc_isop_cubes": abc_cost,
+            "horn_cubes": horn.cost,
+            "horn_L": horn.lower_bound,
+            "horn_U": horn.upper_bound,
+            "horn_certified": horn.certified_optimal,
+            "conjecture_e1": (
+                "AIG simple-homotopy / Forman Morse pairing for multi-level rewrite "
+                "is conjectural; this pass only refines the SOP cover."
+            ),
+        }
+        if horn.cost < 0 or not horn.cover:
+            cert["cubes_after"] = len(state.cubes)
+            cert["gates_after"] = state.gates()
+            cert["cubes"] = [str(c) for c in state.cubes]
+            return LogicPassResult(False, state, cert, "horn failed")
+        if not cover_contains_on(horn.cover, on_cubes):
+            # Verify against ON minterms via cube containment of each ON cube
+            from topospine.cover.cube_array import cube_contained_in_union
+
+            ok_on = all(
+                cube_contained_in_union(c, horn.cover) for c in minterm_sop(state.n, state.on)
+            )
+            if not ok_on:
+                cert["cubes_after"] = len(state.cubes)
+                cert["gates_after"] = state.gates()
+                cert["cubes"] = [str(c) for c in state.cubes]
+                return LogicPassResult(False, state, cert, "horn cover misses ON")
+
+        if horn.cost >= len(state.cubes) and (
+            abc_cost is None or horn.cost >= abc_cost
+        ):
+            cert["cubes_after"] = len(state.cubes)
+            cert["gates_after"] = state.gates()
+            cert["cubes"] = [str(c) for c in state.cubes]
+            cert["action"] = "no_improvement"
+            return LogicPassResult(False, state, cert, "no cube improvement")
+
+        new_state = state.snapshot()
+        new_state.cubes = list(horn.cover)
+        new_state.aig, new_state.out = sop_to_aig(state.n, new_state.cubes)
+        cert["cubes_after"] = len(new_state.cubes)
+        cert["gates_after"] = new_state.gates()
+        cert["cubes"] = [str(c) for c in new_state.cubes]
+        cert["action"] = "sop_refined"
+        new_state.log.append(cert)
+        return LogicPassResult(True, new_state, cert, "horn SOP refine")
+
+
 class AbcBaselineAdapterPass(LogicPass):
     """Berkeley ABC (Mishchenko) baseline adapter.
 
@@ -336,6 +430,7 @@ class LogicPassManager:
         default_factory=lambda: [
             DontCareSpinePass(),
             FactorDiagramRewritePass(),
+            AbcHornSopRefinePass(),
             AbcBaselineAdapterPass(),
         ]
     )

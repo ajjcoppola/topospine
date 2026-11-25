@@ -81,6 +81,10 @@ theorem out_collapse_optimal {Cover : Type}
 
 /-! ## Concrete counterexample: 6-vertex path `P₆` (collar lock-in)
 
+**Not a cyclic core** for the free-face / vertex-row local-transform question
+(the path still has essential edges).  Retained as a Boolean `Out_complex`
+witness only.
+
 Vertices `v0..v5` (`1000, 0000, 0010, 0011, 0111, 0101`), bitmask `63 = 0b111111`.
 Edges `e0..e4` (`-000, 00-0, 001-, 0-11, 01-1`):
 * `e0` (`FF_c`, bit 0) covers `{v0, v1}` = `3`

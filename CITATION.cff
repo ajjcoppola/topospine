@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: TopoSpine
+message: If you use TopoSpine, please cite the Wave 1 arXiv papers (A and E).
+type: software
+authors:
+  - family-names: Coppola
+    given-names: Alan J.
+    email: ajjc@optngn.com
+version: 0.1.0
+date-released: "2026-11-24"
+license: MIT
+repository-code: "https://github.com/ajjcoppola/topospine"
+url: "https://github.com/ajjcoppola/topospine"
+keywords:
+  - cubical complexes
+  - logic minimization
+  - Horn retraction
+  - topological data analysis
+  - certificate-carrying synthesis
+references:
+  - type: article
+    title: "Horn Retraction, Roth Extremals, and Espresso-Horn for Certified Cyclic-Core Covering"
+    authors:
+      - family-names: Coppola
+        given-names: Alan J.
+    year: 2026
+    notes: "TopoSpine Paper A — arXiv ID pending (Wave 1)"
+    # identifiers:
+    #   - type: arxiv
+    #     value: "XXXX.XXXXX"
+  - type: article
+    title: "Horn Retraction and Controlled Chains for Certified TDA Spines, with Espresso/ABC Extensions"
+    authors:
+      - family-names: Coppola
+        given-names: Alan J.
+    year: 2026
+    notes: "TopoSpine Paper E — arXiv ID pending (Wave 1 companion)"

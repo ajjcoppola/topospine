@@ -1,0 +1,37 @@
+{
+  "winner": {
+    "round": 2,
+    "candidate": "far1_face1",
+    "results": {
+      "3x3": {
+        "name": "far1_face1",
+        "total": 32288,
+        "fires": 10760,
+        "failures": 0,
+        "fire_rate": 0.33325074331020815,
+        "pass": true,
+        "trivial_ok": true,
+        "grid": "3x3",
+        "trivial": false,
+        "wall_s": 4.15546187502332
+      },
+      "3x4": {
+        "name": "far1_face1",
+        "total": 24246,
+        "fires": 9846,
+        "failures": 0,
+        "fire_rate": 0.4060876020786934,
+        "pass": true,
+        "trivial_ok": true,
+        "grid": "3x4_sample",
+        "trivial": false,
+        "wall_s": 3.6019753750879318
+      }
+    },
+    "stop_pass": true
+  },
+  "log": [
+    "round 1 far_empty: 3x3 fires=5700/32288 fail=0 rate=0.177; 3x4 fires=5505/24246 fail=0",
+    "round 2 far1_face1: 3x3 fires=10760/32288 fail=0 rate=0.333; 3x4 fires=9846/24246 fail=0"
+  ]
+}

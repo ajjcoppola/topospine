@@ -10,8 +10,30 @@ Every statement below that is not PROVED-* must stay labelled in the paper text.
 | Statement | Label | Evidence | Ledger |
 |-----------|-------|----------|--------|
 | Elementary free-face collapse preserves Euler characteristic | PROVED-PAPER + TESTED | `checkers.collapse_trace`, L1 schema | C0 |
-| Theorem 1: collapse-branch is optimal **given hypothesis (H)** (`cost(C_exp) ≤ cost(C_in)`) | PROVED-PAPER (reduction only) | proof in text | C1/C2 |
-| "CoverAdmissibleFreeFace ⇒ (H)" | **DISPROVED** (n = 5) | `tests/test_shotgun.py::test_c2_*` | C2 |
+| Layer-0 glossary + legal expansions (array of cubes → primes → cyclic core; grids = sandbox) | PROVED-LEAN (monotone lift) + PROVED-PAPER | `docs/definitions-cube-array.md`, `Layer0CubeArray.lean` | C45 |
+| Layer-0 existential 1-recursion counterexamples (`9×9` swap-fail, `12×13` include-fail) | PROVED-LEAN (`native_decide`) + TESTED | `cover.cube_array`, `Layer0CubeArray.lean` | C46 |
+| Layer-0 zero-loss FF push-down (`F_p(f)=∅`) + Layer-0 Far-Side IFF | PROVED-LEAN + AUDITED (`n=5` sample, 0 fails) | `zero_loss_free_face_pushdown`, `Layer0CubeArray.lean` | C47 |
+| Layer-0 blob additivity + cube-space implicit-minterm solver (`minimize_cube_array`) | PROVED-LEAN (blob additivity) + TESTED | `cover.cube_array`, `run_layer0_blob_audit.py` | C48 |
+| Horn retraction `(CC\{f_top}) ∪ (∂f_top\{f})` dominance + Exact Horn IFF | PROVED-LEAN (transport + `5×4` 3-cube `native_decide`) + AUDITED (`n=5` sample, 0/2519 IFF mismatches) | `cover.horn_chains`, `HornChains.lean` | C49 |
+| Cylinder `× I^m` invariance & cone-prism `1 + opt(F)` offset | PROVED-LEAN + TESTED | `cover.horn_chains`, `HornChains.lean` | C50 |
+| Complement boundary free-face duality (`f^(j) ∩ F^c ≠ ∅`) | PROVED-LEAN (mask duality) + AUDITED (`n=3` exhaustive, `n=5` 14682 faces, 0 mismatches) | `is_free_face_via_complement`, `HornChains.lean` | C51 |
+| Controlled collapsible horn chains (`exact`/`approx`/`probabilistic`) + persistent cohomology invariance | PROVED-LEAN (chain induction + window cert) + TESTED (`n=5` 195 cores, 0 cohom/persistence mismatches) | `controlled_horn_chain_cover`, `HornChains.lean` | C52 |
+| Espresso-family + Espresso-Horn (`L=max(L_MIS,⌈z_LP⌉)`) head-to-head | PROVED-LEAN (LP/MIS window) + TESTED | `espresso_variants.py`, `run_espresso_horn_bench.py`, `RothEspressoHorn.lean` | C53 |
+| `sccc`-stall escape by Horn split (E1) | PROVED-LEAN (`native_decide` 5×4) + TESTED | `RothEspressoHorn.sccc_stall_escaped_by_horn` | C54 |
+| Non-vacuous `HornRetractionCollapsePass` on 2007 core | PROVED-IR + TESTED (C21 vacuity of single-face pass) | `HornRetractionCollapsePass`, `pass_trace` | C55 |
+| Paper A grid intuition separated to companion | DRAFT | `intuition_examples.tex`, rewritten `main.tex` / `talk/main.tex` | — |
+| Paper E: Horn covering closes B vacuity on $8^3$/2007 | TESTED | `medical/pipeline`, `test_paper_e_tda_horn.py` | C56 |
+| Paper E: SpineTower Horn $(L,U)$ windows | TESTED | `spine_min`/`tower`, `run_spine_horn_bench.py` | C57 |
+| Paper E: classic Espresso + AbcHornSopRefine; AIG Morse conjectural | TESTED / CONJECTURED | `classic_espresso_minimize`, `AbcHornSopRefinePass` | C58 |
+| Paper E draft + talk | DRAFT | `papers/E-tda-horn-programs/` | — |
+| Face-row Theorem A: free face ⇒ essential, `opt=1+opt(K/p)` | PROVED-PAPER + AUDITED + PROVED-LEAN (abstract); **Layer-1 sandbox** | `star_collapse_face_rows`, `StarLink.lean` | C42 |
+| Link(opp) bounds `L≤opt≤U` | PROVED-PAPER + AUDITED (3×3) + PROVED-LEAN (abstract window); **Layer-1 sandbox** | `link_out_complex`, `StarLink.lean` | C43 |
+| Approx-min certificate interface `(L,U)` | PROVED-PAPER (certificate claim only); sandbox unless re-proved on Layer 0 | Tutorial 05 / paper | C44 |
+| Far-side theorem: `opt(P')=opt(P)` iff far side coverable without `p` in some optimum | PROVED-PAPER + AUDITED (3×3: 0/32288; 3×4: 0/1 013 750) + PROVED-LEAN (abstract + 2×3 strip) | `grid2d`, `grid_collapse_char_3x4.json`, `LocalTransform.lean` | C38 |
+| Row-model dichotomy (face vs vertex rows) | AUDITED (3×3); sandbox row models | `dichotomy_counts` | C39 |
+| Put-back after decode | TESTED + code | `minimize.restore` | C40 |
+| Sufficient condition `|F_p|=|V(f)∩R|=1` (≥5% fire, 0 fail) | AUDITED | `grid_collapse_round2.json` | C41 |
+| "CoverAdmissibleFreeFace ⇒ far-side / (H)" | **DISPROVED** (n = 5) | `tests/test_shotgun.py::test_c2_*` | C2 |
 | Collapse-branch = exact optimum for all n ≤ 4 Boolean instances | AUDITED (255 + 65 535 functions; fired on 330) | `benchmarks/run_shotgun_audit.py` | C2 |
 | Collapse-branch fails on 2 of 1500 sampled n = 5 instances | AUDITED (sample; exhaustive oracle) | same | C2 |
 | Shotgun shelling preserves optimality | **DISPROVED** (7-column counterexample 4 vs 5; 33/864 mismatches at n = 4 with the guarded rule) | `test_c9_counterexample_*` | C9 |
@@ -20,8 +42,8 @@ Every statement below that is not PROVED-* must stay labelled in the paper text.
 | Hochster summary | EXTERNAL | Björner / Francisco et al. | — |
 | TU residue theorem ("informal") | PROPOSED (with B. Krishnamoorthy); no result claimed | — | C10 |
 | 71→57, 431→219 recursive-call wins | TESTED on tiled 2007 cores; not an average-case claim | regression tests | — |
-| Lean: abstract transport, finite L3 / L6 instances, `Out_complex` transport + `P_6` collar lock-in (`decide`) | PROVED-LEAN | `lean/TopoSpine/*.lean`, `tests/test_lean_build.py` | C16, C22, C35, C36 |
-| `Out_complex` 4-step rule: unconditionally feasible; exact on all 198 collapsible `n = 3` functions with `ReducedCov`; fails at `n = 4` via `P_6` collar lock-in (4 vs 3) | PROVED-LEAN + AUDITED | `OutComplex.lean`, `tests/test_out_complex.py` | C35, C36 |
+| Lean: LocalTransform lemmas + 2×3 counterexample; abstract transport; L3/L6; OutComplex (P₆ non-core example) | PROVED-LEAN | `lean/TopoSpine/*.lean`, `tests/test_lean_build.py` | C16, C22, C35, C36, C38 |
+| `Out_complex` 4-step rule: unconditionally feasible; exact on all 198 collapsible `n = 3` with `ReducedCov`; `P_6` collar lock-in is a **non-core** Boolean witness | PROVED-LEAN + AUDITED | `OutComplex.lean`, `tests/test_out_complex.py` | C35, C36 |
 | Cyclic-core collapsible inclusion (`C_in = opt`): holds on all 1,544 `n = 4` cyclic cores (4,368 collapsible columns), **DISPROVED** at `n = 5` (5 vs 4) | AUDITED (`n ≤ 4` exhaustive, `n = 5` witness) | `tests/test_out_complex.py` | C37 |
 | Lean: general collapse theorem, (H) from admissibility, TU | not formalized | — | C16 |
 
@@ -32,7 +54,7 @@ Every statement below that is not PROVED-* must stay labelled in the paper text.
 | PassManager commits only checker-accepted transforms | TESTED (+ fail-closed unit tests) | `tests/test_pass_manager.py` | C11 |
 | Filtration / relative collapse refusals | TESTED | same | C12, C13 |
 | Covering mode never empties the IR; checker rejects deletion-style passes there | TESTED | `tests/test_pass_manager.py` mode tests | C17 |
-| Covering mode is vacuous on the 2007 core and on the 8³ blob | TESTED (negative) | medical bench, `test_covering_collapse_fail_closed_*` | C21 |
+| Single-face covering vacuous on 2007 / 8³ blob | TESTED (historical negative); **superseded for Horn** by C56 / Paper E | `test_covering_collapse_fail_closed_*`; Horn medical bench | C21 → C56 |
 | Homotopy mode 81 → 49 cells on the synthetic blob | EMPIRICAL-SYNTHETIC | `benchmarks/run_medical_bench.py` | — |
 | Shotgun pass never claims optimality; checker rejects a claim | TESTED | `tests/test_shotgun.py` | C9 |
 | Lean library builds (bare `lake build`) and has no unfinished proofs | PROVED-LEAN gate (test) | `tests/test_lean_build.py` | C22 |

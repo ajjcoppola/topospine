@@ -27,6 +27,9 @@ class CoverLevel:
     nerve: list[frozenset[int]]
     betti: list[int]
     parent_map: dict[int, int] = field(default_factory=dict)  # child selected idx -> parent selected idx
+    lower_bound: int = 0
+    upper_bound: int = 0
+    certified_optimal: bool = False
 
 
 @dataclass
@@ -86,6 +89,8 @@ def build_cover_tower(
     n_levels: int = 3,
     *,
     fail_closed: bool = True,
+    spine_method: str = "espresso_loop",
+    horn_mode: str = "approx",
 ) -> CoverTower:
     tower = CoverTower(points=points)
     prev_selected: list[int] | None = None
@@ -102,7 +107,10 @@ def build_cover_tower(
         drop = set(range(sub.n_cols())) - set(feasible)
         sub.remove_cols(drop)
         # Map feasible old -> new
-        result = spine_min(sub, method="espresso_loop")
+        if spine_method == "horn":
+            result = spine_min(sub, method="horn", horn_mode=horn_mode)  # type: ignore[arg-type]
+        else:
+            result = spine_min(sub, method=spine_method)  # type: ignore[arg-type]
         # selected columns in `sub` indices → original landmark indices
         selected_landmarks = []
         for new_j in result.cover_indices:
@@ -144,6 +152,9 @@ def build_cover_tower(
                 nerve=nerve,
                 betti=betti,
                 parent_map=parent_map,
+                lower_bound=result.lower_bound,
+                upper_bound=result.upper_bound,
+                certified_optimal=result.certified_optimal,
             )
         )
         prev_selected = selected_landmarks
@@ -153,6 +164,7 @@ def build_cover_tower(
 
 def tower_certificate(tower: CoverTower) -> dict:
     """ApproximatePersistence contract certificate (not ProvenMinimum)."""
+    n_cert = sum(1 for lv in tower.levels if lv.certified_optimal)
     return {
         "contract": "ApproximatePersistence",
         "n_levels": len(tower.levels),
@@ -162,4 +174,7 @@ def tower_certificate(tower: CoverTower) -> dict:
         "cover_sizes": [len(lv.selected_landmarks) for lv in tower.levels],
         "betti_per_level": [lv.betti for lv in tower.levels],
         "refinement_maps_selected": [lv.parent_map for lv in tower.levels],
+        "windows": [(lv.lower_bound, lv.upper_bound) for lv in tower.levels],
+        "certified_optimal_levels": n_cert,
+        "certified_optimal_fraction": n_cert / max(1, len(tower.levels)),
     }

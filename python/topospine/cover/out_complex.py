@@ -21,10 +21,12 @@ What holds unconditionally and what requires transport ``(H_out)``:
        without ``ReducedCov`` Step 4 returns 3 vs optimum 2; with ``ReducedCov``
        all 198 collapsible ``n=3`` Boolean instances agree with the exact optimum.
     2. *Collar lock-in* (``path6_collar_lockin_instance``, ``n=4``, 6 minterms,
-       5 edges forming path ``P_6``): keeping the shared vertex ``0000`` in
-       ``Out_complex`` lets ``MinCov(Out_complex)`` pick ``{e2, e4, e5}`` (cost 3);
-       adding ``FF_c = e1`` yields ``{e1, e2, e4, e5}`` which is *irredundant* of
-       cost 4, whereas ``{e1, e3, e5}`` covers ``P_6`` with cost 3.
+       5 edges forming path ``P_6``): **not a cyclic core** (it still has essential
+       edges / free-face essentials under face rows).  Kept as a Boolean
+       ``Out_complex`` witness only: keeping the shared vertex ``0000`` lets
+       ``MinCov(Out_complex)`` pick ``{e2, e4, e5}`` (cost 3); adding
+       ``FF_c = e1`` yields an *irredundant* cost-4 cover while ``{e1, e3, e5}``
+       covers ``P_6`` with cost 3.
     3. *Cyclic-core shared boundary* (``cyclic_core_step3_trap_n4`` and
        ``cyclic_core_exclude_win_n5``): after essential removal every remaining
        minterm of ``FF_c`` lies in some other prime, so ``keep_intersection``
@@ -45,14 +47,19 @@ from topospine.core.cubes import BooleanCube, parse_boolean_cube
 from topospine.cover.collapse import list_collapsible_primes
 from topospine.cover.minimize import minimize_cover
 
-OutVariant = Literal["keep_intersection", "drop_free_face", "drop_all_ff_rows"]
+OutVariant = Literal[
+    "keep_intersection",
+    "drop_free_face",
+    "drop_all_ff_rows",
+    "link_opposite",
+]
 
 OUT_VARIANTS: tuple[OutVariant, ...] = (
     "keep_intersection",
     "drop_free_face",
     "drop_all_ff_rows",
+    "link_opposite",
 )
-
 
 @dataclass
 class OutComplexResult:
@@ -120,6 +127,10 @@ def build_out_complex(
         else:
             drop_rows = {i for i in range(cm.n_rows()) if cm.matrix[i][col_j]}
         drop_rows |= {i for i in range(out.n_rows()) if not any(out.matrix[i])}
+    elif variant == "link_opposite":
+        # Boolean tables have no geometric opp/link; fall back to keep_intersection
+        # (grid Link(opp) lives in cover.grid2d.link_out_complex).
+        drop_rows = {i for i in range(out.n_rows()) if not any(out.matrix[i])}
     out.remove_rows(drop_rows)
     return out
 
@@ -209,7 +220,10 @@ def path4_bridge_instance() -> tuple[CoveringMatrix, int]:
 
 
 def path6_collar_lockin_instance() -> tuple[CoveringMatrix, int]:
-    """``n=4`` 6-vertex, 5-edge path ``P_6``: minimal collar lock-in counterexample.
+    """``n=4`` 6-vertex, 5-edge path ``P_6``: collar lock-in (**not** a cyclic core).
+
+    The path retains essential edges, so it is a non-core witness for the
+    ``Out_complex`` put-back gap, not evidence about cyclic-core free faces.
 
     Vertices along the path:
         v1=1000 --e1(-000)-- v2=0000 --e2(00-0)-- v3=0010
@@ -240,7 +254,14 @@ def cyclic_core_step3_trap_n4() -> tuple[CoveringMatrix, int]:
 
 
 def cyclic_core_exclude_win_n5() -> tuple[CoveringMatrix, int]:
-    """``9x9`` ``n=5`` cyclic core where every variant adding ``FF_c`` gets 5 vs opt 4."""
+    """``9x9`` ``n=5`` partial-domain cube table where every variant adding ``FF_c`` gets 5 vs opt 4.
+
+    Layer-0 note (``docs/definitions-cube-array.md``): this synthetic table lists only 9
+    of the 17 minterms covered by its 9 cubes; on the full implicit ON-set of that cube
+    array, 5 primes are essential and the Layer-0 cyclic core is ``0x0``.  For the genuine
+    Layer-0 prime cyclic-core ``C_in`` counterexample (where ALL implicit minterms and ALL
+    Blake primes are included), see ``cover.cube_array.layer0_include_cex_n6_bridged_12x13``.
+    """
     cm = _table_from_strings(
         row_strs=["00010", "00100", "00110", "10000", "10010", "10011", "10100", "10101", "10111"],
         col_strs=["1--00", "001--", "1-0-0", "--10-", "10-11", "-0010", "-01-1", "00-10", "1001-"],

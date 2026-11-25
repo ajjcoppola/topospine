@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=0.55cm,y=0.55cm,every node/.style={font=\scriptsize}]
+\node[anchor=south] at (1.0,3.4) {smallest vertex-row counterexample};
+\draw[fill=white] (0,0) rectangle ++(1,1);
+\draw[thick] (0,0) rectangle ++(1,1);
+\draw[fill=orange!45] (0,1) rectangle ++(1,1);
+\draw[fill=white] (0,2) rectangle ++(1,1);
+\draw[thick] (0,2) rectangle ++(1,1);
+\draw[fill=white] (1,0) rectangle ++(1,1);
+\draw[thick] (1,0) rectangle ++(1,1);
+\draw[fill=white] (1,1) rectangle ++(1,1);
+\draw[thick] (1,1) rectangle ++(1,1);
+\draw[fill=white] (1,2) rectangle ++(1,1);
+\draw[thick] (1,2) rectangle ++(1,1);
+\draw[blue,very thick] (0,1) -- (1,1);
+\fill[red!70] (0,2) circle (2pt);
+\fill[red!70] (1,2) circle (2pt);
+\end{tikzpicture}

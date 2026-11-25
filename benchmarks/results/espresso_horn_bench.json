@@ -1,0 +1,1324 @@
+{
+  "n_instances": 16,
+  "rows": [
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 5,
+      "espresso_ii": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0017229169607162476,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0009075000416487455,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0012020838912576437,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.048141750041395426,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 5,
+        "L": 5,
+        "U": 5,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.35844724997878075,
+        "meta": {
+          "z_lp": 5.0,
+          "ceil_lp": 5,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 5,
+        "L": 5,
+        "U": 5,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.003313082968816161,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 0
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 6,
+      "espresso_ii": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00206091720610857,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0007476669270545244,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0009416248649358749,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.05010291584767401,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002150916028767824,
+        "meta": {
+          "z_lp": 6.0,
+          "ceil_lp": 6,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.003288916079327464,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 1
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 5,
+      "espresso_ii": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0017152908258140087,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0007102920208126307,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0008904580026865005,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04740554094314575,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 5,
+        "L": 5,
+        "U": 5,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0018548329826444387,
+        "meta": {
+          "z_lp": 5.0,
+          "ceil_lp": 5,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 5,
+        "L": 5,
+        "U": 5,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0027220831252634525,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 2
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 6,
+      "espresso_ii": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002678541000932455,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0013588748406618834,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0016235830262303352,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04706725012511015,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0018030840437859297,
+        "meta": {
+          "z_lp": 6.0,
+          "ceil_lp": 6,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.004091792041435838,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 3
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 6,
+      "espresso_ii": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0021546247880905867,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0008728329557925463,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0012128748930990696,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0473625420127064,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.001787541899830103,
+        "meta": {
+          "z_lp": 6.0,
+          "ceil_lp": 6,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00328745786100626,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 4
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 5,
+      "espresso_ii": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0020841669756919146,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0008318750187754631,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0009991659317165613,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 5,
+        "L": 0,
+        "U": 5,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04705975018441677,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 5,
+        "L": 5,
+        "U": 5,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0019599171355366707,
+        "meta": {
+          "z_lp": 5.0,
+          "ceil_lp": 5,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0030870840419083834,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 5
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 6,
+      "espresso_ii": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": true,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0013498750049620867,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0009148749522864819,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.001251207897439599,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 6,
+        "L": 0,
+        "U": 6,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.048066416988149285,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0021724579855799675,
+        "meta": {
+          "z_lp": 6.0,
+          "ceil_lp": 6,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 6,
+        "L": 6,
+        "U": 6,
+        "certified": true,
+        "sccc_stalled": true,
+        "horn_splits": 6,
+        "covers": true,
+        "time_s": 0.0042429578024894,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 6
+    },
+    {
+      "n_on": 10,
+      "n": 5,
+      "opt": 7,
+      "espresso_ii": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002261584158986807,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0007842089980840683,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0011006249114871025,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.048085000133141875,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.001819416880607605,
+        "meta": {
+          "z_lp": 7.0,
+          "ceil_lp": 7,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0033541671000421047,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n5",
+      "trial": 7
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 7,
+      "espresso_ii": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0034537501633167267,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0015558749437332153,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002148207975551486,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04670529090799391,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0019734171219170094,
+        "meta": {
+          "z_lp": 7.0,
+          "ceil_lp": 7,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.005312334047630429,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 0
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 8,
+      "espresso_ii": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0038257078267633915,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0015982920303940773,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00261804205365479,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.05168595816940069,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 8,
+        "L": 8,
+        "U": 8,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0023127500899136066,
+        "meta": {
+          "z_lp": 8.0,
+          "ceil_lp": 8,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 8,
+        "L": 8,
+        "U": 8,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.006779832998290658,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 1
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 8,
+      "espresso_ii": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.004427457926794887,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0020218328572809696,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00306570902466774,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 8,
+        "L": 0,
+        "U": 8,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.049366791965439916,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 8,
+        "L": 8,
+        "U": 8,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002067709108814597,
+        "meta": {
+          "z_lp": 8.0,
+          "ceil_lp": 8,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 8,
+        "L": 8,
+        "U": 8,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.005996874999254942,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 2
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 7,
+      "espresso_ii": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.003455874975770712,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0017023750115185976,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0020608750637620687,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 7,
+        "L": 0,
+        "U": 7,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.047059208853170276,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002319333143532276,
+        "meta": {
+          "z_lp": 7.0,
+          "ceil_lp": 7,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 7,
+        "L": 7,
+        "U": 7,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00560575001873076,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 3
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 9,
+      "espresso_ii": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.005435500061139464,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00242937495931983,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0036437499802559614,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04904387495480478,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 9,
+        "L": 9,
+        "U": 9,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0021263749804347754,
+        "meta": {
+          "z_lp": 9.0,
+          "ceil_lp": 9,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 9,
+        "L": 9,
+        "U": 9,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.007748000090941787,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 4
+    },
+    {
+      "n_on": 12,
+      "n": 6,
+      "opt": 9,
+      "espresso_ii": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.004689417080953717,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0019164171535521746,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0026080410461872816,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 9,
+        "L": 0,
+        "U": 9,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04759749979712069,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 9,
+        "L": 9,
+        "U": 9,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002059041988104582,
+        "meta": {
+          "z_lp": 9.0,
+          "ceil_lp": 9,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 9,
+        "L": 9,
+        "U": 9,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.007113207830116153,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "random_n6",
+      "trial": 5
+    },
+    {
+      "n_on": 8,
+      "n": 4,
+      "opt": 2,
+      "espresso_ii": {
+        "cost": 2,
+        "L": 0,
+        "U": 2,
+        "certified": false,
+        "sccc_stalled": true,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0002583339810371399,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 2,
+        "L": 0,
+        "U": 2,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0001637497916817665,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 2,
+        "L": 0,
+        "U": 2,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.00014404114335775375,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 2,
+        "L": 0,
+        "U": 2,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.04806916695088148,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 2,
+        "L": 2,
+        "U": 2,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.001557457959279418,
+        "meta": {
+          "z_lp": 2.0,
+          "ceil_lp": 2,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 2,
+        "L": 2,
+        "U": 2,
+        "certified": true,
+        "sccc_stalled": true,
+        "horn_splits": 6,
+        "covers": true,
+        "time_s": 0.00130929215811193,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "antipodal_00_11"
+    },
+    {
+      "n_on": 3,
+      "n": 12,
+      "opt": 3,
+      "espresso_ii": {
+        "cost": 3,
+        "L": 0,
+        "U": 3,
+        "certified": false,
+        "sccc_stalled": true,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.0010512920562177896,
+        "meta": {}
+      },
+      "espresso_signature": {
+        "cost": 4,
+        "L": 0,
+        "U": 4,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.001070499885827303,
+        "meta": {}
+      },
+      "boom_cd": {
+        "cost": 4,
+        "L": 0,
+        "U": 4,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.002385667059570551,
+        "meta": {}
+      },
+      "abc_isop": {
+        "cost": 4,
+        "L": 0,
+        "U": 4,
+        "certified": false,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.05018545896746218,
+        "meta": {
+          "available": true
+        }
+      },
+      "highs_lp_ilp": {
+        "cost": 3,
+        "L": 3,
+        "U": 3,
+        "certified": true,
+        "sccc_stalled": false,
+        "horn_splits": 0,
+        "covers": true,
+        "time_s": 0.013264958979561925,
+        "meta": {
+          "z_lp": 3.0,
+          "ceil_lp": 3,
+          "zero_integrality_gap": true
+        }
+      },
+      "espresso_horn": {
+        "cost": 3,
+        "L": 3,
+        "U": 3,
+        "certified": true,
+        "sccc_stalled": true,
+        "horn_splits": 6,
+        "covers": true,
+        "time_s": 0.025087417103350163,
+        "meta": {
+          "L_MIS": 0,
+          "ceil_LP": 0
+        }
+      },
+      "family": "sparse_n12"
+    }
+  ],
+  "mean_cost": {
+    "espresso_ii": 6.25,
+    "espresso_signature": 6.3125,
+    "boom_cd": 6.25,
+    "abc_isop": 6.3125,
+    "highs_lp_ilp": 6.1875,
+    "espresso_horn": 6.25
+  },
+  "horn_certified_rate": 1.0
+}

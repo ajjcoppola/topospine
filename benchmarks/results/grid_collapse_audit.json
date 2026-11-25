@@ -1,0 +1,57 @@
+{
+  "dichotomy": {
+    "3x3": {
+      "vertex_cores": 9770,
+      "vertex_with_collapsible_square": 6126,
+      "face_cores": 4149,
+      "face_with_collapsible_square": 0
+    }
+  },
+  "stats": {
+    "2x2": {
+      "configs": 65,
+      "cores": 0,
+      "pairs": 0,
+      "c_exp_eq_opt": 0,
+      "putback_eq_opt": 0,
+      "putback_rescues": 0,
+      "far_empty": 0,
+      "char_mismatches": 0
+    },
+    "2x3": {
+      "configs": 665,
+      "cores": 147,
+      "pairs": 298,
+      "c_exp_eq_opt": 234,
+      "putback_eq_opt": 236,
+      "putback_rescues": 2,
+      "far_empty": 60,
+      "char_mismatches": 0
+    },
+    "3x3": {
+      "configs": 19171,
+      "cores": 9770,
+      "pairs": 32288,
+      "c_exp_eq_opt": 25900,
+      "putback_eq_opt": 26074,
+      "putback_rescues": 174,
+      "far_empty": 5700,
+      "char_mismatches": 0
+    }
+  },
+  "characterization": {
+    "3x3": {
+      "checked": 32288,
+      "mismatches": 0
+    }
+  },
+  "counterexample": {
+    "grid": "H H\nF H\nH H",
+    "p": "S01",
+    "free_face": "('ed', 'h', 0, 1)",
+    "opt": 5.0,
+    "c_exp": 6.0,
+    "decoded_putback": 6.0
+  },
+  "wall_time_s": 132.50078166695312
+}

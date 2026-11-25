@@ -1,9 +1,14 @@
-"""2D grid complexes for the free-face collapse as a local transform.
+"""2D grid complexes — Layer 1 *geometric sandbox* (not Layer-0 cyclic cores).
+
+See ``docs/definitions-cube-array.md``.  An array-of-cubes absolute-min problem
+has minterm rows; this module builds Filled/Hollow/Absent unit-square complexes
+and covering tables whose rows are **vertices** or **faces** of the grid.  A
+residual after ``reduce_to_cyclic_core`` on those tables is a
+**grid-surrogate core**, not a cyclic core in Alan's Layer-0 sense.
 
 Every unit square of an ``a x b`` grid is filled (top cell of dim 2), hollow
-(boundary edges only) or absent.  Vertex-row covering is the logic-minimization
-problem: rows are vertices of the complex; columns are top cells; unit weights.
-Face-row covering uses all proper faces (edges and vertices) as rows.
+(boundary edges only) or absent.  Vertex-row covering: rows = vertices; columns =
+top cells; unit weights.  Face-row covering: rows = all proper faces.
 
 The free-face transform ``T`` replaces a filled square ``p`` by a free face ``f``.
 Decode swaps ``f`` back to ``p``.  Put-back then drops every chosen cube the rest of
@@ -163,23 +168,64 @@ def face_row_table(g: GridComplex) -> CoveringMatrix:
 
 # ----------------------------------------------------------------- bitmask exact cover
 def exact_min_cost(row_masks: list[int], n_cols: int, universe: int) -> tuple[float, list[int]]:
-    """Exact unit-cost cover by increasing subset size.  Bitmasks over rows."""
+    """Exact unit-cost cover.  Try small-cardinality search first; else bit-DP on rows."""
     if universe == 0:
         return 0.0, []
-    best: tuple[float, list[int]] = (float("inf"), [])
-    for k in range(1, n_cols + 1):
-        found = False
+    bits = [i for i in range(universe.bit_length()) if universe & (1 << i)]
+    r = len(bits)
+    # Prefer DP when the state space is smaller than a mid-size combination sweep
+    use_dp_first = r <= 18 or n_cols > 14
+    if not use_dp_first:
+        for k in range(1, min(n_cols, 8) + 1):
+            for combo in combinations(range(n_cols), k):
+                cov = 0
+                for j in combo:
+                    cov |= row_masks[j]
+                if cov & universe == universe:
+                    return float(k), list(combo)
+    if r <= 22 and n_cols <= 64:
+        remap = {b: i for i, b in enumerate(bits)}
+        full = (1 << r) - 1
+
+        def pack(m: int) -> int:
+            out = 0
+            for b, i in remap.items():
+                if m & (1 << b):
+                    out |= 1 << i
+            return out
+
+        packed = [pack(m) for m in row_masks]
+        inf = n_cols + 1
+        best = [inf] * (1 << r)
+        prev: list[tuple[int, int]] = [(-1, -1)] * (1 << r)
+        best[0] = 0
+        for state in range(1 << r):
+            cur = best[state]
+            if cur >= inf:
+                continue
+            for j, m in enumerate(packed):
+                nxt = state | m
+                if cur + 1 < best[nxt]:
+                    best[nxt] = cur + 1
+                    prev[nxt] = (state, j)
+        if best[full] >= inf:
+            return float("inf"), []
+        pick: list[int] = []
+        state = full
+        while state:
+            pstate, j = prev[state]
+            pick.append(j)
+            state = pstate
+        pick.reverse()
+        return float(len(pick)), pick
+    for k in range(9, n_cols + 1):
         for combo in combinations(range(n_cols), k):
             cov = 0
             for j in combo:
                 cov |= row_masks[j]
             if cov & universe == universe:
-                best = (float(k), list(combo))
-                found = True
-                break
-        if found:
-            break
-    return best
+                return float(k), list(combo)
+    return float("inf"), []
 
 
 def min_subcover_masks(universe: int, chosen: list[tuple[str, int]]) -> list[tuple[str, int]]:
@@ -206,9 +252,15 @@ def greedy_reduce_masks(universe: int, chosen: list[tuple[str, int]]) -> list[tu
     return keep
 
 
-# ----------------------------------------------------------------- core + transform
+# ----------------------------------------------------------------- grid-surrogate core + transform
 @dataclass
 class CoreInstance:
+    """Vertex-row residual after ``reduce_to_cyclic_core`` on a grid table.
+
+    This is a *grid-surrogate core* (Layer 1), not a Layer-0 cyclic core of a
+    minterm×cube array.  See ``docs/definitions-cube-array.md``.
+    """
+
     grid: GridComplex
     core_cols: list[GridColumn]
     core_rows: frozenset[tuple[int, int]]
@@ -219,6 +271,7 @@ class CoreInstance:
 
 
 def to_core(g: GridComplex) -> CoreInstance | None:
+    """Reduce the vertex-row table; return a grid-surrogate core or None if empty."""
     cm = vertex_row_table(g)
     sub, _, ess = reduce_to_cyclic_core(cm.copy())
     if sub.n_rows() == 0:
@@ -295,43 +348,7 @@ def apply_transform(core: CoreInstance, p: GridColumn, f: tuple) -> TransformRes
     raw = float(len(back))
     put = float(len(min_subcover_masks(core.universe, back)))
     F = far_rows(p, f, core.core_rows)
-    far_mask = 0
-    for v in F:
-        far_mask |= 1 << core.row_index[v]
-    # some optimal cover of original excludes p, OR covers F without p
-    far_ok = False
-    if far_mask == 0:
-        far_ok = True
-    else:
-        # exists optimal cover without p covering F?
-        for combo in combinations(range(len(others)), int(opt) if opt < float("inf") else 0):
-            cov = 0
-            for j in combo:
-                cov |= other_masks[j]
-            if cov & far_mask == far_mask and (cov | core.col_masks[idx_p]) & core.universe == core.universe:
-                # cover of size |combo|+1 including p
-                if len(combo) + 1 == opt:
-                    far_ok = True
-                    break
-        # or optimal cover excluding p entirely
-        if not far_ok:
-            c_out, _ = exact_min_cost(other_masks, len(other_masks), core.universe)
-            if c_out == opt:
-                far_ok = True
-        # also: exists any cover of F by others of size <= opt-1 that extends
-        if not far_ok and far_mask:
-            for k in range(0, int(opt)):
-                for combo in combinations(range(len(others)), k):
-                    cov = 0
-                    for j in combo:
-                        cov |= other_masks[j]
-                    if cov & far_mask == far_mask:
-                        # can we finish covering the rest with p?
-                        if (cov | core.col_masks[idx_p]) & core.universe == core.universe and k + 1 == opt:
-                            far_ok = True
-                            break
-                if far_ok:
-                    break
+    far_ok = far_side_condition(core, p, f, opt)
     return TransformResult(
         opt=opt,
         c_exp=c_exp,
@@ -347,9 +364,34 @@ def apply_transform(core: CoreInstance, p: GridColumn, f: tuple) -> TransformRes
     )
 
 
+def far_side_condition(core: CoreInstance, p: GridColumn, f: tuple, opt: float) -> bool:
+    """True iff some optimal cover of P excludes p, or covers F_p without p.
+
+    Equivalently: exists an optimal cover S with either p ∉ S, or (S \\ {p}) ⊇ F_p.
+    """
+    idx_p = core.core_cols.index(p)
+    others_masks = [core.col_masks[k] for k in range(len(core.core_cols)) if k != idx_p]
+    F = far_rows(p, f, core.core_rows)
+    far_mask = 0
+    for v in F:
+        far_mask |= 1 << core.row_index[v]
+    c_out, _ = exact_min_cost(others_masks, len(others_masks), core.universe)
+    if c_out == opt:
+        return True
+    if far_mask == 0:
+        return True
+    # Others must cover every row p does not, and also all of F_p.
+    p_mask = core.col_masks[idx_p]
+    need = (core.universe & ~p_mask) | far_mask
+    c_rest, _ = exact_min_cost(others_masks, len(others_masks), need)
+    return c_rest <= opt - 1
+
+
 def characterization_holds(core: CoreInstance, p: GridColumn, f: tuple, res: TransformResult) -> bool:
-    """opt(P') == opt(P)  iff  far side is empty or coverable without p in some optimum."""
-    return res.agrees == (res.far_empty or res.far_coverable_without_p)
+    """opt(P') == opt(P)  iff  the far-side condition holds."""
+    predicted = far_side_condition(core, p, f, res.opt)
+    actual = res.c_exp == res.opt
+    return predicted == actual
 
 
 # ----------------------------------------------------------------- window profile check
@@ -468,7 +510,7 @@ def window_profile_agrees(core: CoreInstance, p: GridColumn, f: tuple, radius: i
 
 # ----------------------------------------------------------------- audits
 def dichotomy_counts(a: int = 3, b: int = 3) -> dict:
-    """Face rows: no cyclic core keeps a collapsible square. Vertex rows: many do."""
+    """Face rows: no grid-surrogate core keeps a collapsible square; vertex rows: many do."""
     v_cores = v_with = f_cores = f_with = 0
     for cfg in all_configs(a, b):
         g = build_grid(cfg, a, b)
@@ -519,8 +561,21 @@ def smallest_vertex_counterexample() -> TransformResult | None:
     return None
 
 
+def _opt_and_cexp(core: CoreInstance, p: GridColumn, f: tuple) -> tuple[float, float]:
+    """opt(P) and opt(P') only — no put-back / C_in."""
+    idx_p = core.core_cols.index(p)
+    other_masks = [core.col_masks[k] for k in range(len(core.core_cols)) if k != idx_p]
+    f_mask = 0
+    for v in cell_verts(f) & core.core_rows:
+        f_mask |= 1 << core.row_index[v]
+    exp_masks = other_masks + [f_mask]
+    opt, _ = exact_min_cost(core.col_masks, len(core.col_masks), core.universe)
+    c_exp, _ = exact_min_cost(exp_masks, len(exp_masks), core.universe)
+    return opt, c_exp
+
+
 def verify_characterization(a: int = 3, b: int = 3, sample: int | None = None) -> dict:
-    """Check agrees <=> (far empty or far coverable) on every (core, p, f)."""
+    """Check opt(P')=opt(P) <=> far-side condition on every (core, p, f)."""
     checked = mismatches = 0
     n = 0
     for cfg in all_configs(a, b):
@@ -532,41 +587,340 @@ def verify_characterization(a: int = 3, b: int = 3, sample: int | None = None) -
         if core is None:
             continue
         for p, f in collapsible_pairs(core):
-            res = apply_transform(core, p, f)
-            # Recompute far_coverable more carefully for the iff
-            ok_iff = _iff_far_side(core, p, f, res)
+            opt, c_exp = _opt_and_cexp(core, p, f)
+            predicted = far_side_condition(core, p, f, opt)
+            actual = c_exp == opt
             checked += 1
-            if not ok_iff:
+            if predicted != actual:
                 mismatches += 1
     return {"checked": checked, "mismatches": mismatches}
 
 
-def _iff_far_side(core: CoreInstance, p: GridColumn, f: tuple, res: TransformResult) -> bool:
-    """opt(P')=opt(P) iff exists an optimal cover of P that excludes p OR covers F_p without needing p alone."""
-    idx_p = core.core_cols.index(p)
-    others_masks = [core.col_masks[k] for k in range(len(core.core_cols)) if k != idx_p]
+# ----------------------------------------------------------------- sufficient-condition candidates
+def candidate_far_empty(core: CoreInstance, p: GridColumn, f: tuple) -> bool:
+    return len(far_rows(p, f, core.core_rows)) == 0
+
+
+def candidate_far1_face1(core: CoreInstance, p: GridColumn, f: tuple) -> bool:
     F = far_rows(p, f, core.core_rows)
-    far_mask = 0
+    near = cell_verts(f) & core.core_rows
+    return len(F) == 1 and len(near) == 1
+
+
+def candidate_far_dominated(core: CoreInstance, p: GridColumn, f: tuple) -> bool:
+    """Every far row lies in a column (≠ p) that covers the whole far side F_p."""
+    F = far_rows(p, f, core.core_rows)
+    if not F:
+        return True
+    idx_p = core.core_cols.index(p)
     for v in F:
-        far_mask |= 1 << core.row_index[v]
-    opt = res.opt
-    # Exists optimal cover excluding p?
-    c_out, _ = exact_min_cost(others_masks, len(others_masks), core.universe)
-    exclude_ok = c_out == opt
-    # Exists optimal cover including p that covers F with the other chosen columns?
-    include_ok = False
-    if far_mask == 0:
-        include_ok = True
+        if not any(
+            k != idx_p and v in core.core_cols[k].verts and F <= core.core_cols[k].verts
+            for k in range(len(core.core_cols))
+        ):
+            return False
+    return True
+
+
+def candidate_window(core: CoreInstance, p: GridColumn, f: tuple, radius: int) -> bool:
+    return window_profile_agrees(core, p, f, radius=radius)
+
+
+def audit_sufficient_candidate(
+    name: str,
+    predicate,
+    a: int = 3,
+    b: int = 3,
+    sample: int | None = None,
+) -> dict:
+    """Count fires / failures of a sufficient-condition candidate.
+
+    A failure is: predicate true but opt(P') != opt(P).
+    """
+    fires = fails = total = 0
+    n = 0
+    for cfg in all_configs(a, b):
+        n += 1
+        if sample is not None and n > sample:
+            break
+        g = build_grid(cfg, a, b)
+        core = to_core(g)
+        if core is None:
+            continue
+        for p, f in collapsible_pairs(core):
+            total += 1
+            if not predicate(core, p, f):
+                continue
+            fires += 1
+            res = apply_transform(core, p, f)
+            if res.c_exp != res.opt:
+                fails += 1
+    rate = (fires / total) if total else 0.0
+    return {
+        "name": name,
+        "total": total,
+        "fires": fires,
+        "failures": fails,
+        "fire_rate": rate,
+        "pass": fails == 0 and rate >= 0.05,
+        "trivial_ok": fails == 0,
+    }
+
+
+# ----------------------------------------------------------------- star / link Out
+def star_of_free_face(p_cell: tuple, f: tuple) -> frozenset[tuple]:
+    """Closed star ``st(f) = {τ | f ≤ τ}`` in the carrier square: ``{f, p}`` plus faces of ``f``."""
+    cells: set[tuple] = {f, p_cell}
+    for ff in faces_of(f):
+        cells.add(ff)
+    return frozenset(cells)
+
+
+def link_vertices(
+    core: CoreInstance,
+    opp: tuple,
+    *,
+    exclude_col: str | None = None,
+) -> frozenset[tuple[int, int]]:
+    """Combinatorial link vertices of edge ``opp`` in the residual complex.
+
+    A residual vertex ``v ∉ V(opp)`` lies in ``lk(opp)`` if some residual top cell
+    (other than ``exclude_col``) meets both ``v`` and at least one vertex of ``opp``.
+    """
+    R = core.core_rows
+    Vopp = cell_verts(opp) & R
+    adj: set[tuple[int, int]] = set()
+    for c in core.core_cols:
+        if exclude_col is not None and c.name == exclude_col:
+            continue
+        if c.verts & Vopp:
+            adj |= (c.verts & R) - Vopp
+    return frozenset(adj)
+
+
+@dataclass
+class LinkOutInstance:
+    """Vertex-row Out_link(p, f): link of opp(f) plus collar V(opp)."""
+
+    p_name: str
+    free_face: tuple
+    opp: tuple
+    out_rows: frozenset[tuple[int, int]]
+    out_col_names: list[str]
+    out_masks: list[int]
+    out_universe: int
+    L: float
+    U: float
+    opt: float
+    stitch_names: list[str]
+    exact_stitch: bool
+
+
+def _solve_rows(
+    core: CoreInstance,
+    keep_rows: frozenset[tuple[int, int]],
+    drop_cols: set[str],
+) -> tuple[float, list[str]]:
+    keep = sorted(keep_rows)
+    if not keep:
+        return 0.0, []
+    ri = {v: i for i, v in enumerate(keep)}
+    uni = (1 << len(keep)) - 1
+    names: list[str] = []
+    masks: list[int] = []
+    for c in core.core_cols:
+        if c.name in drop_cols:
+            continue
+        m = 0
+        for v in c.verts & set(keep):
+            m |= 1 << ri[v]
+        if m:
+            names.append(c.name)
+            masks.append(m)
+    if uni and not masks:
+        return float("inf"), []
+    cost, pick = exact_min_cost(masks, len(masks), uni)
+    return cost, [names[i] for i in pick]
+
+
+def link_out_complex(core: CoreInstance, p: GridColumn, f: tuple) -> LinkOutInstance:
+    """Build ``Out_link(p,f)``, solve ``L = MinCov(Out)``, stitch ``U = |Reduced(M∪{p})|``."""
+    opp = opposite_edge(p.cell, f)
+    R = core.core_rows
+    Vopp = cell_verts(opp) & R
+    lk = link_vertices(core, opp, exclude_col=p.name)
+    out_rows = frozenset(lk | Vopp)
+    L, mout_names = _solve_rows(core, out_rows, {p.name})
+    opt, _ = exact_min_cost(core.col_masks, len(core.col_masks), core.universe)
+    if L == float("inf"):
+        U = float("inf")
+        stitch_names: list[str] = []
     else:
-        # choose k = opt-1 others; with p they cover everything; others cover F
-        k = int(opt) - 1
-        if k >= 0:
-            for combo in combinations(range(len(others_masks)), k):
-                cov = 0
-                for j in combo:
-                    cov |= others_masks[j]
-                if (cov & far_mask == far_mask) and ((cov | core.col_masks[idx_p]) & core.universe == core.universe):
-                    include_ok = True
-                    break
-    predicted = exclude_ok or include_ok
-    return predicted == res.agrees
+        mmap = {c.name: m for c, m in zip(core.core_cols, core.col_masks)}
+        chosen = [(n, mmap[n]) for n in mout_names if n in mmap] + [(p.name, mmap[p.name])]
+        sub = min_subcover_masks(core.universe, chosen)
+        # Feasibility: Reduced(M∪{p}) must cover all residual rows
+        cov = 0
+        for _, m in sub:
+            cov |= m
+        if cov & core.universe != core.universe:
+            # M may not extend; still form U from forced p + cover of R\V(p)
+            rest = R - p.verts
+            c_rest, rest_names = _solve_rows(core, rest, {p.name})
+            if c_rest == float("inf"):
+                U = float("inf")
+                stitch_names = []
+            else:
+                chosen2 = [(n, mmap[n]) for n in rest_names] + [(p.name, mmap[p.name])]
+                sub2 = min_subcover_masks(core.universe, chosen2)
+                U = float(len(sub2))
+                stitch_names = [n for n, _ in sub2]
+        else:
+            U = float(len(sub))
+            stitch_names = [n for n, _ in sub]
+    out_names = [c.name for c in core.core_cols if c.name != p.name and (c.verts & out_rows)]
+    out_masks = []
+    orows = sorted(out_rows)
+    oi = {v: i for i, v in enumerate(orows)}
+    uni = (1 << len(orows)) - 1 if orows else 0
+    for c in core.core_cols:
+        if c.name == p.name or not (c.verts & out_rows):
+            continue
+        m = 0
+        for v in c.verts & out_rows:
+            m |= 1 << oi[v]
+        out_masks.append(m)
+    return LinkOutInstance(
+        p_name=p.name,
+        free_face=f,
+        opp=opp,
+        out_rows=out_rows,
+        out_col_names=out_names,
+        out_masks=out_masks,
+        out_universe=uni,
+        L=L if out_rows else 0.0,
+        U=U,
+        opt=opt,
+        stitch_names=stitch_names,
+        exact_stitch=(U == opt),
+    )
+
+
+def _covering_opt(cm: CoveringMatrix) -> float:
+    """Exact cover cost; bitmasks for small width, else B&B."""
+    if cm.n_rows() == 0:
+        return 0.0
+    if cm.n_cols() == 0:
+        return float("inf")
+    if cm.n_cols() <= 14 and cm.n_rows() <= 24:
+        uni = (1 << cm.n_rows()) - 1
+        masks = []
+        for jj in range(cm.n_cols()):
+            m = 0
+            for i in range(cm.n_rows()):
+                if cm.matrix[i][jj]:
+                    m |= 1 << i
+            masks.append(m)
+        return exact_min_cost(masks, cm.n_cols(), uni)[0]
+    from topospine.cover.minimize import minimize_cover
+
+    _, cost, _ = minimize_cover(cm.copy(), use_collapse=False)
+    return cost
+
+
+def star_collapse_face_rows(
+    g: GridComplex,
+    p: GridColumn,
+    f: tuple,
+) -> dict:
+    """Theorem A (face rows): free face ⇒ ``p`` essential and ``opt = 1 + opt(K/p)``.
+
+    ``K/p`` forces ``p``: delete rows covered by ``p`` and delete column ``p``.
+    ``st(f)`` is the geometric star recorded for the paper/Lean narrative.
+    """
+    cm = face_row_table(g)
+    try:
+        j = cm.cols.index(p.name)
+    except ValueError:
+        return {"ok": False, "reason": "p_missing"}
+    st = star_of_free_face(p.cell, f)
+    n = cm.n_cols()
+    n_rows = cm.n_rows()
+    exclusive = [
+        i
+        for i in range(n_rows)
+        if cm.matrix[i][j] and not any(cm.matrix[i][jj] for jj in range(n) if jj != j)
+    ]
+    opt = _covering_opt(cm)
+    cm_in = cm.copy()
+    rows_drop = {i for i in range(cm_in.n_rows()) if cm_in.matrix[i][j]}
+    cm_in.remove_rows(rows_drop)
+    if p.name in cm_in.cols:
+        cm_in.remove_cols({cm_in.cols.index(p.name)})
+    collapsed_opt = _covering_opt(cm_in)
+    cm_out = cm.copy()
+    cm_out.remove_cols({cm_out.cols.index(p.name)})
+    c_out = _covering_opt(cm_out)
+    predicted = 1.0 + collapsed_opt
+    essential = len(exclusive) > 0 and (c_out > opt or c_out == float("inf"))
+    return {
+        "ok": essential and predicted == opt,
+        "opt": opt,
+        "collapsed_plus_one": predicted,
+        "c_out": c_out,
+        "p_essential": essential,
+        "exclusive_rows": len(exclusive),
+        "st_size": len(st),
+    }
+
+
+def audit_face_row_theorem_a(a: int = 3, b: int = 3) -> dict:
+    """Exhaustive Theorem A check on face-row free squares (unreduced grids)."""
+    checked = mismatches = essential = 0
+    for cfg in all_configs(a, b):
+        g = build_grid(cfg, a, b)
+        by = {c.name: c for c in g.columns}
+        for c in g.columns:
+            if c.dim != 2:
+                continue
+            others = [o.cell for o in g.columns if o is not c]
+            for f in free_faces(c.cell, others):
+                rec = star_collapse_face_rows(g, c, f)
+                checked += 1
+                essential += int(rec.get("p_essential") or rec.get("exclusive_rows", 0) > 0)
+                if not rec["ok"]:
+                    mismatches += 1
+    return {"checked": checked, "mismatches": mismatches, "essential_pairs": essential}
+
+
+def audit_link_bounds(a: int = 3, b: int = 3, sample: int | None = None) -> dict:
+    """Theorem C (sandbox): L ≤ opt ≤ U on every vertex-row grid-surrogate free pair."""
+    checked = viol = exact = 0
+    gaps: list[int] = []
+    n = 0
+    for cfg in all_configs(a, b):
+        n += 1
+        if sample is not None and n > sample:
+            break
+        core = to_core(build_grid(cfg, a, b))
+        if core is None:
+            continue
+        for p, f in collapsible_pairs(core):
+            inst = link_out_complex(core, p, f)
+            checked += 1
+            if not (inst.L <= inst.opt <= inst.U):
+                viol += 1
+            if inst.exact_stitch:
+                exact += 1
+            if inst.U < float("inf"):
+                gaps.append(int(inst.U - inst.opt))
+    from collections import Counter
+
+    hist = Counter(gaps)
+    return {
+        "checked": checked,
+        "violations": viol,
+        "exact_stitch": exact,
+        "exact_rate": (exact / checked) if checked else 0.0,
+        "gap_histogram": dict(sorted(hist.items())),
+    }

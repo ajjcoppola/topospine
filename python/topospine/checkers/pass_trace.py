@@ -61,6 +61,46 @@ def verify_pass_trace(
             return False, "missing decode map"
         return True, "ok"
 
+    if cert.get("pass") == "HornRetractionCollapse":
+        cell = cert.get("cell")
+        horn = cert.get("inserted_horn") or cert.get("horn_faces") or []
+        if cell is None or not horn:
+            return False, "missing cell/horn faces"
+        if old_state.size() > 0 and new_state.size() == 0:
+            return False, "covering IR silently emptied"
+        if cell in new_state.cell_names():
+            return False, "collapsed cell still present"
+        if cell in old_state.relative:
+            return False, "relative cell collapsed"
+        if cert.get("dim_after", 0) >= cert.get("dim_before", 0):
+            return False, "horn face dimension not lower"
+        names = set(new_state.cell_names())
+        decode = cert.get("decode") or {}
+        for h in horn:
+            if h not in names and h not in decode:
+                return False, f"horn face {h} missing from IR and decode"
+            if h not in decode:
+                return False, f"missing decode entry for horn face {h}"
+        if not cert.get("weight_preserved", False):
+            return False, "weight not preserved"
+        if cert.get("cohomology_preserved") is False:
+            return False, "H*(K; F2) not preserved"
+        if "L" in cert and "U" in cert and cert["L"] > cert["U"]:
+            return False, "cost window L > U"
+        return True, "ok"
+
+    if cert.get("pass") == "FiltrationCompatibleHorn":
+        cell = cert.get("cell")
+        if cell is None:
+            return False, "missing cell"
+        if cell in new_state.cell_names():
+            return False, "collapsed cell still present"
+        if cert.get("dim_after", 0) >= cert.get("dim_before", 0):
+            return False, "horn face dimension not lower"
+        if cert.get("persistence_preserved") is False:
+            return False, "persistent Betti curves changed"
+        return True, "ok"
+
     if cert.get("pass") == "ShotgunCoveringCollapse":
         if cert.get("optimality_claim", True):
             return False, "shotgun batches must not claim optimality (C9 disproved)"

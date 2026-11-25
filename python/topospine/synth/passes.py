@@ -140,6 +140,287 @@ class CoveringAwareCollapsePass(Pass):
         return reject("no admissible free face")
 
 
+class HornRetractionCollapsePass(Pass):
+    """Covering-mode Horn retraction (Theorem H1): replace ``f_top`` by ``∂f_top \\ {f}``.
+
+    Unlike :class:`CoveringAwareCollapsePass` (single-face swap, vacuous on the 2007
+    core and solid voxel blobs), this pass inserts the full active horn
+    ``Λ_f(f_top) = ∂f_top \\ {f}``, preserving residual care coverage and exact
+    cubical cohomology ``H*(K; F2)``.  Applicable whenever ``f`` is a free face of
+    a top cube with ``dim >= 2``, or a cyclic-core non-essential edge (``dim = 1``).
+
+    Certificate records the multi-face ``horn -> parent`` decode map, Betti numbers
+    before/after, and a cost-window ``(L, U)``.
+    """
+
+    name = "HornRetractionCollapse"
+    contract = "CoverOptimality"
+
+    def try_apply(self, state: SynthesisState) -> PassResult:
+        from topospine.cover.horn_chains import cubical_cohomology_betti_f2, horn_faces
+        from topospine.cover.cube_array import _masks_from_cm, _mis_lower_bound
+        from topospine.core.cubes import BooleanCube, GridCube
+
+        def reject(reason: str) -> PassResult:
+            return PassResult(False, state, {"type": "PassTrace", "pass": self.name}, reason)
+
+        if state.size() == 0:
+            return reject("empty")
+
+        present = set(state.cell_names())
+        # Prefer complex.collapsible_cells (O(tops)) over graded tables on large voxel blobs
+        use_fast = state.size() > 16 or any(isinstance(c, GridCube) for c in state.complex.top_cells)
+        candidates: list[tuple[int, Any, Any]] = []
+        cm = None
+        col_j = -1
+        if use_fast:
+            for cell, faces in state.complex.collapsible_cells():
+                if str(cell) in state.relative:
+                    continue
+                dim = int(cell.dimension)  # type: ignore[attr-defined]
+                if dim < 1:
+                    continue
+                for face in faces:
+                    candidates.append((dim, cell, face))
+        else:
+            from topospine.cover.collapse import list_collapsible_primes
+
+            cm = graded_table_from_cubical(state.complex, include_faces_down_to=0)
+            for j, faces in list_collapsible_primes(cm):
+                cell = cm.col_cubes[j]
+                if cell is None or str(cell) in state.relative:
+                    continue
+                dim = int(cell.dimension)  # type: ignore[attr-defined]
+                if dim < 1:
+                    continue
+                for face in faces:
+                    candidates.append((dim, cell, face))
+
+        if not candidates:
+            return reject("no free face for horn retraction")
+
+        candidates.sort(key=lambda t: (-t[0], str(t[1]), str(t[2])))
+        _, cell, face = candidates[0]
+        if cm is not None:
+            col_j = next(j for j, c in enumerate(cm.col_cubes) if c == cell or str(c) == str(cell))
+        horn = horn_faces(cell, face)
+        # Active horn faces (all for geometric GridCube; residual-row filter for Boolean tables)
+        active: list[Any] = []
+        if cm is None or any(rc is None for rc in cm.row_cubes):
+            active = list(horn)
+        else:
+            for h in horn:
+                if str(h) in present and str(h) != str(cell):
+                    active.append(h)
+                    continue
+                covers_row = any(
+                    cm.matrix[i][col_j] and rc is not None and rc.is_face_of(h)  # type: ignore[attr-defined]
+                    for i, rc in enumerate(cm.row_cubes)
+                )
+                if covers_row:
+                    active.append(h)
+            if not active:
+                active = list(horn)
+
+        # Replace cell by horn faces not already present as other tops
+        new_tops: list[Any] = []
+        inserted: list[str] = []
+        for c in state.complex.top_cells:
+            if c == cell or str(c) == str(cell):
+                continue
+            new_tops.append(c)
+        for h in active:
+            if any(str(t) == str(h) for t in new_tops):
+                continue
+            new_tops.append(h)
+            inserted.append(str(h))
+        if not inserted and all(any(str(t) == str(h) for t in state.complex.top_cells if str(t) != str(cell)) for h in active):
+            return reject("horn faces already present; nothing to insert")
+
+        new_state = state.snapshot()
+        new_state.complex = CubicalComplex(top_cells=new_tops, name=state.complex.name)
+        g = new_state.grades.pop(str(cell), None)
+        decode = dict(new_state.meta.get("decode", {}))
+        parent = decode.pop(str(cell), str(cell))
+        horn_decode: dict[str, str] = {}
+        for h in active:
+            hs = str(h)
+            decode[hs] = parent
+            horn_decode[hs] = parent
+            if g is not None:
+                new_state.grades.setdefault(hs, g)
+        new_state.meta["decode"] = decode
+
+        # Exact H* is O(face-closure); skip on large GridCube volumes (bench computes once).
+        from topospine.core.cubes import BooleanCube
+
+        tops_small = state.size() <= 12 and all(
+            isinstance(c, BooleanCube) for c in state.complex.top_cells
+        )
+        if tops_small:
+            betti_before = cubical_cohomology_betti_f2(list(state.complex.top_cells))
+            betti_after = cubical_cohomology_betti_f2(list(new_state.complex.top_cells))
+            cohom_ok: bool | None = betti_before == betti_after
+        else:
+            betti_before, betti_after, cohom_ok = None, None, None
+
+        # Cost window: cheap bounds; skip full rematrix on huge / fast-path volumes
+        if cm is not None and cm.n_rows() <= 64 and cm.n_cols() <= 32:
+            try:
+                cm_after = graded_table_from_cubical(new_state.complex, include_faces_down_to=0)
+                masks_a, univ_a = _masks_from_cm(cm_after)
+                Ca = cm_after.n_cols()
+                rc_a = [
+                    sum((1 << j) for j in range(Ca) if (masks_a[j] >> r) & 1)
+                    for r in range(cm_after.n_rows())
+                ]
+                L = _mis_lower_bound(rc_a, univ_a) if univ_a else 0
+                U = cm_after.n_cols()
+            except Exception:
+                L, U = 0, new_state.size()
+        else:
+            L, U = 0, new_state.size()
+
+        max_dim_before = max((int(c.dimension) for c in state.complex.top_cells), default=-1)  # type: ignore[attr-defined]
+        max_dim_after = max((int(c.dimension) for c in new_state.complex.top_cells), default=-1)  # type: ignore[attr-defined]
+        cert = {
+            "type": "PassTrace",
+            "pass": self.name,
+            "contract": self.contract,
+            "cell": str(cell),
+            "free_face": str(face),
+            "inserted_horn": inserted,
+            "horn_faces": [str(h) for h in active],
+            "decode": horn_decode,
+            "weight_preserved": True,
+            "size_before": state.size(),
+            "size_after": new_state.size(),
+            "dim_before": int(cell.dimension),  # type: ignore[attr-defined]
+            "dim_after": int(face.dimension),  # type: ignore[attr-defined]
+            "max_dim_before": max_dim_before,
+            "max_dim_after": max_dim_after,
+            "betti_before": betti_before,
+            "betti_after": betti_after,
+            "cohomology_preserved": cohom_ok,
+            "L": L,
+            "U": U,
+        }
+        new_state.log.append(cert)
+        return PassResult(True, new_state, cert, "horn retraction")
+
+
+def horn_retraction_closure(
+    state: SynthesisState, max_steps: int = 256
+) -> SynthesisState:
+    """Apply HornRetractionCollapse until no free-face horn step remains."""
+    from topospine.checkers.pass_trace import verify_pass_trace
+
+    cur = state.snapshot()
+    p = HornRetractionCollapsePass()
+    for _ in range(max_steps):
+        res = p.try_apply(cur)
+        if not res.accepted:
+            break
+        ok, why = verify_pass_trace(res.certificate, res.state, cur)
+        if not ok:
+            raise RuntimeError(f"HornRetractionCollapse failed independent check: {why}")
+        cur = res.state
+    return cur
+
+
+class FiltrationCompatibleHornPass(Pass):
+    """Homotopy-mode Horn retraction restricted to ``birth(f) == birth(f_top)``.
+
+    Uses ``filtration_compatible_spine`` (H4) on the graded top cells; records cell
+    compression and equal persistent-cohomology Betti curves when cheap to compute.
+    """
+
+    name = "FiltrationCompatibleHorn"
+    contract = "PersistentEquivalence"
+
+    def try_apply(self, state: SynthesisState) -> PassResult:
+        from topospine.cover.horn_chains import (
+            cubical_persistent_cohomology_betti_f2,
+            filtration_compatible_spine,
+            horn_faces,
+        )
+        from topospine.core.cubes import BooleanCube
+
+        def reject(reason: str) -> PassResult:
+            return PassResult(False, state, {"type": "PassTrace", "pass": self.name}, reason)
+
+        if state.mode == "covering":
+            return reject("use HornRetractionCollapse in covering mode")
+        if state.size() == 0:
+            return reject("empty")
+        # Build birth map on face-closed Boolean tops when grades exist
+        tops = list(state.complex.top_cells)
+        if not tops or not all(isinstance(c, BooleanCube) for c in tops):
+            return reject("filtration horn requires BooleanCube tops")
+        births: dict[Any, float] = {}
+        for c in tops:
+            g = state.grades.get(str(c), 0.0)
+            births[c] = g
+            for f in c.faces():
+                births.setdefault(f, state.grades.get(str(f), g))
+
+        rem, steps = filtration_compatible_spine(births)
+        if not steps:
+            return reject("no filtration-compatible horn step")
+        # Apply first step only (pass manager iterates)
+        f, gcell = steps[0]
+        if str(gcell) in state.relative:
+            return reject("relative cell")
+        if gcell not in tops:
+            return reject("collapsed cell not a top")
+        horn = horn_faces(gcell, f)
+        new_tops = [c for c in tops if c != gcell]
+        inserted = []
+        for h in horn:
+            if h not in new_tops and all(str(t) != str(h) for t in new_tops):
+                new_tops.append(h)
+                inserted.append(str(h))
+        if not inserted:
+            # Pure deletion of {f,g} from face-closed view: remove gcell only if horn already present
+            new_tops = [c for c in tops if c != gcell]
+
+        thresholds = sorted({births[c] for c in births})
+        before_curves = cubical_persistent_cohomology_betti_f2(births, thresholds)
+        new_births = {c: births[c] for c in rem}
+        after_curves = cubical_persistent_cohomology_betti_f2(new_births, thresholds)
+
+        new_state = state.snapshot()
+        new_state.complex = CubicalComplex(top_cells=new_tops, name=state.complex.name)
+        new_state.grades.pop(str(gcell), None)
+        for h in inserted:
+            new_state.grades.setdefault(h, state.grades.get(str(gcell), 0.0))
+        cert = {
+            "type": "FiltrationMapWitness",
+            "pass": self.name,
+            "contract": self.contract,
+            "cell": str(gcell),
+            "free_face": str(f),
+            "inserted_horn": inserted,
+            "size_before": state.size(),
+            "size_after": new_state.size(),
+            "dim_before": int(gcell.dimension),
+            "dim_after": int(f.dimension),
+            "cells_before_closure": len(births),
+            "cells_after_closure": len(rem),
+            "compression": 1.0 - (len(rem) / max(1, len(births))),
+            "persistent_betti_before": before_curves,
+            "persistent_betti_after": after_curves,
+            "persistence_preserved": before_curves == after_curves,
+            "weight_preserved": True,
+            "L": 0,
+            "U": new_state.size(),
+        }
+        new_state.log.append(cert)
+        if before_curves != after_curves:
+            return reject("persistent Betti curves changed")
+        return PassResult(True, new_state, cert, "filtration-compatible horn")
+
+
 class ShotgunCoveringCollapsePass(Pass):
     """Batch (simultaneous) covering-mode collapse -- EXPERIMENTAL, no optimality claim.
 

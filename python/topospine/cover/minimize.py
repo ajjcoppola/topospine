@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
+from itertools import combinations
 
 from topospine.core.covering import CoveringMatrix, reduce_to_cyclic_core
 from topospine.cover.collapse import (
@@ -25,7 +26,40 @@ class MinimizeStats:
     wall_time_s: float = 0.0
     best_cost: float = float("inf")
     admissibility_failures: int = 0
+    putback_exact: int = 0
+    putback_greedy: int = 0
     log: list[str] = field(default_factory=list)
+
+
+def _min_subcover_names(
+    names: set[str],
+    cov: dict[str, frozenset[int]],
+    universe: frozenset[int],
+    *,
+    greedy_threshold: int = 16,
+) -> tuple[set[str], str]:
+    """Drop redundant columns after decode. Exact for ≤ greedy_threshold cols; else greedy."""
+    chosen = [(n, cov[n]) for n in names if n in cov]
+    if not chosen:
+        return set(names), "noop"
+    if len(chosen) > greedy_threshold:
+        keep = list(chosen)
+        for item in list(keep):
+            trial = [x for x in keep if x is not item]
+            covered: set[int] = set()
+            for _, s in trial:
+                covered |= s
+            if universe <= covered:
+                keep = trial
+        return {n for n, _ in keep}, "greedy"
+    for k in range(0, len(chosen) + 1):
+        for combo in combinations(chosen, k):
+            covered: set[int] = set()
+            for _, s in combo:
+                covered |= s
+            if universe <= covered:
+                return {n for n, _ in combo}, "exact"
+    return {n for n, _ in chosen}, "exact"
 
 
 def minimize_cover(
@@ -41,11 +75,20 @@ def minimize_cover(
     If every admissible pair is rejected, the search falls through to ordinary
     two-way branching.  The default ``None`` keeps the historical policy: the
     first admissible pair is collapsed.
+
+    After decoding free-face columns back to their parents, ``restore`` runs a
+    put-back minimum sub-cover (exact ≤ 16 columns, greedy beyond) so cubes now
+    covered by ``p`` are dropped — the paper's ``Reduced`` step.
     """
     if stats is None:
         stats = MinimizeStats()
     t0 = time.perf_counter()
     weight_map = {cm.cols[j]: cm.weights[j] for j in range(cm.n_cols())}
+    orig_cov = {
+        cm.cols[j]: frozenset(i for i in range(cm.n_rows()) if cm.matrix[i][j])
+        for j in range(cm.n_cols())
+    }
+    orig_universe = frozenset(range(cm.n_rows()))
     cm_work = cm.copy()
     cm_work, red_log, essentials = reduce_to_cyclic_core(cm_work)
     stats.log.extend(red_log)
@@ -74,7 +117,12 @@ def minimize_cover(
                 out -= faces
                 out.add(p_name)
                 weight_map.setdefault(p_name, 1.0)
-        return out
+        reduced, mode = _min_subcover_names(out, orig_cov, orig_universe)
+        if mode == "greedy":
+            stats.putback_greedy += 1
+        elif mode == "exact":
+            stats.putback_exact += 1
+        return reduced
 
     def pick_col(sub: CoveringMatrix) -> int:
         for j, name in enumerate(sub.cols):

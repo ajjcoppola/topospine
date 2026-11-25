@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
-\usepackage{amsmath,amssymb,amsthm,enumerate,graphicx,hyperref}
+\usepackage{amsmath,amssymb,amsthm,enumerate,graphicx,hyperref,tikz}
+\usetikzlibrary{arrows.meta}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -8,58 +9,95 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{example}[theorem]{Example}
 
-\title{Certified Cyclic-Core Transformations for Minimum Covering}
+\title{Horn Retraction, Roth Extremals, and Espresso-Horn\\
+for Certified Cyclic-Core Covering}
 \author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}} \and
 Bala Krishnamoorthy\thanks{Washington State University. \textit{(proposed co-author)}}}
-\date{Draft 2026-11-18 (TopoSpine Loop~4, camera-ready audit)}
+\date{arXiv Wave~1 freeze 2026-11-24}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We show that the cyclic core of two-level logic minimization and unate covering
-problems is naturally a \emph{cubical cell complex}, not merely an incidence
-matrix.  Free faces (collapsible cubes) from simple-homotopy theory generalize
-essential prime implicants and allow a cost-preserving \emph{collapse-branch}
-that solves a cyclic-core node with one recursive call instead of two,
-\emph{under an explicit transport hypothesis} (Theorem~\ref{thm:collapse}).
-The checkable admissibility predicate we implement is \emph{not} sufficient for
-that hypothesis: it agrees with an exact oracle on every Boolean covering
-instance with $n\le 4$ variables (65\,535 functions) but fails on two of 1\,500
-sampled $n=5$ instances, and we also report a counterexample to simultaneous
-(``shotgun'') shelling.  We connect the geometry to the nerve and
-Stanley--Reisner complexes of the cover, and to total unimodularity of the
-residual covering LP (the latter as proposed joint work).  The
-\textsf{TopoSpine} reference implementation derives graded covering tables from
-typed cubes and audits collapse-branch against exhaustive oracles; the Lean~4
-library contains an abstract transport lemma and finite, machine-checked
-instances of the collapse contraction and the cup-product Leibniz rule.
+We treat the cyclic core of two-level logic minimization as a \emph{cubical
+complex} in the sense of Quine--McCluskey and Roth~\cite{roth1957}: primes are
+elementary cocycles, essentials are $0$-dimensional $L$-extremals, and
+codimension-$1$ free faces survive in over $95\%$ of nontrivial $n=5$ cores.
+Classical Espresso-family heuristics (\textsf{REDUCE}/\texttt{sccc}, Signature,
+BOOM, ABC ISOP) and exact solvers stop topological reduction when essentials
+vanish.  We elevate \emph{Horn retraction}
+$\Lambda_f(f_{\mathrm{top}})=\partial f_{\mathrm{top}}\setminus\{f\}$
+(Theorems~H1--H4) as the main exact / bounded-approximate / probabilistic
+extension: it preserves residual coverage and $H^*(K;\mathbb{F}_2)$, escapes
+\texttt{sccc}-locked local minima (Theorem~E1), and tightens the certified
+window $L=\max(L_{\mathrm{MIS}},\lceil z_{\mathrm{LP}}\rceil)\le\mathrm{opt}\le U$.
+\textsf{TopoSpine}'s non-vacuous \textsf{HornRetractionCollapsePass} reduces the
+2007 core where single-face covering collapse stalls; Lean~4 certifies the
+Roth/Espresso-Horn lemmas with zero \texttt{sorry}.  Two-dimensional grid
+surrogates are deferred to the companion note \texttt{intuition\_examples.pdf}.
+The program-level TDA companion is Paper~E~\cite{paperE}.
 \end{abstract}
+
+\noindent\textbf{Keywords:} logic minimization, cubical complexes, Horn retraction,
+cyclic core, Espresso, certified covering, Lean~4.
 
 \section{Introduction}
 \label{sec:intro}
 
 Minimum-cost unate covering is the computational kernel of two-level Boolean
-minimization~\cite{coudert1994}.  Branch-and-bound on the covering table
-iterates essentials, row/column dominance, and partitioning until a fixed
-point---the \emph{cyclic core}---where one typically branches on a column
-``in'' versus ``out''~\cite{goldberg2000}.
+minimization~\cite{quine1952,mccluskey1956,coudert1994}.  Branch-and-bound on
+the covering table iterates essentials, row/column dominance, and partitioning
+until a fixed point---the \emph{cyclic core}---where classical exact solvers
+(Espresso-EXACT, Scherzo) and Espresso-II~\cite{brayton1984} typically branch
+two-way or enter \textsf{REDUCE}/\texttt{sccc} local search~\cite{goldberg2000}.
+Espresso-Signature~\cite{mcgeer1993}, BOOM coverage-directed
+search~\cite{fiser2003}, ABC's Minato--Morreale ZDD ISOP, and LP/ILP bounds
+(HiGHS) provide complementary baselines.
 
-Following Roth~\cite{roth1957} and Coppola~\cite{coppola1989}, we represent
-primes as cubes in a \emph{cubical complex} $C(f)$.  The graded covering
-table is a dimension-graded view of incidences; restoring face structure
-enables \emph{collapse-branch}~\cite{coppola2007,coppola2006sat}.
+Following Roth~\cite{roth1957} and Coppola~\cite{coppola1989,coppola2007}, we
+represent primes as cubes in a \emph{cubical complex} $C(f)$.  Roth's
+$0$-dimensional extremals are essentials; we treat free faces as
+\emph{higher-dimensional Roth extremals}.  Whitehead's elementary collapse
+removes $R_f=\{f,f_{\mathrm{top}}\}$ and retracts onto the
+\emph{horn}~$\Lambda_f(f_{\mathrm{top}})$, strictly dominating single-face swap
+and enabling controlled collapsible chains compatible with Forman / modern TDA
+persistence pipelines.
 
 \paragraph{Contributions.}
 \begin{enumerate}
-\item Formal cubical and simplicial definitions of $C(f)$, cyclic core $K_{\mathrm{cc}}$, and collapse-branch (Section~\ref{sec:defs}).
-\item A \emph{conditional} proof that collapse-branch preserves minimum cover cost under an explicit transport hypothesis (Theorem~\ref{thm:collapse}), together with exhaustive evidence for $n\le4$ and \emph{counterexamples} showing that the implemented admissibility predicate does not imply the hypothesis (Section~\ref{sec:negative}).
-\item Cover cohomology via nerve and Stanley--Reisner complexes; TU/LP bridge (Section~\ref{sec:cohom}).
-\item Empirical audit with \textsf{TopoSpine} (Section~\ref{sec:experiments}), including a disproof of the batch (shotgun) variant.
+\item Layer~0 cube-array definitions: legal expansions, cyclic cores, free faces,
+and zero-loss Roth push-down (Section~\ref{sec:defs}--\ref{sec:layer0-main}).
+\item Constructive Theorems~H1--H4 and Theorem~E1: Horn retraction, cylinder /
+cone-prism, complement-boundary duality, controlled horn chains in exact /
+bounded-approx / probabilistic modes, and Horn escape from Espresso
+\textsf{REDUCE} stalls with LP/MIS tightening (Section~\ref{sec:horn-chains}).
+\item \textsf{Espresso-Horn} and head-to-head variants
+(\textsf{espresso\_ii}, Signature, BOOM CD-Search, ABC ISOP, HiGHS LP/ILP) plus
+a non-vacuous \textsf{HornRetractionCollapsePass} in \textsf{TopoSpine}
+(Section~\ref{sec:experiments}).
+\item Lean~4 modules \textsf{HornChains} / \textsf{RothEspressoHorn} (zero
+\texttt{sorry}); Layer~1 grid intuition isolated in
+\texttt{intuition\_examples.pdf}.
 \end{enumerate}
 
 \section{Definitions}
 \label{sec:defs}
+
+\noindent\textit{Layer~0 (home problem).}  Absolute minimization starts from an
+\emph{array of cubes} covering an ON-set of minterms (minterms may be implicit).
+Canonical glossary: \texttt{docs/definitions-cube-array.md}.
+
+\begin{definition}[Array of cubes, legal expansions, and absolute minimum]
+\label{def:array-cubes}
+Let $C=\{c_1,\ldots,c_k\}\subseteq\{0,1,-\}^n$ be an input \emph{array of cubes}
+implicitly defining the ON-set $F=\bigcup_{i=1}^k\mathrm{minterms}(c_i)$.  For the
+\emph{absolute minimization} problem, candidates are not restricted to subsets of
+$C$: \emph{legal expansions} (single-cube literal raising checked by cube
+containment $c'\subseteq\bigcup C$, absorption, and consensus $a*b$) expand cubes
+toward the prime implicants $P(F)$ without enumerating $2^n$ minterms.  The
+\emph{absolute minimum} is
+$\mathrm{opt}(F)=\min\{|S|:S\subseteq P(F),\ S\text{ covers }F\}$.
+\end{definition}
 
 \begin{definition}[Cubical complex $C(f)$]
 Let $f:\{0,1\}^n\to\{0,1\}$ with ON-set $F$.  Let $P$ be the set of prime
@@ -68,14 +106,14 @@ $C(f)=(\mathrm{Skel},\le,\dim)$ is the closure of $P$ under intersection and
 face relations (see~\cite{coppola2007}).
 \end{definition}
 
-\begin{definition}[Graded covering table]
-Each row is a cube $c$ in the cover domain (typically ON-set product terms
-and their face cells); columns are primes $p\in P$.  Entries
-$\mathrm{Pair}(c,p)=1$ iff $c\le p$ (face relation).  Minterm-only tables
-are the degenerate case $n_i=0$ for $i>0$; they are impractical at scale
-when $|F|\approx 2^n$.  When a row is jointly coverable but not containable
-in any single prime, lazy cofactor splitting restores correctness
-(Lemma~\ref{lem:refine}).
+\begin{definition}[Covering table (Layer~0)]
+\label{def:covering-table}
+Rows are taken from the cover domain (classically ON-set minterms; graded tables
+may use product terms and faces); columns are cubes $p\in P$.  Entries
+$\mathrm{Pair}(c,p)=1$ iff $c\le p$ (containment / face relation).  Minterms need
+not be listed explicitly when containment is determined by the cubes.  When a row
+is jointly coverable but not containable in any single prime, lazy cofactor
+splitting restores correctness (Lemma~\ref{lem:refine}).
 \end{definition}
 
 \begin{lemma}[Lazy row refinement]
@@ -86,14 +124,18 @@ $c$ iff it covers both cofactors.
 \end{lemma}
 
 \begin{definition}[Cyclic core]
-The \emph{cyclic core} is the residual pair $(A^*,K_{\mathrm{cc}})$ after
-iterating essentials, row/column dominance, and partitioning to a fixed point,
-with $A^*$ the binary covering matrix on remaining rows/columns.
+\label{def:cyclic-core}
+The \emph{cyclic core} is the residual covering problem after legal expansions
+and legal reductions (essential-prime extraction via cube difference
+$p\setminus\bigcup_{q\ne p}q\ne\emptyset$ or unique-row essentials, row/column
+dominance, zero-loss free-face push-down, and connected-component
+\emph{blob} partitioning) reach a fixed point.  By definition it has no essential
+primes and no dominated rows/columns.
 \end{definition}
 
 \begin{definition}[Collapsible cube]
-A cell $c\in K_{\mathrm{cc}}$ is \emph{collapsible} if it has a face $f<c$ with
-$\dim f=\dim c-1$ that is not a face of any other cell in $K_{\mathrm{cc}}$
+A cell $c$ in a cyclic core is \emph{collapsible} if it has a face $f<c$ with
+$\dim f=\dim c-1$ that is not a face of any other remaining cell
 (a \emph{free face}).
 \end{definition}
 
@@ -103,176 +145,147 @@ columns for cubes in $F(p)$, recurse once, then if the returned cover uses any
 face in $F(p)$ replace them by $p$; otherwise keep the cover.
 \end{definition}
 
-\begin{example}[Suspension sphere]
-\label{ex:suspension}
-Let $I^k=[0,1]^k$ with its standard cubical decomposition.  Remove the
-antipodal vertices $(0,\ldots,0)$ and $(1,\ldots,1)$ together with every cube
-containing either vertex, and take face closure.  The result $X_k$ is the
-equatorial belt in the suspension $\Sigma S^{k-2}\cong S^{k-1}$: top cells have
-cubical dimension $k-2$ and $X_k$ is homotopy equivalent to $S^{k-2}$ ($k=3$
-gives a $6$-cycle; $k=4$ a cubical $S^2$).  For $k\ge 3$, $X_k$ is
-\emph{not} contractible, and in the geometric construction every top cell is a
-prime with no free face.  The code's $k=3$ complex is that 6-cycle and has no
-collapsible column.  The code's $k=4$ complex is a shorter stand-in (six
-squares) and \emph{does} have free faces, so it is not the negative control
-the geometric sentence describes.
-\end{example}
+\paragraph{Grid intuition.}
+Two-dimensional $F/H/.$\ grid surrogates ($2\times 3$ ring, $3\times 3$
+face/vertex dichotomy, Link$(\mathrm{opp})$ tables, non-core paths) live in the
+companion note \texttt{intuition\_examples.pdf}; they are not Layer~0 theorems.
 
-\section{Main theorem: collapse-branch}
-\label{sec:main}
+\section{Layer-0 cube-array theorems and blob push-down}
+\label{sec:layer0-main}
 
-\begin{definition}[Cover-admissible free face]
-\label{def:admissible}
-A free face $f\in F(p)$ is \emph{cover-admissible} if every covering-table row
-incident to $f$ is not covered by any original prime $q\neq p$ that fails to
-contain $f$.  This is a decidable predicate on the table and is what the
-implementation (\textsf{CoverAdmissibleFreeFace}) checks.  It is \emph{a priori
-unrelated} to the following semantic condition.
-\end{definition}
+On a Layer~0 cyclic core $(R,P_{\mathrm{cc}})$ with typed residual domain $R$ and
+unit weights, let $p\in P_{\mathrm{cc}}$ have free face $f<p$ and residual far set
+$F_p(f)=(p\cap R)\setminus f$.
 
-\begin{definition}[Transport hypothesis $(H)$]
-\label{def:transport}
-Let $C_{\mathrm{in}}$ be a minimum-cost cover of the original instance among
-covers containing $p$, and $C_{\mathrm{exp}}$ a minimum-cost cover of the
-expanded instance (column $p$ deleted, column $f$ inserted).  Hypothesis $(H)$
-is $\mathrm{cost}(C_{\mathrm{exp}})\le\mathrm{cost}(C_{\mathrm{in}})$; it is the
-``$\mathrm{encode}$'' inequality of abstract optimality transport (Lean
-\textsf{transport\_optimum}, which is proved only in its abstract form).
-\end{definition}
-
-\begin{theorem}[Collapse-branch optimality under hypothesis $(H)$]
-\label{thm:collapse}
-Let $(A^*,K_{\mathrm{cc}})$ be a cyclic-core instance, $p$ a collapsible
-prime, and $f\in F(p)$ a free face for which hypothesis $(H)$
-(Definition~\ref{def:transport}) holds.  Assume unit or dimension-monotone column
-weights.  Let $C_{\mathrm{exp}}$ be a minimum-cost cover of the expanded
-instance obtained by removing $p$ and adding a column for $f$, and write
-$\mathrm{FreeSize}=|C_{\mathrm{exp}}\cap \{f\}|$.
-Then:
-\begin{itemize}
-\item if $\mathrm{FreeSize}=0$, then $C_{\mathrm{exp}}$ is a minimum-cost cover
-of the original instance;
-\item if $\mathrm{FreeSize}\ge 1$, then
-$\mathrm{Reduced}\bigl((C_{\mathrm{exp}}\setminus \{f\})\cup\{p\}\bigr)$ is a
-minimum-cost cover of the original instance,
-\end{itemize}
-where $\mathrm{Reduced}$ deletes redundant columns.  In either case a single
-recursive call replaces the classical pair of branches $p\in S$ vs.\ $p\notin S$.
+\begin{theorem}[Layer-0 zero-loss push-down, Far-Side IFF, and blob additivity]
+\label{thm:layer0}
+\begin{enumerate}[(a)]
+\item \emph{Zero-loss free-face push-down (L0-A).}  If $F_p(f)=\emptyset$ (the
+opposite face of~$f$ on~$p$ was already covered by essentials/dominance), pushing
+$p\mapsto f$ leaves the incidence matrix on~$R$ identical and preserves
+$\mathrm{opt}$ with \emph{zero branching} (Lean \textsf{zero\_loss\_pushdown\_exact};
+fires on $87.7\%$ of $n=5$ collapsible cyclic cores after checking all free faces,
+fixing an earlier implementation check that examined only \texttt{free\_faces[0]}).
+\item \emph{Layer-0 Far-Side IFF (L0-B).}  Replacing $p$ by $f$ (decode $f\mapsto p$
+plus put-back) satisfies $\mathrm{opt}(P')=\mathrm{opt}(P)$ iff some minimum cover
+excludes~$p$ or covers $F_p(f)$ without~$p$ ($0/2\,821$ mismatches on $n=5$ cores).
+Unlike 2D grids, $|F_p|=|f\cap R|=1$ is \emph{not} sufficient on hypercube cores.
+\item \emph{Blob additivity (L0-C).}  Partitioning into connected components
+$B_1\sqcup\cdots\sqcup B_k$ satisfies $\mathrm{opt}=\sum_i\mathrm{opt}(B_i)$
+(Lean \textsf{blob\_partition\_opt\_additive}).  Iteratively pushing down all
+remaining free faces interleaved with dominance severs bridge cubes into smaller
+blobs and yields a certified upper bound $U$ ($30\%$ of $n=5$ cores emptied with
+no B\&B; exact $U=\mathrm{opt}$ on $78.6\%$) that prunes exact B\&B in
+\textsf{minimize\_cube\_array} (Table~\ref{tab:layer0-blobs}).
+\end{enumerate}
 \end{theorem}
 
-\begin{proof}
-Write $C_{\mathrm{in}}$ (resp.\ $C_{\mathrm{out}}$) for a minimum-cost cover of
-the original matrix among covers containing (resp.\ excluding) $p$; the original
-optimum is $m=\min\{\mathrm{cost}(C_{\mathrm{in}}),\mathrm{cost}(C_{\mathrm{out}})\}$.
-Expansion only adds columns, so every cover of the original matrix excluding $p$ is
-feasible on the expanded table: $\mathrm{cost}(C_{\mathrm{exp}})\le\mathrm{cost}(C_{\mathrm{out}})$.
-Together with $(H)$, $\mathrm{cost}(C_{\mathrm{exp}})\le m$.
-
-\emph{Case $\mathrm{FreeSize}=0$.}  Then $C_{\mathrm{exp}}$ uses only original
-columns other than $p$, hence is a feasible original cover and
-$\mathrm{cost}(C_{\mathrm{exp}})\ge m$.  So equality holds.
-
-\emph{Case $\mathrm{FreeSize}\ge 1$.}  Every row covered by $f$ is covered by $p$
-($f<p$), so $C'=(C_{\mathrm{exp}}\setminus\{f\})\cup\{p\}$ is a feasible original
-cover.  Under unit or dimension-monotone weights $\mathrm{cost}(C')\le
-\mathrm{cost}(C_{\mathrm{exp}})\le m\le\mathrm{cost}(C')$, so $C'$ is optimal, and
-irredundant reduction cannot increase cost.
-\end{proof}
-
-\noindent\textbf{Remark (what is and is not proved).}  The theorem is a
-\emph{reduction}: it holds if $(H)$ does.  It does \emph{not} say that
-cover-admissibility (Definition~\ref{def:admissible}) implies $(H)$; Section~\ref{sec:negative}
-exhibits instances where the predicate holds, the collapse branch fires, and the
-result is suboptimal, so $(H)$ must fail there.  Both cases above are mechanically
-re-checked only on finite audits, not in Lean.
-
-\begin{corollary}
-At a cyclic-core node with a collapsible cube and hypothesis $(H)$, collapse-branch reduces the
-branching factor from two recursive calls to one.
-\end{corollary}
-
-\subsection{The $\mathrm{Out\_complex}$ formulation and why $(H)$ cannot be dropped}
-\label{sec:outcomplex}
-
-One can state the single-branch idea without introducing free-face columns at all.
-Let $\mathrm{FF}_c\in P$ be a collapsible prime of unit weight~$1$, and consider
-the four-step \emph{$\mathrm{Out\_complex}$ procedure}
-(\textsf{topospine.cover.out\_complex}):
-\begin{enumerate}
-\item Remove $\mathrm{FF}_c$ from the prime set while keeping its intersection
-faces with $P\setminus\{\mathrm{FF}_c\}$ in $\mathrm{Out\_complex}=(R_{\mathrm{out}},P\setminus\{\mathrm{FF}_c\})$.
-\item Compute a minimum cover $M=\mathrm{MinCov}(\mathrm{Out\_complex})$.
-\item If $M$ already covers every row of $\mathrm{FF}_c$ in $R$
-($\mathrm{Intersection}(M,\mathrm{FF}_c)=\mathrm{FF}_c$), return $M$.
-\item Otherwise return $\mathrm{Reduced}(M\cup\{\mathrm{FF}_c\})$.
-\end{enumerate}
-
-\begin{proposition}[$\mathrm{Out\_complex}$ transport; Lean \textsf{OutComplex.lean}]
-\label{prop:outcomplex}
-Whenever $R\setminus\mathrm{rows}(\mathrm{FF}_c)\subseteq R_{\mathrm{out}}\subseteq R$:
-\begin{enumerate}[(a)]
-\item Steps~3--4 return a feasible cover of $(R,P)$ unconditionally
-(\textsf{out\_collapse\_feasible}).
-\item Because $R_{\mathrm{out}}\subseteq R$, every exclude-$\mathrm{FF}_c$ cover is
-feasible on $\mathrm{Out\_complex}$, so $\mathrm{cost}(M)\le\mathrm{cost}(C_{\mathrm{out}})$
-holds unconditionally; in Step~3 optimality requires \emph{only}
-$\mathrm{cost}(M)\le\mathrm{cost}(C_{\mathrm{in}})$
-(\texttt{step3\_optimal\_from\_in\_bound}).
-\item The output is globally optimal if and only if $(H_{\mathrm{out}})$ holds:
-$\mathrm{cost}(M)\le\mathrm{cost}(C_{\mathrm{in}})$ when Step~3 fires, and, when Step~4
-fires,
-\[
-\mathrm{cost}\bigl(\mathrm{Reduced}(M\cup\{\mathrm{FF}_c\})\bigr)
-\;\le\; \min\bigl\{\mathrm{cost}(C_{\mathrm{in}}),\,\mathrm{cost}(C_{\mathrm{out}})\bigr\}
-\quad (\texttt{out\_collapse\_optimal}).
-\]
-\end{enumerate}
+\begin{proposition}[No blind existential 1-recursion on all Layer-0 cyclic cores]
+\label{prop:layer0-cex}
+Even allowing existential choice of collapsible prime and free face:
+(i)~swap-only fails on an $n=5$, $9\times 9$ Blake-prime cyclic core with unique
+collapsible prime \texttt{0-10-} ($\mathrm{opt}=4$, every free-face swap $=5$;
+Lean \textsf{layer0\_n5\_9x9\_swap\_counterexample}); and
+(ii)~force-include ($C_{\mathrm{in}}$) fails on an $n=6$, $12\times 13$ bridged
+double-$6$-cycle Blake-prime cyclic core with unique collapsible prime
+\texttt{--0000} ($\mathrm{opt}=6$, $C_{\mathrm{in}}=7$, while free-face push-down
+splits it into two $6\times 6$ blobs with $0$ B\&B nodes; Lean
+\textsf{layer0\_n6\_12x13\_include\_counterexample}).
 \end{proposition}
 
-\noindent\textbf{Why $(H_{\mathrm{out}})$ cannot be omitted (three minimal witnesses).}
-\begin{enumerate}
-\item \emph{Bridge redundancy ($n=3$, 4 minterms, 3 edges).}  On
-$R=\{100,000,001,011\}$ with primes $\{-00,00-,0-1\}$ and $\mathrm{FF}_c={-00}$,
-keeping the shared vertex $000$ in $\mathrm{Out\_complex}$ forces
-$M=\{00-,0-1\}$ (cost~2).  Raw Step~4 ($M\cup\{-00\}$) has cost~3 vs.\ optimum~2;
-applying $\mathrm{Reduced}$ drops $00-$ and restores exact optimality on all
-$198$ collapsible $n=3$ Boolean functions.
-\item \emph{Collar lock-in ($P_6$ in $n=4$, 6 minterms, 5 edges; Lean \texttt{path6\_collar\_lockin}).}
-Along the 6-vertex path ($e_1={-000}=\mathrm{FF}_c$)
-\[
-1000 \stackrel{e_1}{\text{---}} 0000 \stackrel{e_2}{\text{---}} 0010
-\stackrel{e_3}{\text{---}} 0011 \stackrel{e_4}{\text{---}} 0111
-\stackrel{e_5}{\text{---}} 0101,
-\]
-keeping the shared vertex $0000$ in $\mathrm{Out\_complex}$ yields the 5-vertex
-path $P_5$, on which $M=\{e_2,e_4,e_5\}$ is a valid minimum cover of cost~3.
-Step~4 produces $\{e_1,e_2,e_4,e_5\}$ of cost~4, which is \emph{irredundant}
-($1000$ needs $e_1$, $0010$ needs $e_2$, $0011$ needs $e_4$, $0101$ needs $e_5$),
-whereas $\{e_1,e_3,e_5\}$ covers $P_6$ with cost~3.
-\item \emph{Cyclic-core shared boundary ($n=4$ vs.\ $n=5$).}  After essential
-removal, no remaining minterm belongs to $\mathrm{FF}_c$ alone: a 1-dimensional
-free face $f=\{v_1,v_2\}<\mathrm{FF}_c$ can have $v_1\in q_1$ and $v_2\in q_2$
-for distinct primes $q_1\neq q_2$ without $f\le q_i$.  Hence keeping shared
-minterms sets $R_{\mathrm{out}}=R$, so Step~3 \emph{always} fires and returns
-$C_{\mathrm{out}}$ (failing on $192/1\,544$ $n=4$ cyclic cores; smallest: $9\times 9$,
-cost~5 vs.~4).  Conversely, dropping all rows of $\mathrm{FF}_c$ sets Step~4 to
-$C_{\mathrm{in}}$; exhaustively, \emph{every} collapsible prime in all $1\,544$
-$n=4$ cyclic cores ($4\,368$ collapsible columns across all $65\,535$ functions)
-lies in a minimum cover (0 mismatches), before failing at $n=5$ ($9\times 9$ core
-with $\mathrm{FF}_c={1\text{--}00}$: $C_{\mathrm{in}}$ costs~5 while
-$C_{\mathrm{out}}$ costs~4).
+\subsection{Horn retraction, ambient expansions, complement duality, and collapsible chains}
+\label{sec:horn-chains}
+
+Rather than replacing $f_{\mathrm{top}}$ by $f$ alone, Whitehead's elementary
+collapse removes $R_f=\{f,f_{\mathrm{top}}\}$ and retracts $f_{\mathrm{top}}$ onto
+its \emph{horn} $\Lambda_f(f_{\mathrm{top}})=\partial f_{\mathrm{top}}\setminus\{f\}$.
+
+\begin{theorem}[Constructive Layer-0 variants and collapsible horn chains]
+\label{thm:horn-chains}
+Let $(R,P_{\mathrm{cc}})$ be a unit-weight Layer~0 cyclic core of an ON-set
+$F\subseteq Q_n$ with prime complex $C(F)$ and complement $\overline{F}=Q_n\setminus F$.
+\begin{enumerate}[(a)]
+\item \emph{Horn retraction (H1).}  Replacing $f_{\mathrm{top}}$ ($\dim\ge 1$) by
+$\Lambda_f(f_{\mathrm{top}})$ covers $100\%$ of~$R$, induces
+$H^*(K;\mathbb{F}_2)\cong H^*(K\setminus R_f;\mathbb{F}_2)$, and satisfies
+$\mathrm{opt}(\mathrm{CC}_{\mathrm{horn}})=\mathrm{opt}(\mathrm{CC})$ iff some
+minimum cover excludes $f_{\mathrm{top}}$ or covers
+$(f_{\mathrm{top}}\cap R)\setminus h$ without $f_{\mathrm{top}}$ for \emph{some}
+$h\in\Lambda_f(f_{\mathrm{top}})$ ($0/2\,519$ IFF mismatches on $n=5$ cores).
+Horn retraction strictly dominates single-face swap ($94.3\%$ vs.\ $92.6\%$; Lean
+\textsf{horn\_beats\_single\_swap\_5x4} checks a $5\times 4$ 3-cube core where
+$\mathrm{opt}=2$, single swap $=3$, and horn retraction $=2$ via a side face).
+\item \emph{Cylinder and cone-prism expansions (H2).}  Global product
+$\mathrm{CC}\times I^m$ preserves primes, free faces, cohomology, and $\mathrm{opt}$
+(Lean \textsf{cylinder\_product\_opt\_eq}).  The contractible ambient cone-prism
+$E(F)=(F\times\{0\})\cup(Q_n\times\{1\})\subseteq Q_{n+1}$ lifts every
+$p\in P(F)$ to $p\times\texttt{-}$ against complement $\overline{F}\times\{0\}$
+with exact roof offset $\mathrm{opt}(E(F))=1+\mathrm{opt}(F)$ when $F\neq Q_n$.
+\item \emph{Complement boundary duality (H3).}  For $p\in P(F)$ and codimension-1
+$f<p$, $f$ is a free face of~$p$ in $C(F)$ iff every external normal reflection
+$f|_{x_j:=1-p_j}$ ($p_j\in\{0,1\}$) meets $\overline{F}$ ($0/14\,682$ mismatches
+on $n=5$; Lean \textsf{extension\_blocked\_iff\_meets\_complement}), deciding free
+faces in $\le n-\dim(p)$ queries without enumerating $P(F)$.
+\item \emph{Controlled collapsible horn chains (H4).}  Maximal horn chains
+$K_0\searrow\cdots\searrow K_{\mathrm{spine}}$ preserve $H^*(-;\mathbb{F}_2)$
+($0/195$ mismatches), and filtration-compatible chains
+($\mathrm{birth}(f)=\mathrm{birth}(f_{\mathrm{top}})$) preserve persistent
+cohomology Betti curves identically while compressing filtered cells to $52.1\%$.
+Across $K$ randomized chains (\textsf{controlled\_horn\_chain\_cover}),
+$L_{\mathrm{MIS}}\le\mathrm{opt}\le U_{\mathrm{best}}$ with exact hit rate rising
+from $82.6\%$ ($K=1$) to $92.8\%$ ($K=8$) and $60.5\%$ certified optimal in zero
+B\&B via $U_{\mathrm{best}}=L_{\mathrm{MIS}}$ (Table~\ref{tab:horn-chains}; Lean
+\textsf{chain\_preserves\_invariant}, \textsf{controlled\_chain\_window\_and\_cert}).
 \end{enumerate}
+\end{theorem}
+
+\section{Espresso variants and Horn escape from \texttt{sccc} stalls}
+\label{sec:espresso-horn}
+
+\begin{theorem}[Espresso-Horn and the Roth extremal hierarchy]
+\label{thm:espresso-horn}
+\begin{enumerate}[(a)]
+\item \emph{Roth extremal hierarchy.}  A $0$-dimensional Roth extremal (essential
+prime~$p$) forces $\mathrm{opt}(K)=1+\mathrm{opt}(K/p)$.  A codimension-$1$
+zero-loss free face ($F_p(f)=\emptyset$) is the offset-$0$ case: push-down
+preserves $\mathrm{opt}$ while lowering dimension by~$1$ (Lean
+\textsf{roth\_extremal\_hierarchy}).
+\item \emph{Horn escape from Espresso \textsf{REDUCE} stalls (E1).}  Classical
+Espresso-II \textsf{REDUCE} shrinks each cube~$p$ to
+$\mathrm{sccc}(p\setminus\mathrm{others})$ and stalls whenever every cube has
+antipodal private points ($\mathrm{sccc}=p$), possibly at suboptimal cost.
+Splitting an \texttt{sccc}-locked cube along a free-face horn
+$\Lambda_f(p)$ and re-running \textsf{IRREDUNDANT}/\textsf{EXPAND} strictly
+drops cover cardinality to $\mathrm{opt}$ on a concrete $5\times 4$ Layer~0
+witness (Lean \textsf{sccc\_stall\_escaped\_by\_horn}: stuck irredundant cost~$3$,
+Horn cost~$2$).
+\item \emph{Tightened LP/MIS window.}  With $L=\max(L_{\mathrm{MIS}},\lceil z_{\mathrm{LP}}\rceil)$
+from an MIS packing lower bound and the HiGHS LP relaxation of the residual
+covering table, every feasible horn-chain upper bound~$U$ satisfies
+$L\le\mathrm{opt}\le U$, and $U=L$ certifies optimality with zero B\&B (Lean
+\textsf{tightened\_lp\_mis\_window}).
+\end{enumerate}
+\end{theorem}
+
+\begin{definition}[Espresso-family baselines]
+\label{def:espresso-variants}
+\textsf{TopoSpine} implements six comparable cube-array minimizers in
+\textsf{espresso\_variants.py}:
+\textsf{espresso\_ii} (Brayton et al.), \textsf{espresso\_signature} (McGeer et al.),
+\textsf{boom\_cd} (Fi\v{s}er--Hlavi\v{c}ka), \textsf{abc\_isop} (\texttt{yosys-abc}
+\texttt{read\_pla; collapse; sop; write\_pla}), \textsf{highs\_lp\_ilp\_bound}
+(SciPy HiGHS $\lceil z_{\mathrm{LP}}\rceil$ / MILP), and \textsf{espresso\_horn}
+(H3 duality + L0-A push-down + Horn-guided \textsf{REDUCE} + H4 chains).
+\end{definition}
 
 \begin{example}[Coppola--Weiss 2007 cyclic core]
 \label{ex:cyccore}
-Figure~\ref{fig:cyccore} realizes a nine-cell cyclic core whose graded
-covering table is the $9\times 9$ incidence matrix of
-Coppola--Weiss~\cite{coppola2007} (Table~1 of the 2006/07 draft).  The six
-outer primes $p_1,\ldots,p_6$ each have a free face; the three inner primes
-$p_7,p_8,p_9$ do not.  Choosing $p_1$ as the collapsible cell removes that
-column, inserts its free-face column(s), and recurses once---after which any
-used free face is restored to $p_1$.  The instance is encoded in
-\textsf{TopoSpine} as \textsf{coppola\_2007\_graded} (derived typed $T_C$).
+Figure~\ref{fig:cyccore} realizes a nine-cell cyclic core whose graded covering
+table is the $9\times 9$ incidence matrix of Coppola--Weiss~\cite{coppola2007}.
+Single-face \textsf{CoveringAwareCollapsePass} is vacuous (all free faces
+inadmissible).  \textsf{HornRetractionCollapsePass} replaces a collapsible top
+cube by its active horn and reduces dimension non-vacuously while preserving
+$H^*(K;\mathbb{F}_2)$.
 \end{example}
 
 \section{Cover cohomology and total unimodularity}
@@ -289,35 +302,40 @@ homology of links in $\Delta(f)$; $\beta_0$ counts partition components,
 $\beta_1$ detects independent overlap cycles in the cyclic core.
 \end{proposition}
 
-\begin{theorem}[TU residue, informal]
+\begin{theorem}[TU residue --- PROPOSED, informal]
 \label{thm:tu}
+\textit{Status:} PROPOSED (not claimed as a proved theorem).
 If the cyclic-core matrix $A^*$ is totally unimodular, the minimum-cost cover
 is an LP optimum.  If not, Krishnamoorthy--Smith neutralization~\cite{ks2018}
 applies to a subcomplex; the non-TU part coincides with the hard cyclic core.
 Collapse-branch reduces matrix size regardless.
 \end{theorem}
 
-Full proof and simplicial/cubical translation appear in the companion notes
-\textsf{notes/cohomology-tu-bridge.md}.
+\noindent Informal discussion and notes appear in
+\textsf{docs/} companions; no general TU theorem is formalized.
 
 \section{Experiments}
 \label{sec:experiments}
 
 We implemented \textsf{TopoSpine} (\textsf{python/topospine}).  Graded covering
-tables are \emph{derived} from typed cubical complexes (no
-\texttt{row\_cubes=None} parent-column clones).  An exhaustive auditor compares
-standard B\&B and collapse-branch on cost, recursive calls, total nodes, and
-wall time.  Example~\ref{ex:suspension} ($k=3$ suspension sphere) remains the
-negative control: zero collapsible columns.  Exact $\mathbb{F}_2$ Betti numbers
-and full-minor TU tests (including a $C_5$ non-TU witness) are part of the
-Loop~1 kernel.
+tables are \emph{derived} from typed cubical complexes.  Head-to-head
+Espresso-family benchmarks (\textsf{run\_espresso\_horn\_bench.py}) compare
+\textsf{espresso\_ii}, Signature, BOOM CD-Search, ABC ISOP, plain B\&B / HiGHS,
+and \textsf{espresso\_horn} on random $n=5,6$ cores, \texttt{sccc}-locked traps,
+sparse high-$n$ cube arrays, and $.pla$ specs.  Horn-chain audits and Layer~0
+blob push-down remain in Tables~\ref{tab:horn-chains}--\ref{tab:layer0-blobs}.
+\textsf{HornRetractionCollapsePass} is non-vacuous on the 2007 core and on
+synthetic 3-cube complexes where single-face covering collapse stalls or only
+shrinks by one face.
 
-\paragraph{Where one recursion pans out.}
-Block-diagonal tilings of the 2007 core remain useful stress tests; historical
-\textsf{TopoSpine} call-count wins ($71\!\to\!57$, $431\!\to\!219$) are retained as
-regression targets under identical preprocessing.  Section~\ref{sec:negative}
-reports the audits.  Metrics report both recursive calls
-\emph{and} total search nodes / runtime.
+\input{../../benchmarks/results/layer0_blob_audit_table.tex}
+\input{../../benchmarks/results/horn_chain_audit_table.tex}
+\input{../../benchmarks/results/espresso_horn_bench_table.tex}
+
+\paragraph{Regression targets.}
+Block-diagonal tilings of the 2007 core remain stress tests; historical
+call-count wins ($71\!\to\!57$, $431\!\to\!219$) are retained under identical
+preprocessing.  Section~\ref{sec:negative} reports negative audits.
 
 \begin{figure}[ht]
 \centering
@@ -327,62 +345,49 @@ are collapsible; inner $7$--$9$ are not.}
 \label{fig:cyccore}
 \end{figure}
 
-\section{Negative results: admissibility is not sufficient; shotgun shelling fails}
+\section{Counterexample sharpness on Layer-0 cores}
 \label{sec:negative}
-We audited collapse-branch (with the admissibility predicate enforced) against an
-exact oracle on Boolean covering instances (rows: ON-set minterms; columns: prime
-implicants; unit weights).
 
 \begin{itemize}
-\item \textbf{$n\le 4$.}  On all $2^8$ ($n=3$) and all $2^{16}$ ($n=4$) functions the
-collapse branch fired on 330 instances and never disagreed with the exact optimum.
-\item \textbf{$n=5$.}  On 1\,500 sampled functions the branch fired on 36 and was
-suboptimal on \textbf{2} (cost 9 vs.\ exact 8, and 8 vs.\ 7; both confirmed by the
-exhaustive oracle).  Hence the \emph{implemented} claim is false; Theorem~\ref{thm:collapse}
-survives only as the reduction to $(H)$.  Certified synthesis in \textsf{TopoSpine} therefore
-uses plain branch-and-bound for its optimality witnesses and keeps collapse-branch as an
-audited comparator.
-A later draw of 40\,000 functions (seed 21) disagreed with plain branch-and-bound
-on 42 instances (rate $0.00105$, Wilson 95\% interval $[0.00078,0.00142]$).
-The branch fired on 856, and $4.9\%$ of those firings disagreed
-($[0.037,0.066]$).  That comparison is against branch-and-bound, not a fresh
-exhaustive oracle.  Decidable filters aimed at $(H)$ were vacuous on a
-4\,000-function slice (equal row support, vertex faces, edge parents) or still
-refuted (a face covering at most one row).
-\item \textbf{Shotgun shelling.}  Collapsing several admissible pairs at once and decoding
-(rules: all pairs; pairwise row-disjoint pairs; row-disjoint plus a coverability guard) is
-\emph{not} optimality-preserving.  On $n=4$ the guarded rule still returns a suboptimal cover
-on 33 of 864 nontrivial instances (smallest: a 7-column instance, optimum~4, shotgun~5); the
-unguarded rules additionally leave the reduced table infeasible in 672 cases.
+\item \textbf{Swap-only and force-include.}  Proposition~\ref{prop:layer0-cex}:
+$9\times 9$ swap counterexample and $12\times 13$ bridged double-$6$-cycle
+include counterexample (Lean \texttt{native\_decide}).
+\item \textbf{Single-face covering collapse.}  Vacuous on the 2007 core (C21);
+Horn retraction is non-vacuous on the same instance.
+\item \textbf{Shotgun shelling.}  Simultaneous admissible free-face batches are
+\emph{not} optimality-preserving (C9; Table~\ref{tab:shotgun}).
+\item \textbf{Classical collapse-branch.}  On $n=5$ samples the implemented
+admissibility-guarded branch disagrees with exact optima; certified synthesis
+uses plain B\&B / Espresso-Horn windows, with collapse-branch as a comparator.
 \end{itemize}
-Table~\ref{tab:shotgun} gives the counts; the $n=5$ row is a sample, not an exhaustive result.
+Visual $2$D intuition for the older grid far-side story is in
+\texttt{intuition\_examples.pdf}.
 
 \input{../../benchmarks/results/shotgun_audit_table.tex}
 
-\noindent The call-count regression targets above ($71\!\to\!57$, $431\!\to\!219$) are tiled
-copies of the 2007 core under identical preprocessing; they say nothing about the failure
-rate on random instances and should not be read as an average-case speedup.
-
 \section{Conclusion}
 
-The cyclic core is a complex: collapsibility from simple-homotopy theory,
-cohomology from nerves and Stanley--Reisner theory, and integrality from
-total unimodularity jointly explain when covering is easy or hard.
+The cyclic core is a cubical complex: Roth extremals (essentials and free faces),
+Horn retraction, Espresso-family heuristics, and LP/TU bounds jointly explain
+when covering is easy, approximable, or hard---and how to escape
+\texttt{sccc}-locked local minima with certified windows.
 
 \paragraph{Status of the formalization.}  The Lean~4 library builds from a bare
-\texttt{lake build} with no unfinished proofs (checked by a regression test).  It
-contains: the abstract transport lemma (L5); finite, \texttt{decide}-checked
-instances of the elementary-collapse chain contraction on a filled triangle (L3) and of the
-$\mathbb F_2$ cup-product Leibniz rule on a 3-simplex (L6); list-level invariants of
-covering-aware collapse; and the $\mathrm{Out\_complex}$ transport lemmas together with a
-\texttt{decide}-checked proof of the $P_6$ collar lock-in counterexample
-(\textsf{OutComplex.lean}).  It does \emph{not} contain the general collapse theorem, the
-admissibility-implies-$(H)$ claim (which is false), or any TU statement.
+\texttt{lake build} with no unfinished proofs.  It contains Layer-0 legal
+expansion / zero-loss / blob lemmas (\textsf{Layer0CubeArray.lean}); Horn
+retraction, cylinder, complement duality, and chain-window lemmas
+(\textsf{HornChains.lean}); Roth extremal hierarchy, \texttt{sccc}-stall escape,
+and tightened LP/MIS window (\textsf{RothEspressoHorn.lean}); plus older
+\textsf{StarLink}/\textsf{LocalTransform}/\textsf{OutComplex} companions for the
+intuition note.  It does \emph{not} contain a general TU theorem.
 
-\paragraph{Future work.}  A sufficient, checkable condition implying $(H)$; a Bala-led
-analysis of when the cyclic-core residue is TU or neutralizable (proposed, no result
-claimed here); the Lusternik--Schnirelmann cup-length lower bound for covers, currently
-tested in Python only.
+\paragraph{Program companion.}  Paper~E~\cite{paperE} measures Horn covering on
+medical voxels / 2007 cores, spine windows, and classic Espresso / ABC-Horn SOP
+(claims C56--C58).
+
+\paragraph{Future work.}  Larger $.pla$ suites; Bala-led TU/neutralization of
+cyclic-core residues; Lusternik--Schnirelmann cup-length lower bounds (Python
+tested only).
 
 \section*{Acknowledgments}
 The author thanks Richard Weiss for early discussions and collaboration on
@@ -391,6 +396,37 @@ the 2006--2007 manuscript \emph{Cyclic Core Covering and Finite Cell Complexes}
 
 \bibliographystyle{plain}
 \begin{thebibliography}{99}
+
+\bibitem{paperE}
+A.~J. Coppola.
+\newblock Horn retraction and controlled chains for certified TDA spines, with
+Espresso/ABC extensions.
+\newblock TopoSpine Paper~E (arXiv Wave~1 companion; ID pending), 2026.
+
+\bibitem{quine1952}
+W.~V. Quine.
+\newblock The problem of simplifying truth functions.
+\newblock \emph{Amer. Math. Monthly}, 59(8):521--531, 1952.
+
+\bibitem{mccluskey1956}
+E.~J. McCluskey.
+\newblock Minimization of Boolean functions.
+\newblock \emph{Bell System Tech.\ J.}, 35(6):1417--1444, 1956.
+
+\bibitem{brayton1984}
+R.~K. Brayton, G.~D. Hachtel, C.~T. McMullen, and A.~L. Sangiovanni-Vincentelli.
+\newblock \emph{Logic Minimization Algorithms for VLSI Synthesis}.
+\newblock Kluwer, 1984.
+
+\bibitem{mcgeer1993}
+P.~C. McGeer, J.~V. Sanghavi, R.~K. Brayton, and A.~L. Sangiovanni-Vincentelli.
+\newblock Espresso-Signature: a new exact minimizer for logic functions.
+\newblock \emph{IEEE Trans.\ VLSI}, 1(4):432--440, 1993.
+
+\bibitem{fiser2003}
+P.~Fi\v{s}er and J.~Hlavi\v{c}ka.
+\newblock BOOM---a heuristic Boolean minimizer.
+\newblock \emph{ICCAD}, 2003.
 
 \bibitem{coudert1994}
 O.~Coudert.

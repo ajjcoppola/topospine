@@ -11,21 +11,28 @@ emptied.  The verifier (`verify_pass_trace`) rejects a deletion-style pass or a 
 emptying while `mode == "covering"`.  Covering mode is **vacuous** on the 2007 core and on a
 solid voxel blob (no admissible free face): that is a recorded negative result.
 
-## 2. Collapse-branch is audited, not trusted
+## 2. Free-face local transform + Link(opp) window (Paper A sandbox)
 
-The checkable predicate `CoverAdmissibleFreeFace` does *not* imply the transport hypothesis
-(H) of Paper A.  Exhaustively: no disagreement with the exact optimum for all n ≤ 4; two
-disagreements in 1500 sampled n = 5 instances (costs 9 vs 8 and 8 vs 7).  Hence certified
-covers use plain B&B, and the checker compares them against the exhaustive oracle.
+**Vocabulary:** Layer 0 vs Layer 1 in `docs/definitions-cube-array.md`. The items
+below are **Layer 1** (grid surrogate) unless re-proved for minterm×cube arrays.
 
-The `Out_complex` 4-step formulation (`topospine.cover.out_complex`, Lean `TopoSpine/OutComplex.lean`)
-makes the transport barrier concrete without free-face columns:
-* with `ReducedCov`, all 198 collapsible `n = 3` Boolean functions agree with the exact optimum;
-* on the 6-vertex, 5-edge path `P_6` (`n = 4`), keeping the shared vertex `0000` in `Out_complex`
-  causes **collar lock-in** (`{e1, e2, e4, e5}` irredundant of cost 4 vs optimum `{e1, e3, e5}` of cost 3,
-  proved by `decide` in `OutComplex.lean`);
-* on cyclic cores, dropping all rows of `FF_c` (`= C_in`) succeeds on **all 1,544 `n = 4` cyclic cores**
-  (4,368 collapsible columns) and first fails at `n = 5` (cost 5 vs 4).
+**Face rows.** Free face of square `p` ⇒ `p` essential and
+`opt = 1 + opt(K/p)` (`star_collapse_face_rows`, Lean `StarLink.lean`, claim C42).
+
+**Vertex rows (far-side).** Replace collapsible square `p` by free face `f`,
+solve once, decode `f→p`, then **put-back**. Exact criterion
+(`cover.grid2d`, Lean `LocalTransform.lean`):
+`opt(P') = opt(P)` iff some optimum excludes `p` or covers the far side
+`F_p = (V(p) ∩ R) \ V(f)` without `p`.  Sufficient condition
+`|F_p| = |V(f) ∩ R| = 1` fires on 33% of 3×3 pairs with zero failures.
+
+**Vertex rows (Link approx).** `Out_link = Link(opp(f))` with collar `V(opp)`:
+`L = MinCov(Out_link)`, `U = cost(Reduced(M ∪ {p}))` satisfy `L ≤ opt ≤ U`
+(claim C43). Stitch + window `(L,U)` is an approx-min certificate for downstream
+cohomology checkers (C44) — not a free cohomology theorem.
+
+`Out_complex` Boolean path `P_6` collar lock-in remains a **non-core** witness.
+One-recursion absolute-min on Layer-0 cyclic cores is **deferred** (C45).
 
 ## 3. Shotgun (simultaneous) shelling is not optimality-preserving (claim C9, disproved)
 

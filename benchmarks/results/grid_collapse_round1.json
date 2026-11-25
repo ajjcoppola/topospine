@@ -1,0 +1,31 @@
+{
+  "round": 1,
+  "candidate": "far_empty",
+  "results": {
+    "3x3": {
+      "name": "far_empty",
+      "total": 32288,
+      "fires": 5700,
+      "failures": 0,
+      "fire_rate": 0.17653617443012884,
+      "pass": true,
+      "trivial_ok": true,
+      "grid": "3x3",
+      "trivial": true,
+      "wall_s": 3.4193821668159217
+    },
+    "3x4": {
+      "name": "far_empty",
+      "total": 24246,
+      "fires": 5505,
+      "failures": 0,
+      "fire_rate": 0.22704776045533284,
+      "pass": true,
+      "trivial_ok": true,
+      "grid": "3x4_sample",
+      "trivial": true,
+      "wall_s": 3.300536082824692
+    }
+  },
+  "stop_pass": false
+}

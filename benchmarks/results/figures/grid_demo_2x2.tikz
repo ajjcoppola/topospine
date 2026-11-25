@@ -1,0 +1,9 @@
+\begin{tikzpicture}[x=0.55cm,y=0.55cm,every node/.style={font=\scriptsize}]
+\node[anchor=south] at (1.0,2.4) {filled / hollow demo};
+\draw[fill=black!18] (0,0) rectangle ++(1,1);
+\draw[fill=white] (0,1) rectangle ++(1,1);
+\draw[thick] (0,1) rectangle ++(1,1);
+\draw[fill=white] (1,0) rectangle ++(1,1);
+\draw[thick] (1,0) rectangle ++(1,1);
+\draw[fill=black!18] (1,1) rectangle ++(1,1);
+\end{tikzpicture}

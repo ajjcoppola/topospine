@@ -7,3 +7,8 @@ import TopoSpine.FilteredRelative
 import TopoSpine.CoveringCollapse
 import TopoSpine.Cocycle
 import TopoSpine.OutComplex
+import TopoSpine.LocalTransform
+import TopoSpine.StarLink
+import TopoSpine.Layer0CubeArray
+import TopoSpine.HornChains
+import TopoSpine.RothEspressoHorn

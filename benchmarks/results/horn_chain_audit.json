@@ -1,0 +1,31 @@
+{
+  "complement_free_face_duality": {
+    "candidate_faces_checked": 14682,
+    "mismatches": 0
+  },
+  "horn_replacement_vs_single_swap": {
+    "n5_cores": 195,
+    "pairs_checked": 2519,
+    "horn_iff_mismatches": 0,
+    "single_face_swap_exact": 2332,
+    "single_face_swap_rate": 0.925764192139738,
+    "horn_replacement_exact": 2376,
+    "horn_replacement_rate": 0.9432314410480349
+  },
+  "collapsible_chains": {
+    "n5_cores": 195,
+    "cohomology_mismatches": 0,
+    "persistent_cohomology_mismatches": 0,
+    "avg_filtered_cell_ratio": 0.5210976095869795,
+    "approx_k1_exact": 161,
+    "approx_k1_rate": 0.8256410256410256,
+    "prob_k4_exact": 179,
+    "prob_k4_rate": 0.9179487179487179,
+    "prob_k8_exact": 181,
+    "prob_k8_rate": 0.9282051282051282,
+    "prob_k8_certified_optimal_zero_bb": 118,
+    "prob_k8_certified_rate": 0.6051282051282051,
+    "exact_mode_mismatches": 0
+  },
+  "wall_s": 9.11647945898585
+}

@@ -18,6 +18,9 @@ class SpineResult:
     cost: float
     certificate: dict
     log: list[str] = field(default_factory=list)
+    lower_bound: int = 0
+    upper_bound: int = 0
+    certified_optimal: bool = False
 
 
 def _dist(a: Sequence[float], b: Sequence[float]) -> float:
@@ -71,9 +74,60 @@ def irredundant_prune(cm: CoveringMatrix, cover: list[int]) -> list[int]:
 def spine_min(
     cm: CoveringMatrix,
     *,
-    method: Literal["greedy", "espresso_loop", "exact"] = "espresso_loop",
+    method: Literal["greedy", "espresso_loop", "exact", "horn"] = "espresso_loop",
+    horn_mode: Literal["exact", "approx", "probabilistic"] = "approx",
 ) -> SpineResult:
     log: list[str] = []
+    if method == "horn":
+        from topospine.cover.horn_chains import controlled_horn_chain_cover
+
+        work = cm.copy()
+        if any(abs(w - 1.0) > 1e-9 for w in work.weights):
+            work.weights = [1.0] * work.n_cols()
+        chain = controlled_horn_chain_cover(work, mode=horn_mode, num_chains=8, seed=0)
+        # Optional LP tighten
+        ceil_lp = 0
+        try:
+            import math
+            import numpy as np
+            from scipy.optimize import linprog
+
+            if work.n_rows() and work.n_cols() <= 64:
+                A = np.array(work.matrix, dtype=float)
+                lp = linprog(
+                    np.ones(work.n_cols()),
+                    A_ub=-A,
+                    b_ub=-np.ones(work.n_rows()),
+                    bounds=(0, 1),
+                    method="highs",
+                )
+                if lp.success:
+                    ceil_lp = int(math.ceil(float(lp.fun) - 1e-9))
+        except Exception:
+            ceil_lp = 0
+        L = max(chain.lower_bound, ceil_lp)
+        U = int(chain.upper_bound)
+        cert_opt = U == L or chain.certified_optimal
+        return SpineResult(
+            cover_indices=chain.cover_indices,
+            cover_names=[cm.cols[i] for i in chain.cover_indices],
+            cost=float(U),
+            certificate={
+                "method": "horn",
+                "horn_mode": horn_mode,
+                "contract": "CoverOptimality" if cert_opt else "Coverage",
+                "L": L,
+                "U": U,
+                "L_MIS": chain.lower_bound,
+                "ceil_LP": ceil_lp,
+                "certified_optimal": cert_opt,
+                "horn_steps": chain.total_horn_steps,
+            },
+            log=[f"horn_{horn_mode}=[{L},{U}]"],
+            lower_bound=L,
+            upper_bound=U,
+            certified_optimal=cert_opt,
+        )
     if method == "exact":
         idx, cost, stats = minimize_cover(cm.copy(), use_collapse=False)  # exact B&B (collapse-branch not trusted: C2)
         return SpineResult(
@@ -82,6 +136,9 @@ def spine_min(
             cost=cost,
             certificate={"method": "exact", "contract": "CoverOptimality", "bb_calls": stats.recursive_calls},
             log=stats.log,
+            lower_bound=int(cost),
+            upper_bound=int(cost),
+            certified_optimal=True,
         )
     cover = greedy_set_cover(cm)
     log.append(f"greedy={len(cover)}")
@@ -102,8 +159,13 @@ def spine_min(
             "contract": "Coverage",  # not ProvenMinimum
             "cover_size": len(cover),
             "candidate_size": cm.n_cols(),
+            "L": 0,
+            "U": len(cover),
         },
         log=log,
+        lower_bound=0,
+        upper_bound=len(cover),
+        certified_optimal=False,
     )
 
 

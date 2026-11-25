@@ -11,6 +11,15 @@ from topospine.core.cohomology import CohomologyF2, sphere2, torus7, vertex_star
 from topospine.core.cubes import parse_boolean_cube  # noqa: E402
 from topospine.core.cubical import CubicalComplex  # noqa: E402
 from topospine.cover.auditor import exhaustive_min_cost  # noqa: E402
+from topospine.cover.grid2d import (  # noqa: E402
+    FILLED,
+    HOLLOW,
+    ABSENT,
+    apply_transform,
+    build_grid,
+    collapsible_pairs,
+    to_core,
+)
 from topospine.cover.minimize import minimize_cover  # noqa: E402
 from topospine.cover.out_complex import out_complex_step, path6_collar_lockin_instance  # noqa: E402
 from topospine.cover.shotgun import _instance, shotgun_minimize  # noqa: E402
@@ -65,12 +74,26 @@ def main() -> None:
     print(f"C2 n=5 instance: exact {exh5:g}, plain B&B {bb:g}, collapse-branch {br:g} (collapse used {s5.collapse_used}x)")
     assert exh5 == bb < br
 
-    # 4b. Out_complex P6 collar lock-in (n = 4, 6 vertices, 5 edges)
+    # 4b. Grid local transform: 2x3 strip counterexample (vertex rows)
+    cfg = {
+        (0, 0): HOLLOW, (1, 0): ABSENT,
+        (0, 1): FILLED, (1, 1): ABSENT,
+        (0, 2): HOLLOW, (1, 2): ABSENT,
+    }
+    g = build_grid(cfg, 2, 3)
+    core = to_core(g)
+    assert core is not None
+    p, f = collapsible_pairs(core)[0]
+    tres = apply_transform(core, p, f)
+    print(f"grid 2x3 strip: opt {tres.opt:g}, opt(P') {tres.c_exp:g}, put-back {tres.decoded_putback:g}")
+    assert tres.c_exp > tres.opt
+
+    # 4c. Out_complex P6 collar lock-in — Boolean non-core witness
     p6, j_ff = path6_collar_lockin_instance()
     exh_p6, _ = exhaustive_min_cost(p6)
     bad_tie = lambda sub: [sub.cols.index(nm) for nm in ("00-0", "0-11", "01-1")]
     res_p6 = out_complex_step(p6, j_ff, variant="keep_intersection", use_reduced=True, out_solver=bad_tie)
-    print(f"Out_complex P6 : exact {exh_p6:g}, Step {res_p6.step_taken} (irredundant) {res_p6.cost:g} {res_p6.cover_names}")
+    print(f"Out_complex P6 (non-core): exact {exh_p6:g}, Step {res_p6.step_taken} (irredundant) {res_p6.cost:g}")
     assert exh_p6 == 3.0 and res_p6.cost == 4.0
 
     # 5. cohomology

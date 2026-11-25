@@ -1,0 +1,148 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,graphicx,hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\title{Horn Retraction and Controlled Chains for Certified TDA Spines,\\
+with Espresso/ABC Extensions}
+\author{Alan J.\ Coppola\thanks{Optn gn Software. \texttt{ajjc@optngn.com}}}
+\date{arXiv Wave~1 freeze 2026-11-24}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Paper~A established Horn retraction (H1), cylinder/cone-prism expansions (H2),
+complement-boundary duality (H3), controlled collapsible chains (H4), and
+Espresso-Horn escape from \texttt{sccc} stalls with LP/MIS windows (E1).
+Paper~B historically reported that \emph{single-face} covering-mode synthesis was
+vacuous on a solid $8^3$ voxel blob and on the Coppola--Weiss 2007 cyclic core.
+We show Horn theorems are good for TDA \emph{here and now}:
+\textsf{HornRetractionCollapsePass} performs $132$ non-vacuous covering steps on
+the $8^3$ blob (reducing dimension-$3$ tops $81\to 27$) and $9$ steps on the 2007
+core while preserving $H^*(K;\mathbb{F}_2)$.  Spine towers expose certified windows
+$L=\max(L_{\mathrm{MIS}},\lceil z_{\mathrm{LP}}\rceil)\le\mathrm{opt}\le U$.
+For large two-level instances we wrap classic Berkeley Espresso and an
+\textsf{AbcHornSopRefine} SOP pass; full AIG simple-homotopy rewriting is stated
+as Conjecture~E1 (explicitly not claimed).
+\end{abstract}
+
+\noindent\textbf{Keywords:} topological data analysis, Horn retraction, covering
+collapse, Espresso, ABC, certificate-carrying synthesis.
+
+\noindent\textit{Companion:} submitted simultaneously with Paper~A~\cite{paperA}
+(arXiv IDs to be filled after acceptance).
+
+\section{Introduction}
+\label{sec:intro}
+
+TopoSpine is a certificate-carrying rewrite engine for cubical complexes and
+covering IRs~\cite{paperB}.  Its covering mode previously stalled wherever
+single-face admissibility failed---exactly the setting where Horn retraction
+$\Lambda_f(f_{\mathrm{top}})=\partial f_{\mathrm{top}}\setminus\{f\}$
+(Paper~A, H1) is designed to act.  This note wires H1--H4 and Espresso-Horn
+into live programs and measures TDA-relevant deltas: non-vacuous covering
+reduction, filtration-compatible compression, and spine cost windows.
+
+\paragraph{Contributions.}
+(1)~Non-vacuous Horn covering on medical voxels and the 2007 core (C56).
+(2)~Filtration-compatible Horn pass and SpineTower $(L,U)$ windows (C57).
+(3)~Classic Espresso CLI adapter and ABC-Horn SOP refine, with AIG Morse left
+conjectural (C58).
+
+\section{Recap: H1--H4 and Espresso-Horn}
+\label{sec:recap}
+
+We use Paper~A terminology without grid surrogates~\cite{paperA}.
+\begin{itemize}
+\item \textbf{H1} Horn retraction preserves residual coverage and $H^*(\mathbb{F}_2)$.
+\item \textbf{H2} Cylinder / cone-prism expansions (engineering support tests).
+\item \textbf{H3} Free faces via complement duality (no full prime enum).
+\item \textbf{H4} Controlled chains in exact / approx / probabilistic modes.
+\item \textbf{E1} Horn escape from Espresso \textsf{REDUCE}/\texttt{sccc} stalls;
+$L=\max(L_{\mathrm{MIS}},\lceil z_{\mathrm{LP}}\rceil)$.
+\end{itemize}
+
+\section{Program architecture}
+\label{sec:arch}
+
+\textsf{PassManager.covering\_horn()} runs only
+\textsf{HornRetractionCollapsePass} (GridCube-fast path via
+\texttt{collapsible\_cells}).  Homotopy mode prefers
+\textsf{FiltrationCompatibleHornPass} before elementary filtration collapse.
+\textsf{spine\_min(..., method="horn")} and \textsf{build\_cover\_tower(..., spine\_method="horn")}
+attach $(L,U)$ and \texttt{certified\_optimal} to each level.
+
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Medical volumes and the 2007 core}
+Paper~B covering mode: $81\to 81$ cells, zero steps.  Horn covering
+(Table~\ref{tab:medical}): $132$ steps on the $8^3$ blob; 2007 core max-dim
+$2\to 1$ with $H^*$ preserved.
+
+\input{../../benchmarks/results/medical_benchmark_table.tex}
+
+\subsection{SpineTower windows}
+On a $24$-point circle tower, Horn approx attaches windows per level
+(Table~\ref{tab:spine-horn}).
+
+\input{../../benchmarks/results/spine_horn_bench_table.tex}
+
+\subsection{Classic Espresso and ABC-Horn SOP}
+We ship a Berkeley Espresso binary under \texttt{third\_party/espresso/build}
+and compare against ABC ISOP and Espresso-Horn (Table~\ref{tab:classic-espresso}).
+\textsf{AbcHornSopRefinePass} mutates the logic IR when Horn strictly improves
+cube count after an optional ABC ISOP seed.
+
+\input{../../benchmarks/results/classic_espresso_bench_table.tex}
+
+Literature: classic Espresso remains effective into thousands of cubes;
+beyond $\sim 50$k terms, ABC pre-collapse or divide-and-conquer heuristics are
+appropriate~\cite{iccad2021million}.  Horn is a cyclic-core local escape, not a
+million-minterm solver.
+
+\section{Conjecture: AIG simple-homotopy}
+\label{sec:conjecture}
+
+\begin{conjecture}[E1 --- AIG Forman pairing]
+\label{conj:e1}
+There exists a discrete Morse pairing on a cubical (or cellular) lift of an ABC
+AIG cone that realizes elementary collapses preserving the Boolean function on
+the care set and weakly decreasing AND count, extending the SOP Horn refine
+already implemented.
+\end{conjecture}
+
+\noindent We explicitly \emph{do not} claim Conjecture~\ref{conj:e1} for general
+multi-level AIGs until such pairings exist; the SOP refine is the measured cut.
+
+\section{Conclusion}
+Horn retraction closes Paper~B's covering vacuity and supplies certified spine
+windows.  Classic Espresso plus ABC-Horn SOP refine connect the same theorems to
+large two-level practice; AIG Morse remains future work.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+
+\bibitem{paperA}
+A.~J. Coppola.
+\newblock Horn retraction, Roth extremals, and Espresso-Horn for certified
+cyclic-core covering.
+\newblock TopoSpine Paper~A (arXiv Wave~1; ID pending), 2026.
+
+\bibitem{paperB}
+A.~J. Coppola.
+\newblock TopoSpine: certificate-carrying synthesis of filtered cubical and dual
+complexes.
+\newblock TopoSpine Paper~B (Wave~2; patched Horn covering), 2026.
+
+\bibitem{iccad2021million}
+Heuristics for million-scale two-level logic minimization.
+\newblock \emph{ICCAD}, 2021.
+
+\end{thebibliography}
+\end{document}

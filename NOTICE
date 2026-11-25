@@ -1,0 +1,26 @@
+TopoSpine
+Copyright (c) 2026 Alan J. Coppola / Optn gn Software
+
+This product is licensed under the MIT License (see LICENSE).
+
+---------------------------------------------------------------------------
+Third-party: Berkeley Espresso (third_party/espresso)
+---------------------------------------------------------------------------
+
+Portions under third_party/espresso derive from the University of California,
+Berkeley Espresso logic minimizer (Oct Tools Distribution), Copyright (c)
+1988, 1989, Regents of the University of California.  All rights reserved.
+
+Use and copying of that software and preparation of derivative works based
+upon that software are permitted.  Any distribution of that software or
+derivative works must include the Berkeley copyright notice (see
+third_party/espresso/utility/copyright.h and third_party/espresso/README.md).
+
+The software is made available AS IS, and neither the Electronics Research
+Laboratory nor the University of California make any warranty about the
+software, its performance or its conformity to any specification.
+
+Build docs: see third_party/espresso/README.md (CMake / Make).  TopoSpine
+adapters look for an `espresso` binary on PATH or under
+third_party/espresso/build; the binary is not the only supported path —
+source is vendored for reproducibility.
