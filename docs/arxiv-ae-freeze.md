@@ -53,7 +53,8 @@ Grep guard: Paper B must not assert current covering vacuity without
 
 ## Human arXiv steps (Wave 1)
 
-1. Run release gate green on tagged commit.
+1. Run release gate green on tagged commit `v0.1.0-arxiv-ae`
+   (`https://github.com/ajjcoppola/topospine/releases/tag/v0.1.0-arxiv-ae`).
 2. Upload A: `main.pdf` + ancillary `intuition_examples.pdf`.
 3. Upload E same week; E cites A; A cites E as program companion.
 4. Record IDs in `CITATION.cff`, README Papers section, and this file.
